@@ -1,0 +1,10 @@
+services:
+  rmn-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ran-rmn-web:latest
+    container_name: ran-rmn-web
+    ports:
+      - "8080:8080"
+    restart: unless-stopped

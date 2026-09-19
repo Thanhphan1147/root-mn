@@ -1,0 +1,11 @@
+# build artifacts
+/rmn
+/wan
+*.test
+*.out
+coverage.txt
+
+# editor / OS
+.DS_Store
+.idea/
+.vscode/

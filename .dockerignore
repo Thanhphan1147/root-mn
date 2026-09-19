@@ -1,0 +1,9 @@
+.git
+.gitignore
+Dockerfile
+docker-compose.yml
+.dockerignore
+SPEC.md
+Design.md
+testdata
+*.md

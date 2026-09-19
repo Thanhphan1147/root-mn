@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ROOT · Root Machine Notation</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header class="masthead">
+  <div class="brand">
+    <span class="mark">R</span>
+    <div>
+      <h1>ROOT <span class="thin">· base game</span></h1>
+      <p class="sub">rules engine + analysis bench</p>
+    </div>
+  </div>
+  <div class="turnbar" id="turnbar"></div>
+  <button id="autosetup" class="ghost">Quick setup</button>
+  <button id="newgame" class="ghost">New manual setup</button>
+</header>
+
+<main class="bench">
+  <aside class="players" id="players"></aside>
+
+  <section class="boardwrap">
+    <div class="board" id="board"></div>
+    <div class="boardfoot" id="boardfoot"></div>
+  </section>
+
+  <section class="rightcol">
+    <div class="panel">
+      <div class="panel-head"><h2 id="actionhead">Actions</h2><span class="hint" id="pendhint"></span></div>
+      <div class="actions" id="actions"></div>
+    </div>
+    <div class="panel logpanel">
+      <div class="panel-head"><h2>Annotations</h2></div>
+      <ol class="log" id="log"></ol>
+    </div>
+  </section>
+</main>
+<script src="wasm_exec.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
