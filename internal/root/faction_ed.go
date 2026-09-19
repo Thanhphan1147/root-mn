@@ -94,11 +94,19 @@ func (g *Game) legalEDDaylight() []Action {
 				if !g.Relaxed && !g.Rules(ED, from) && !g.Rules(ED, to) {
 					continue
 				}
+				n := g.Clearings[from].Warriors[ED]
 				acts = append(acts, Action{
-					ID:    actID("decree-move", from, to, front.Card),
-					Label: fmt.Sprintf("Decree Move %s → %s (%s)", from, to, front.Card),
-					Kind:  "decree-move", Faction: ED, From: from, To: to, Card: front.Card,
+					ID:    actID("decree-move", from, to, front.Card, "1"),
+					Label: fmt.Sprintf("Decree Move 1 %s → %s (%s)", from, to, front.Card),
+					Kind:  "decree-move", Faction: ED, From: from, To: to, Card: front.Card, Amount: 1,
 				})
+				if n > 1 {
+					acts = append(acts, Action{
+						ID:    actID("decree-move", from, to, front.Card, "all"),
+						Label: fmt.Sprintf("Decree Move all %d %s → %s (%s)", n, from, to, front.Card),
+						Kind:  "decree-move", Faction: ED, From: from, To: to, Card: front.Card, Amount: n,
+					})
+				}
 			}
 		}
 	case "BATTLE":
@@ -132,61 +140,14 @@ func (g *Game) legalEDDaylight() []Action {
 			})
 		}
 	}
-	if g.Relaxed {
-		acts = append(acts, Action{
-			ID:    actID("decree-skip", front.Card),
-			Label: "Skip decree card " + cardName(front.Card) + " (relaxed)",
-			Kind:  "decree-skip", Faction: ED, Card: front.Card,
-		})
-	}
-	if len(acts) == 0 {
-		acts = append(acts, Action{ID: "ed-turmoil", Label: "Turmoil", Kind: "pass", Faction: ED})
-	}
+	// Turmoil is always available while resolving the Decree: if no card can be
+	// resolved it is the only option, otherwise it is an explicit choice.
+	acts = append(acts, Action{
+		ID:    "ed-turmoil",
+		Label: "Turmoil (lose VP per bird, purge Decree, new leader, go to Evening)",
+		Kind:  "ed-turmoil", Faction: ED,
+	})
 	return acts
-}
-
-// checkEDTurmoil triggers turmoil if the front decree card cannot be resolved.
-func (g *Game) checkEDTurmoil() {
-	if g.Relaxed || g.Phase != "D" || g.Current != ED || len(g.DecreeQueue) == 0 || g.EDNeedsLeader {
-		return
-	}
-	front := g.DecreeQueue[0]
-	suit := cardSuit(front.Card)
-	resolvable := false
-	switch front.Column {
-	case "RECRUIT":
-		for _, c := range g.clearingsSorted() {
-			if g.buildingsOf(ED, c, "roost") > 0 && matches(g.Clearings[c].Suit, suit) {
-				resolvable = true
-			}
-		}
-	case "MOVE":
-		for _, from := range g.clearingsSorted() {
-			if matches(g.Clearings[from].Suit, suit) && g.Clearings[from].Warriors[ED] > 0 {
-				for _, to := range g.Clearings[from].Adj {
-					if g.Rules(ED, from) || g.Rules(ED, to) {
-						resolvable = true
-					}
-				}
-			}
-		}
-	case "BATTLE":
-		for _, c := range g.clearingsSorted() {
-			if matches(g.Clearings[c].Suit, suit) && g.Clearings[c].Warriors[ED] > 0 && len(g.enemiesIn(ED, c)) > 0 {
-				resolvable = true
-			}
-		}
-	case "BUILD":
-		for _, c := range g.clearingsSorted() {
-			if matches(g.Clearings[c].Suit, suit) && g.Rules(ED, c) && g.buildingsOf(ED, c, "roost") == 0 &&
-				len(g.Clearings[c].Buildings) < g.Clearings[c].Slots && g.totalBuildings(ED, "roost") < 7 {
-				resolvable = true
-			}
-		}
-	}
-	if !resolvable {
-		g.turmoil()
-	}
 }
 
 func (g *Game) turmoil() {
@@ -256,6 +217,10 @@ func (g *Game) applyED(a Action) error {
 		}
 		g.EDNeedsLeader = false
 		g.Logf(ED, "leader", "Chose leader %s", a.Leader)
+		if g.EDTurmoilRest {
+			g.EDTurmoilRest = false
+			g.beginEvening()
+		}
 	case "decree-recruit":
 		n := 1
 		if p.Leader == "charismatic" {
@@ -265,7 +230,10 @@ func (g *Game) applyED(a Action) error {
 		g.popDecree(a.Card)
 		g.Logf(ED, "decree", "Recruited %d at %s", n, a.Clearing)
 	case "decree-move":
-		n := g.Clearings[a.From].Warriors[ED]
+		n := a.Amount
+		if n <= 0 || n > g.Clearings[a.From].Warriors[ED] {
+			n = g.Clearings[a.From].Warriors[ED]
+		}
 		g.addWarrior(ED, a.From, -n)
 		g.addWarrior(ED, a.To, n)
 		g.popDecree(a.Card)
@@ -278,17 +246,20 @@ func (g *Game) applyED(a Action) error {
 		}
 		// pop decree after battle completes; store pending card in battle context
 		g.popDecree(a.Card)
-	case "decree-skip":
-		g.popDecree(a.Card)
-		g.Logf(ED, "decree", "Skipped decree card %s (relaxed)", cardName(a.Card))
 	case "decree-build":
 		g.Clearings[a.Clearing].Buildings = append(g.Clearings[a.Clearing].Buildings, Building{ED, "roost"})
 		g.popDecree(a.Card)
 		g.Logf(ED, "decree", "Built roost at %s", a.Clearing)
+	case "ed-turmoil":
+		g.turmoil()
+		g.EDTurmoilRest = true
+		if !g.EDNeedsLeader {
+			g.EDTurmoilRest = false
+			g.beginEvening()
+		}
 	default:
 		return fmt.Errorf("unknown ED action %s", a.Kind)
 	}
-	g.checkEDTurmoil()
 	return nil
 }
 

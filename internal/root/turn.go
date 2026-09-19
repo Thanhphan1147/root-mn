@@ -131,7 +131,6 @@ func (g *Game) beginDaylight() {
 		g.MarchMovesLeft = 0
 	case ED:
 		g.buildDecreeQueue()
-		g.checkEDTurmoil()
 	}
 	g.grantCommandWarren(g.Current)
 	g.Logf(g.Current, "daylight", "%s begins Daylight", g.Current)

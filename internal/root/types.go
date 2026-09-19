@@ -149,6 +149,7 @@ type Game struct {
 	EDAdded        int
 	EDBirdAdded    bool
 	EDNeedsLeader  bool
+	EDTurmoilRest  bool
 	WAEveningDrawn bool
 	Winner         []Faction
 	Log            []LogEntry

@@ -50,7 +50,7 @@ func (g *Game) Apply(a Action) error {
 		return g.applyDominance(a)
 	case "mc-recruit", "mc-build", "mc-overwork", "spend-bird":
 		return g.applyMC(a)
-	case "decree-add", "decree-recruit", "decree-move", "decree-battle", "decree-build", "decree-skip", "leader":
+	case "decree-add", "decree-recruit", "decree-move", "decree-battle", "decree-build", "leader", "ed-turmoil":
 		return g.applyED(a)
 	case "revolt", "spread", "mobilize", "train", "organize", "wa-move", "wa-battle", "wa-recruit":
 		return g.applyWA(a)

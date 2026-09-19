@@ -458,3 +458,77 @@ func TestStateRoundTrip(t *testing.T) {
 		}
 	}
 }
+
+func TestEyrieDecreeResolutionAndTurmoil(t *testing.T) {
+	// A resolvable Build card offers resolution; an unresolvable one offers Turmoil.
+	g := newTestGame(t)
+	g.Relaxed = false // test canonical rule requirements
+	g.Current = ED
+	g.Phase = "D"
+	p := g.Players[ED]
+	p.Hand = nil
+
+	// ED rules C3 (Rabbit roost). A Rabbit Recruit card is resolvable there.
+	p.Decree = map[string][]string{"RECRUIT": {"R01"}}
+	g.buildDecreeQueue()
+	hasBuild, hasTurmoil := false, false
+	for _, a := range g.LegalActions() {
+		if a.Kind == "decree-recruit" {
+			hasBuild = true
+		}
+		if a.Kind == "ed-turmoil" {
+			hasTurmoil = true
+		}
+	}
+	if !hasBuild {
+		t.Fatal("resolvable Rabbit Recruit card should offer a decree-recruit option")
+	}
+	if !hasTurmoil {
+		t.Fatal("Turmoil should always be available while resolving the Decree")
+	}
+
+	// A Mouse Build card is unresolvable (ED rules no Mouse clearing).
+	p.Decree = map[string][]string{"BUILD": {"M01"}}
+	g.buildDecreeQueue()
+	hasBuild, hasTurmoil = false, false
+	for _, a := range g.LegalActions() {
+		if a.Kind == "decree-build" {
+			hasBuild = true
+		}
+		if a.Kind == "ed-turmoil" {
+			hasTurmoil = true
+		}
+	}
+	if hasBuild {
+		t.Fatal("unresolvable card should not offer a resolution")
+	}
+	if !hasTurmoil {
+		t.Fatal("unresolvable card must offer Turmoil")
+	}
+
+	// Applying Turmoil runs the penalties, then requires a new leader, then Evening.
+	vpBefore := p.VP
+	if err := g.Apply(Action{ID: "ed-turmoil", Kind: "ed-turmoil", Faction: ED}); err != nil {
+		t.Fatalf("turmoil: %v", err)
+	}
+	if !g.EDNeedsLeader {
+		t.Fatal("turmoil should require choosing a new leader")
+	}
+	if p.Decree["BUILD"] != nil && len(p.Decree["BUILD"]) > 0 {
+		t.Fatalf("decree should be purged, got %v", p.Decree)
+	}
+	if p.VP > vpBefore {
+		t.Fatal("turmoil should not increase VP")
+	}
+	// Choose a leader -> Evening.
+	la := findAction(g, "leader")
+	if la == nil {
+		t.Fatal("expected a leader choice after turmoil")
+	}
+	if err := g.Apply(*la); err != nil {
+		t.Fatalf("leader: %v", err)
+	}
+	if g.Phase != "E" {
+		t.Fatalf("after turmoil + new leader, expected Evening, got %s", g.Phase)
+	}
+}
