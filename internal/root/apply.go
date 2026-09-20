@@ -3,7 +3,7 @@ package root
 import "fmt"
 
 // Apply executes an action (by ID) after re-validating it against legal actions.
-func (g *Game) Apply(a Action) error {
+func (g *Game) Apply(a Action) (err error) {
 	defer g.checkWin()
 	defer g.maybeFieldHospitals()
 	legal := g.LegalActions()
@@ -18,6 +18,11 @@ func (g *Game) Apply(a Action) error {
 		return fmt.Errorf("illegal action %q", a.ID)
 	}
 	a = *found
+	defer func() {
+		if err == nil {
+			g.recordRMN(a, false)
+		}
+	}()
 
 	if a.Kind == "battle-skip" && g.Pending != nil && g.Pending.Kind == PendingFieldHospitals {
 		g.FH = nil

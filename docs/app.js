@@ -65,6 +65,7 @@ function render() {
   renderBoard(g);
   renderActions(g);
   renderLog(g);
+  renderRMN(g);
 }
 
 function renderPlayers(g) {
@@ -309,6 +310,23 @@ function renderLog(g) {
     li.className = (e.kind || "") + (e.kind === "battle" || e.kind === "turmoil" || e.kind === "ambush" ? " battle" : "");
     li.innerHTML = `<span class="seq">${e.seq}</span><span>${e.round}.${e.phase}</span>` +
       `<span class="act ${e.actor}">${e.actor}</span><span>${e.text}</span>`;
+    el.append(li);
+  }
+  el.scrollTop = el.scrollHeight;
+}
+
+function renderRMN(g) {
+  const el = document.getElementById("rmn");
+  if (!el) return;
+  el.innerHTML = "";
+  const lines = g.rmn || [];
+  if (lines.length === 0) {
+    el.innerHTML = '<li class="rmnempty">No RMN events yet.</li>';
+    return;
+  }
+  for (const line of lines) {
+    const li = document.createElement("li");
+    li.textContent = line;
     el.append(li);
   }
   el.scrollTop = el.scrollHeight;

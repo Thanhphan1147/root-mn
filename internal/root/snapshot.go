@@ -35,6 +35,7 @@ func Snapshot(g *Game) map[string]any {
 		"setupStage": g.SetupStage,
 		"dayStage":   g.DayStage(),
 		"cards":      CardInfoMap(),
+		"rmn":        g.RMNLog,
 		"hash":       stateDigest(g),
 	}
 }

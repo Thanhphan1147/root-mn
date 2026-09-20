@@ -155,6 +155,7 @@ type Game struct {
 	WAEveningDrawn bool
 	Winner         []Faction
 	Log            []LogEntry
+	RMNLog         []string
 	Seq            int
 	RngSeed        uint64
 	Relaxed        bool

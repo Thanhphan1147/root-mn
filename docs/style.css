@@ -153,3 +153,9 @@ button.ghost:hover { background:var(--paper-2); color:var(--ink); }
   pointer-events: none;
   z-index: 4;
 }
+
+/* Root Machine Notation annotations */
+.rmnpanel .rmn { list-style: none; margin: 0; padding: .5rem; max-height: 30vh; overflow: auto; font-family: var(--mono); font-size: .64rem; }
+.rmnpanel .rmn li { white-space: pre-wrap; word-break: break-word; padding: .16rem .3rem; border-bottom: 1px solid var(--line); color: var(--ink); }
+.rmnpanel .rmn li:nth-child(odd) { background: rgba(255,255,255,.35); }
+.rmnpanel .rmn .rmnempty { color: var(--ink-soft); }
