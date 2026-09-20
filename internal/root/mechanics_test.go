@@ -932,3 +932,32 @@ func TestWABaseRemovedInBattle(t *testing.T) {
 		t.Fatal("base should no longer be considered placed")
 	}
 }
+
+func TestMCBattleTargets(t *testing.T) {
+	g := newTestGame(t)
+	g.Current = MC
+	g.Phase = "D"
+	g.MCDayStage = "actions"
+	g.ActionsLeft = 3
+
+	// MC can battle the Eyrie once it has warriors in their clearing.
+	g.addWarrior(MC, "C3", 2)
+	// MC can battle the Vagabond pawn when it is in a clearing with MC warriors.
+	g.Players[VB].Pawn = "C1"
+
+	var vsED, vsVB bool
+	for _, a := range g.LegalActions() {
+		if a.Kind == "battle" && a.Clearing == "C3" && a.Target == ED {
+			vsED = true
+		}
+		if a.Kind == "battle" && a.Clearing == "C1" && a.Target == VB {
+			vsVB = true
+		}
+	}
+	if !vsED {
+		t.Fatal("MC should be able to battle the Eyrie where it has warriors")
+	}
+	if !vsVB {
+		t.Fatal("MC should be able to battle the Vagabond pawn")
+	}
+}

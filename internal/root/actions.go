@@ -434,11 +434,20 @@ func (g *Game) enemiesIn(f Faction, c string) []Faction {
 		if other == f {
 			continue
 		}
-		if g.areEnemies(f, other) && g.pieceCount(other, c) > 0 {
+		if g.areEnemies(f, other) && g.hasPieceIn(other, c) {
 			out = append(out, other)
 		}
 	}
 	return out
+}
+
+// hasPieceIn reports whether f has any piece in a clearing that can be a battle
+// defender. The Vagabond pawn counts (it is a piece), unlike for rule.
+func (g *Game) hasPieceIn(f Faction, c string) bool {
+	if g.pieceCount(f, c) > 0 {
+		return true
+	}
+	return f == VB && g.Players[VB].Pawn == c
 }
 
 func (g *Game) areEnemies(a, b Faction) bool {

@@ -360,6 +360,18 @@ func (g *Game) sympathyOnMap() int {
 	return n
 }
 
+// DayStage reports the current faction's Daylight sub-step ("craft" or
+// "actions"/"decree"), used by the client to explain why actions are limited.
+func (g *Game) DayStage() string {
+	switch g.Current {
+	case MC:
+		return g.MCDayStage
+	case ED:
+		return g.EDDayStage
+	}
+	return ""
+}
+
 // Logf appends a log entry (capped so persisted state stays small).
 func (g *Game) Logf(actor Faction, kind, format string, args ...any) {
 	g.Seq++

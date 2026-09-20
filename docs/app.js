@@ -253,8 +253,14 @@ function renderActions(g) {
   pend.textContent = g.pending ? g.pending.Kind + " (" + g.pending.Player + ")" : "";
   if (g.setupMode) {
     head.textContent = "Setup · " + (g.setupStage || "");
+  } else if (g.winner && g.winner.length) {
+    head.textContent = "Game over";
+  } else if (g.dayStage === "craft") {
+    head.textContent = "Actions · " + g.current + " · craft first";
+  } else if (g.dayStage === "decree") {
+    head.textContent = "Actions · " + g.current + " · resolve Decree";
   } else {
-    head.textContent = g.winner && g.winner.length ? "Game over" : "Actions · " + g.current;
+    head.textContent = "Actions · " + g.current;
   }
 
   if (g.battle) {

@@ -33,6 +33,7 @@ func Snapshot(g *Game) map[string]any {
 		"relaxed":    g.Relaxed,
 		"setupMode":  g.SetupMode,
 		"setupStage": g.SetupStage,
+		"dayStage":   g.DayStage(),
 		"cards":      CardInfoMap(),
 		"hash":       stateDigest(g),
 	}
