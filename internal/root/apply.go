@@ -99,9 +99,13 @@ func (g *Game) applyMove(a Action) error {
 			g.MarchMovesLeft = 1 // second move of this March
 		}
 	}
-	n := g.Clearings[a.From].Warriors[a.Faction]
-	if n <= 0 {
+	avail := g.Clearings[a.From].Warriors[a.Faction]
+	if avail <= 0 {
 		return fmt.Errorf("no warriors to move")
+	}
+	n := a.Amount
+	if n <= 0 || n > avail {
+		n = avail
 	}
 	if g.Phase == "E" && g.ExtraMove {
 		g.ExtraMove = false

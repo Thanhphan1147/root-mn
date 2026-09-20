@@ -532,3 +532,68 @@ func TestEyrieDecreeResolutionAndTurmoil(t *testing.T) {
 		t.Fatalf("after turmoil + new leader, expected Evening, got %s", g.Phase)
 	}
 }
+
+func TestMoveQuantities(t *testing.T) {
+	g := newTestGame(t)
+	g.Current = MC
+	g.Phase = "D"
+	g.ActionsLeft = 3
+	// Put 3 Marquise warriors in C5 (adjacent to C1, which MC rules).
+	g.Clearings["C5"].Warriors[MC] = 3
+
+	amounts := map[int]bool{}
+	for _, a := range g.LegalActions() {
+		if a.Kind == "move" && a.From == "C5" && a.To == "C1" {
+			amounts[a.Amount] = true
+		}
+	}
+	for q := 1; q <= 3; q++ {
+		if !amounts[q] {
+			t.Fatalf("missing move option for quantity %d", q)
+		}
+	}
+	// Apply a partial move of 2.
+	var pick *Action
+	for _, a := range g.LegalActions() {
+		if a.Kind == "move" && a.From == "C5" && a.To == "C1" && a.Amount == 2 {
+			aa := a
+			pick = &aa
+		}
+	}
+	if pick == nil {
+		t.Fatal("no move-2 option")
+	}
+	before := g.Clearings["C1"].Warriors[MC]
+	if err := g.Apply(*pick); err != nil {
+		t.Fatal(err)
+	}
+	if g.Clearings["C5"].Warriors[MC] != 1 {
+		t.Fatalf("C5 = %d, want 1", g.Clearings["C5"].Warriors[MC])
+	}
+	if g.Clearings["C1"].Warriors[MC] != before+2 {
+		t.Fatalf("C1 = %d, want %d", g.Clearings["C1"].Warriors[MC], before+2)
+	}
+
+	// Eyrie decree Move offers every quantity too.
+	g.Relaxed = false
+	g.Current = ED
+	g.Phase = "D"
+	p := g.Players[ED]
+	p.Decree = map[string][]string{"MOVE": {"R01"}} // Rabbit card, C3 is Rabbit
+	g.buildDecreeQueue()
+	dq := map[int]bool{}
+	for _, a := range g.LegalActions() {
+		if a.Kind == "decree-move" && a.From == "C3" {
+			dq[a.Amount] = true
+		}
+	}
+	n := g.Clearings["C3"].Warriors[ED]
+	if n < 2 {
+		t.Fatalf("expected several ED warriors at C3, got %d", n)
+	}
+	for q := 1; q <= n; q++ {
+		if !dq[q] {
+			t.Fatalf("decree move missing quantity %d of %d", q, n)
+		}
+	}
+}

@@ -95,16 +95,12 @@ func (g *Game) legalEDDaylight() []Action {
 					continue
 				}
 				n := g.Clearings[from].Warriors[ED]
-				acts = append(acts, Action{
-					ID:    actID("decree-move", from, to, front.Card, "1"),
-					Label: fmt.Sprintf("Decree Move 1 %s → %s (%s)", from, to, front.Card),
-					Kind:  "decree-move", Faction: ED, From: from, To: to, Card: front.Card, Amount: 1,
-				})
-				if n > 1 {
+				// Any number from 1 to N may move.
+				for q := 1; q <= n; q++ {
 					acts = append(acts, Action{
-						ID:    actID("decree-move", from, to, front.Card, "all"),
-						Label: fmt.Sprintf("Decree Move all %d %s → %s (%s)", n, from, to, front.Card),
-						Kind:  "decree-move", Faction: ED, From: from, To: to, Card: front.Card, Amount: n,
+						ID:    actID("decree-move", from, to, front.Card, itoa(q)),
+						Label: fmt.Sprintf("Decree Move %d %s → %s (%s)", q, from, to, front.Card),
+						Kind:  "decree-move", Faction: ED, From: from, To: to, Card: front.Card, Amount: q,
 					})
 				}
 			}

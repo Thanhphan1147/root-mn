@@ -426,27 +426,29 @@ func (g *Game) areEnemies(a, b Faction) bool {
 // moveActions enumerates standard moves.
 func (g *Game) moveActions(f Faction) []Action {
 	var acts []Action
-	p := g.Players[f]
 	if f == VB {
 		// VB moves pawn by item; handled in VB file.
 		return nil
 	}
 	for _, from := range g.clearingsSorted() {
-		if g.Clearings[from].Warriors[f] == 0 {
+		n := g.Clearings[from].Warriors[f]
+		if n == 0 {
 			continue
 		}
 		for _, to := range g.Clearings[from].Adj {
 			if !g.Relaxed && !g.Rules(f, from) && !g.Rules(f, to) {
 				continue
 			}
-			acts = append(acts, Action{
-				ID:    actID("move", from, to),
-				Label: fmt.Sprintf("Move %s → %s", from, to), Kind: "move",
-				Faction: f, From: from, To: to,
-			})
+			// Any number from 1 to N may move.
+			for q := 1; q <= n; q++ {
+				acts = append(acts, Action{
+					ID:    actID("move", from, to, itoa(q)),
+					Label: fmt.Sprintf("Move %d %s → %s", q, from, to), Kind: "move",
+					Faction: f, From: from, To: to, Amount: q,
+				})
+			}
 		}
 	}
-	_ = p
 	return acts
 }
 
