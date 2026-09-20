@@ -301,6 +301,19 @@ func (g *Game) ruleValue(f Faction, c string) int {
 	return n
 }
 
+// FreeSlots returns the number of available building slots. A ruin occupies one
+// slot until the Vagabond explores it.
+func (cl *Clearing) FreeSlots() int {
+	n := cl.Slots - len(cl.Buildings)
+	if cl.Ruin {
+		n--
+	}
+	if n < 0 {
+		n = 0
+	}
+	return n
+}
+
 // pieceCount counts all pieces of a faction in a clearing.
 func (g *Game) pieceCount(f Faction, c string) int {
 	cl := g.Clearings[c]

@@ -216,10 +216,22 @@ function renderBoard(g) {
     if (c.Sympathy) chips += `<span class="chip WA">sympathy</span>`;
     if (vbPawn === id) chips += `<span class="chip VB">pawn</span>`;
     const wood = c.Wood ? `<span class="wood">wood ${c.Wood}</span>` : "";
-    const ruin = c.Ruin ? `<span class="ruin">ruin${c.RuinItem ? " " + c.RuinItem : ""}</span>` : "";
+    const slots = c.Slots || 0;
+    const used = (c.Buildings || []).length;
+    const hasRuin = c.Ruin ? 1 : 0;
+    const free = Math.max(0, slots - used - hasRuin);
+    let pips = "";
+    for (let i = 0; i < used; i++) pips += '<span class="slot used"></span>';
+    for (let i = 0; i < hasRuin; i++) pips += '<span class="slot ruinslot"></span>';
+    for (let i = 0; i < free; i++) pips += '<span class="slot free"></span>';
+    const ruinLabel = c.Ruin ? `<span class="ruin">ruin ${(c.RuinItem || "").replace(/^i\./, "")}</span>` : "";
+    const slotRow = (slots || hasRuin)
+      ? `<div class="slots" title="building slots: ${free} free of ${slots}"><span class="slotpips">${pips}</span>` +
+        `<span class="slotnum">${free}/${slots}</span>${ruinLabel}</div>`
+      : "";
     div.innerHTML =
       `<div class="cid"><span>${id}</span><span class="suit ${c.Suit}">${c.Suit}</span></div>` +
-      `<div class="crowd">${chips}${wood}</div>${ruin}`;
+      `<div class="crowd">${chips}${wood}</div>${slotRow}`;
     el.append(div);
   }
   // Vagabond pawn in a forest.

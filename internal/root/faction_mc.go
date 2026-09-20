@@ -53,7 +53,7 @@ func (g *Game) mcBuildActions(p *Player) []Action {
 	types := []string{"sawmill", "workshop", "recruiter"}
 	for _, c := range g.clearingsSorted() {
 		cl := g.Clearings[c]
-		if !g.Rules(MC, c) || len(cl.Buildings) >= cl.Slots {
+		if !g.Rules(MC, c) || cl.FreeSlots() <= 0 {
 			continue
 		}
 		for _, typ := range types {

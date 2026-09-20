@@ -1016,3 +1016,23 @@ func TestWASympathySpendRecorded(t *testing.T) {
 		t.Fatalf("RMN should record spend=B11: %q", rmn)
 	}
 }
+
+func TestRuinOccupiesBuildSlot(t *testing.T) {
+	g := newTestGame(t)
+	cl := g.Clearings["C6"] // Fox, 2 slots, has a ruin
+	if !cl.Ruin || cl.Slots != 2 {
+		t.Fatalf("C6 = %+v", cl)
+	}
+	if cl.FreeSlots() != 1 {
+		t.Fatalf("with a ruin, free slots = %d, want 1", cl.FreeSlots())
+	}
+	cl.Ruin = false
+	cl.RuinItem = ""
+	if cl.FreeSlots() != 2 {
+		t.Fatalf("after the ruin is removed, free slots = %d, want 2", cl.FreeSlots())
+	}
+	cl.Buildings = append(cl.Buildings, Building{MC, "sawmill"})
+	if cl.FreeSlots() != 1 {
+		t.Fatalf("free slots = %d, want 1", cl.FreeSlots())
+	}
+}

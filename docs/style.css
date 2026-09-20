@@ -253,7 +253,15 @@ body::before {
 .chip.WA { border-color: var(--wa); color: var(--wa); }
 .chip.VB { border-color: var(--vb); color: var(--vb); }
 .wood { font-family: var(--mono); font-size: 0.58rem; color: var(--vb); }
-.ruin { position: absolute; right: 0.3rem; bottom: 0.25rem; font-family: var(--mono); font-size: 0.55rem; opacity: 0.72; }
+/* Building slots */
+.slots { display: flex; align-items: center; gap: 0.3rem; margin-top: 0.28rem; font-family: var(--mono); font-size: 0.55rem; color: var(--ink-soft); }
+.slotpips { display: inline-flex; gap: 2px; }
+.slot { width: 0.5rem; height: 0.5rem; display: inline-block; border: 1px solid var(--line-strong); border-radius: 1px; }
+.slot.used { background: var(--ink-soft); border-color: var(--ink-soft); }
+.slot.free { background: transparent; }
+.slot.ruinslot { border-color: var(--crimson); background: repeating-linear-gradient(45deg, var(--crimson) 0 2px, transparent 2px 4px); }
+.slotnum { opacity: 0.8; }
+.ruin { color: var(--crimson); opacity: 0.85; }
 
 .forest {
   position: absolute;

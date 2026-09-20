@@ -83,7 +83,7 @@ func (g *Game) newRoost(p *Player) {
 	bestN := 1 << 30
 	for _, c := range g.clearingsSorted() {
 		cl := g.Clearings[c]
-		if g.isKeep(c) || len(cl.Buildings) >= cl.Slots {
+		if g.isKeep(c) || cl.FreeSlots() <= 0 {
 			continue
 		}
 		n := 0

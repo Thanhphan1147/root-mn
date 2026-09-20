@@ -140,7 +140,7 @@ func (g *Game) legalEDDaylight() []Action {
 				if g.isKeep(c) {
 					continue // only the Marquise may place pieces in the keep clearing
 				}
-				if g.buildingsOf(ED, c, "roost") > 0 || len(g.Clearings[c].Buildings) >= g.Clearings[c].Slots {
+				if g.buildingsOf(ED, c, "roost") > 0 || g.Clearings[c].FreeSlots() <= 0 {
 					continue
 				}
 				if g.totalBuildings(ED, "roost") >= 7 {

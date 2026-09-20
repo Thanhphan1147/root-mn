@@ -113,7 +113,7 @@ func (g *Game) setupMCBuild(typ, clearing string) bool {
 		return false
 	}
 	cl := g.Clearings[clearing]
-	if cl == nil || len(cl.Buildings) >= cl.Slots {
+	if cl == nil || cl.FreeSlots() <= 0 {
 		return false
 	}
 	cl.Buildings = append(cl.Buildings, Building{MC, typ})
@@ -217,7 +217,7 @@ func (g *Game) legalSetup() []Action {
 			}
 			for _, c := range allowed {
 				cl := g.Clearings[c]
-				if cl == nil || len(cl.Buildings) >= cl.Slots {
+				if cl == nil || cl.FreeSlots() <= 0 {
 					continue
 				}
 				acts = append(acts, Action{
@@ -288,7 +288,7 @@ func (g *Game) applySetup(a Action) error {
 
 func placeMC(g *Game, typ, clearing string) {
 	cl := g.Clearings[clearing]
-	if len(cl.Buildings) >= cl.Slots {
+	if cl.FreeSlots() <= 0 {
 		return
 	}
 	cl.Buildings = append(cl.Buildings, Building{MC, typ})
