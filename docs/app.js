@@ -235,7 +235,8 @@ function renderBoard(g) {
 
   document.getElementById("boardfoot").textContent =
     "roads: " + EDGES.map(([a, b]) => a + "–" + b).join("  ") +
-    "   ·   forests: " + Object.keys(FORESTS).join(", ");
+    "   ·   forests: " + Object.keys(FORESTS).join(", ") +
+    (vbPawn ? "   ·   VB pawn: " + vbPawn : "");
 }
 
 function highlightRoads(svg, id, on) {
@@ -334,6 +335,18 @@ function renderRMN(g) {
 
 document.getElementById("newgame").onclick = newGame;
 document.getElementById("autosetup").onclick = autoSetup;
+
+// Collapsible Players drawer (small viewports).
+const playersToggle = document.getElementById("toggleplayers");
+const backdrop = document.getElementById("drawerbackdrop");
+function setDrawer(open) {
+  document.body.classList.toggle("players-open", open);
+  playersToggle.setAttribute("aria-expanded", open ? "true" : "false");
+  backdrop.hidden = !open;
+}
+playersToggle.onclick = () => setDrawer(!document.body.classList.contains("players-open"));
+backdrop.onclick = () => setDrawer(false);
+window.addEventListener("keydown", e => { if (e.key === "Escape") setDrawer(false); });
 
 async function boot() {
   const status = document.getElementById("actions");

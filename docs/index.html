@@ -17,11 +17,14 @@
     </div>
     <div class="turnbar" id="turnbar" aria-live="polite"></div>
     <div class="topactions">
+      <button id="toggleplayers" class="btn ghost" type="button" aria-controls="players" aria-expanded="false">Players</button>
       <button id="autosetup" class="btn ghost" type="button">Quick setup</button>
       <button id="newgame" class="btn ghost" type="button">New manual setup</button>
     </div>
   </div>
 </header>
+
+<div class="drawer-backdrop" id="drawerbackdrop" hidden></div>
 
 <main class="bench">
   <aside class="players" id="players" aria-label="Players"></aside>
