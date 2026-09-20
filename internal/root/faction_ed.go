@@ -10,7 +10,7 @@ func (g *Game) legalEDDecreeAdd() []Action {
 		return g.leaderActions()
 	}
 	if g.EDAdded >= 2 {
-		return []Action{{ID: "pass", Label: "End Birdsong", Kind: "pass", Faction: ED}}
+		return nil
 	}
 	var acts []Action
 	for _, id := range p.Hand {
@@ -24,9 +24,6 @@ func (g *Game) legalEDDecreeAdd() []Action {
 				Kind:  "decree-add", Faction: ED, Card: id, Column: col,
 			})
 		}
-	}
-	if g.EDAdded >= 1 {
-		acts = append(acts, Action{ID: "pass", Label: "End Birdsong", Kind: "pass", Faction: ED})
 	}
 	return acts
 }
@@ -68,81 +65,103 @@ func (g *Game) legalEDDaylight() []Action {
 		return g.leaderActions()
 	}
 	p := g.Players[ED]
-	acts := g.craftActions(p)
-	if len(g.DecreeQueue) == 0 {
+	// Daylight step 1: Craft (before resolving the Decree).
+	if g.EDDayStage == "craft" {
+		acts := g.craftActions(p)
+		acts = append(acts, Action{
+			ID: "ed-done-crafting", Label: "Done crafting — resolve the Decree",
+			Kind: "ed-done-crafting", Faction: ED,
+		})
 		return acts
 	}
-	front := g.DecreeQueue[0]
-	suit := cardSuit(front.Card)
-	switch front.Column {
-	case "RECRUIT":
-		for _, c := range g.clearingsSorted() {
-			if g.buildingsOf(ED, c, "roost") > 0 && matches(g.Clearings[c].Suit, suit) {
-				acts = append(acts, Action{
-					ID:    actID("decree-recruit", c, front.Card),
-					Label: fmt.Sprintf("Decree Recruit at %s (%s)", c, front.Card),
-					Kind:  "decree-recruit", Faction: ED, Clearing: c, Card: front.Card,
-				})
-			}
+	// Daylight step 2: Resolve the Decree.
+	if len(g.DecreeQueue) == 0 {
+		return nil
+	}
+	// Columns resolve left to right; within a column, cards may resolve in any order.
+	col := g.DecreeQueue[0].Column
+	var cards []DecreeItem
+	for _, it := range g.DecreeQueue {
+		if it.Column == col {
+			cards = append(cards, it)
 		}
-	case "MOVE":
-		for _, from := range g.clearingsSorted() {
-			if !matches(g.Clearings[from].Suit, suit) || g.Clearings[from].Warriors[ED] == 0 {
-				continue
-			}
-			for _, to := range g.Clearings[from].Adj {
-				if !g.Relaxed && !g.Rules(ED, from) && !g.Rules(ED, to) {
-					continue
-				}
-				n := g.Clearings[from].Warriors[ED]
-				// Any number from 1 to N may move.
-				for q := 1; q <= n; q++ {
+	}
+	var acts []Action
+	for _, it := range cards {
+		suit := decreeSuit(it.Card)
+		switch col {
+		case "RECRUIT":
+			for _, c := range g.clearingsSorted() {
+				if g.buildingsOf(ED, c, "roost") > 0 && matches(g.Clearings[c].Suit, suit) {
 					acts = append(acts, Action{
-						ID:    actID("decree-move", from, to, front.Card, itoa(q)),
-						Label: fmt.Sprintf("Decree Move %d %s → %s (%s)", q, from, to, front.Card),
-						Kind:  "decree-move", Faction: ED, From: from, To: to, Card: front.Card, Amount: q,
+						ID:    actID("decree-recruit", c, it.Card),
+						Label: fmt.Sprintf("Decree Recruit at %s (%s)", c, cardName(it.Card)),
+						Kind:  "decree-recruit", Faction: ED, Clearing: c, Card: it.Card, Column: col,
 					})
 				}
 			}
-		}
-	case "BATTLE":
-		for _, c := range g.clearingsSorted() {
-			if !matches(g.Clearings[c].Suit, suit) || g.Clearings[c].Warriors[ED] == 0 {
-				continue
+		case "MOVE":
+			for _, from := range g.clearingsSorted() {
+				if !matches(g.Clearings[from].Suit, suit) || g.Clearings[from].Warriors[ED] == 0 {
+					continue
+				}
+				for _, to := range g.Clearings[from].Adj {
+					if !g.Relaxed && !g.Rules(ED, from) && !g.Rules(ED, to) {
+						continue
+					}
+					n := g.Clearings[from].Warriors[ED]
+					for q := 1; q <= n; q++ {
+						acts = append(acts, Action{
+							ID:    actID("decree-move", from, to, it.Card, itoa(q)),
+							Label: fmt.Sprintf("Decree Move %d %s → %s (%s)", q, from, to, cardName(it.Card)),
+							Kind:  "decree-move", Faction: ED, From: from, To: to, Card: it.Card, Amount: q, Column: col,
+						})
+					}
+				}
 			}
-			for _, def := range g.enemiesIn(ED, c) {
+		case "BATTLE":
+			for _, c := range g.clearingsSorted() {
+				if !matches(g.Clearings[c].Suit, suit) || g.Clearings[c].Warriors[ED] == 0 {
+					continue
+				}
+				for _, def := range g.enemiesIn(ED, c) {
+					acts = append(acts, Action{
+						ID:    actID("decree-battle", c, string(def), it.Card),
+						Label: fmt.Sprintf("Decree Battle %s in %s (%s)", def, c, cardName(it.Card)),
+						Kind:  "decree-battle", Faction: ED, Clearing: c, Target: def, Card: it.Card, Column: col,
+					})
+				}
+			}
+		case "BUILD":
+			for _, c := range g.clearingsSorted() {
+				if !matches(g.Clearings[c].Suit, suit) || !g.Rules(ED, c) {
+					continue
+				}
+				if g.isKeep(c) {
+					continue // only the Marquise may place pieces in the keep clearing
+				}
+				if g.buildingsOf(ED, c, "roost") > 0 || len(g.Clearings[c].Buildings) >= g.Clearings[c].Slots {
+					continue
+				}
+				if g.totalBuildings(ED, "roost") >= 7 {
+					continue
+				}
 				acts = append(acts, Action{
-					ID:    actID("decree-battle", c, string(def), front.Card),
-					Label: fmt.Sprintf("Decree Battle %s in %s (%s)", def, c, front.Card),
-					Kind:  "decree-battle", Faction: ED, Clearing: c, Target: def, Card: front.Card,
+					ID:    actID("decree-build", c, it.Card),
+					Label: fmt.Sprintf("Decree Build roost at %s (%s)", c, cardName(it.Card)),
+					Kind:  "decree-build", Faction: ED, Clearing: c, Card: it.Card, Column: col,
 				})
 			}
 		}
-	case "BUILD":
-		for _, c := range g.clearingsSorted() {
-			if !matches(g.Clearings[c].Suit, suit) || (!g.Relaxed && !g.Rules(ED, c)) {
-				continue
-			}
-			if g.buildingsOf(ED, c, "roost") > 0 || len(g.Clearings[c].Buildings) >= g.Clearings[c].Slots {
-				continue
-			}
-			if g.totalBuildings(ED, "roost") >= 7 {
-				continue
-			}
-			acts = append(acts, Action{
-				ID:    actID("decree-build", c, front.Card),
-				Label: fmt.Sprintf("Decree Build roost at %s (%s)", c, front.Card),
-				Kind:  "decree-build", Faction: ED, Clearing: c, Card: front.Card,
-			})
-		}
 	}
-	// Turmoil is always available while resolving the Decree: if no card can be
-	// resolved it is the only option, otherwise it is an explicit choice.
-	acts = append(acts, Action{
-		ID:    "ed-turmoil",
-		Label: "Turmoil (lose VP per bird, purge Decree, new leader, go to Evening)",
-		Kind:  "ed-turmoil", Faction: ED,
-	})
+	// If no card in the current column can be resolved, Turmoil is the only way.
+	if len(acts) == 0 {
+		acts = append(acts, Action{
+			ID:    "ed-turmoil",
+			Label: "Turmoil — cannot resolve the Decree (lose VP per bird, purge, new leader)",
+			Kind:  "ed-turmoil", Faction: ED,
+		})
+	}
 	return acts
 }
 
@@ -187,6 +206,9 @@ func (g *Game) turmoil() {
 func (g *Game) applyED(a Action) error {
 	p := g.Players[ED]
 	switch a.Kind {
+	case "ed-done-crafting":
+		g.EDDayStage = "decree"
+		g.Logf(ED, "daylight", "Finished crafting; resolving the Decree")
 	case "decree-add":
 		if g.EDAdded >= 2 {
 			return fmt.Errorf("already added 2 cards")
@@ -223,7 +245,7 @@ func (g *Game) applyED(a Action) error {
 			n = 2
 		}
 		g.addWarrior(ED, a.Clearing, n)
-		g.popDecree(a.Card)
+		g.popDecree(a.Card, a.Column)
 		g.Logf(ED, "decree", "Recruited %d at %s", n, a.Clearing)
 	case "decree-move":
 		n := a.Amount
@@ -232,7 +254,7 @@ func (g *Game) applyED(a Action) error {
 		}
 		g.addWarrior(ED, a.From, -n)
 		g.addWarrior(ED, a.To, n)
-		g.popDecree(a.Card)
+		g.popDecree(a.Card, a.Column)
 		g.Logf(ED, "decree", "Moved %d %s → %s", n, a.From, a.To)
 		g.checkOutrageAfterMove(ED, a.To)
 	case "decree-battle":
@@ -241,10 +263,10 @@ func (g *Game) applyED(a Action) error {
 			return err
 		}
 		// pop decree after battle completes; store pending card in battle context
-		g.popDecree(a.Card)
+		g.popDecree(a.Card, a.Column)
 	case "decree-build":
 		g.Clearings[a.Clearing].Buildings = append(g.Clearings[a.Clearing].Buildings, Building{ED, "roost"})
-		g.popDecree(a.Card)
+		g.popDecree(a.Card, a.Column)
 		g.Logf(ED, "decree", "Built roost at %s", a.Clearing)
 	case "ed-turmoil":
 		g.turmoil()
@@ -259,7 +281,22 @@ func (g *Game) applyED(a Action) error {
 	return nil
 }
 
-func (g *Game) popDecree(card string) {
+// decreeSuit returns the suit a Decree card is resolved as. Loyal Viziers are
+// bird cards, so they match any clearing.
+func decreeSuit(card string) Suit {
+	if card == "VIZIER" {
+		return Bird
+	}
+	return cardSuit(card)
+}
+
+func (g *Game) popDecree(card, column string) {
+	for i, it := range g.DecreeQueue {
+		if it.Card == card && it.Column == column {
+			g.DecreeQueue = append(g.DecreeQueue[:i:i], g.DecreeQueue[i+1:]...)
+			return
+		}
+	}
 	if len(g.DecreeQueue) > 0 {
 		g.DecreeQueue = g.DecreeQueue[1:]
 	}

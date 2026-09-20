@@ -59,10 +59,36 @@ func (g *Game) LegalActions() []Action {
 	case "E":
 		acts = g.legalEvening(f)
 	}
-	// Pass is always available at phase end, except when a mandatory step
-	// remains (ED decree must be added; WA evening ops are optional).
-	acts = append(acts, Action{ID: "pass", Label: "End " + phaseName(g.Phase), Kind: "pass", Faction: f})
+	if g.passAllowed() {
+		acts = append(acts, Action{ID: "pass", Label: "End " + phaseName(g.Phase), Kind: "pass", Faction: f})
+	}
 	return acts
+}
+
+// passAllowed reports whether the generic end-of-phase action is legal. The
+// Eyrie may not end Daylight until the Decree is fully resolved, and may not
+// end Birdsong before adding cards to the Decree.
+func (g *Game) passAllowed() bool {
+	if g.SetupMode || g.Pending != nil || len(g.Winner) > 0 {
+		return false
+	}
+	if g.Current == ED {
+		if g.EDNeedsLeader {
+			return false
+		}
+		switch g.Phase {
+		case "B":
+			// Must add 1-2 cards; if the hand is empty (Emergency Orders could
+			// not draw), allow proceeding so the game cannot deadlock.
+			return g.EDAdded >= 1 || len(g.Players[ED].Hand) == 0
+		case "D":
+			if g.EDDayStage == "craft" {
+				return false
+			}
+			return len(g.DecreeQueue) == 0
+		}
+	}
+	return true
 }
 
 func phaseName(p string) string {

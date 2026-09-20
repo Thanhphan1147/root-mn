@@ -483,8 +483,8 @@ func TestEyrieDecreeResolutionAndTurmoil(t *testing.T) {
 	if !hasBuild {
 		t.Fatal("resolvable Rabbit Recruit card should offer a decree-recruit option")
 	}
-	if !hasTurmoil {
-		t.Fatal("Turmoil should always be available while resolving the Decree")
+	if hasTurmoil {
+		t.Fatal("Turmoil must not be offered while a card can still be resolved")
 	}
 
 	// A Mouse Build card is unresolvable (ED rules no Mouse clearing).
@@ -595,5 +595,159 @@ func TestMoveQuantities(t *testing.T) {
 		if !dq[q] {
 			t.Fatalf("decree move missing quantity %d of %d", q, n)
 		}
+	}
+}
+
+func TestEyrieCraftBeforeDecree(t *testing.T) {
+	g := newTestGame(t)
+	g.Current = ED
+	g.Phase = "D"
+	p := g.Players[ED]
+	p.Decree = map[string][]string{"RECRUIT": {"R01"}}
+	g.buildDecreeQueue()
+	g.EDDayStage = "craft"
+
+	hasDone, hasDecree := false, false
+	for _, a := range g.LegalActions() {
+		if a.Kind == "ed-done-crafting" {
+			hasDone = true
+		}
+		if a.Kind == "decree-recruit" {
+			hasDecree = true
+		}
+	}
+	if !hasDone {
+		t.Fatal("craft step should offer 'done crafting'")
+	}
+	if hasDecree {
+		t.Fatal("the Decree must not resolve during the craft step")
+	}
+	if err := g.Apply(Action{ID: "ed-done-crafting", Kind: "ed-done-crafting", Faction: ED}); err != nil {
+		t.Fatal(err)
+	}
+	if g.EDDayStage != "decree" {
+		t.Fatalf("stage = %q, want decree", g.EDDayStage)
+	}
+	hasDone, hasDecree = false, false
+	for _, a := range g.LegalActions() {
+		if a.Kind == "ed-done-crafting" {
+			hasDone = true
+		}
+		if a.Kind == "decree-recruit" {
+			hasDecree = true
+		}
+	}
+	if hasDone {
+		t.Fatal("'done crafting' should not persist into the decree step")
+	}
+	if !hasDecree {
+		t.Fatal("expected decree resolution after crafting")
+	}
+}
+
+func TestEyrieViziersResolve(t *testing.T) {
+	g := newTestGame(t) // Despot: viziers in MOVE and BUILD
+	g.Current = ED
+	g.Phase = "D"
+	g.EDDayStage = "decree"
+	g.buildDecreeQueue()
+	vcount := 0
+	for _, it := range g.DecreeQueue {
+		if it.Card == "VIZIER" {
+			vcount++
+		}
+	}
+	if vcount != 2 {
+		t.Fatalf("expected 2 viziers in the resolution queue, got %d", vcount)
+	}
+	if g.DecreeQueue[0].Card != "VIZIER" || g.DecreeQueue[0].Column != "MOVE" {
+		t.Fatalf("front decree item = %+v", g.DecreeQueue[0])
+	}
+	// A vizier is a bird card, so its Move resolves from any clearing (C3).
+	found := false
+	for _, a := range g.LegalActions() {
+		if a.Kind == "decree-move" && a.From == "C3" {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatal("vizier Move should be resolvable from any clearing")
+	}
+}
+
+func TestEyrieRoostRequiresRule(t *testing.T) {
+	g := newTestGame(t)
+	g.Current = ED
+	g.Phase = "D"
+	g.EDDayStage = "decree"
+	p := g.Players[ED]
+
+	// A Mouse Build card: ED rules no Mouse clearing, so no build option.
+	p.Decree = map[string][]string{"BUILD": {"M01"}}
+	g.buildDecreeQueue()
+	for _, a := range g.LegalActions() {
+		if a.Kind == "decree-build" {
+			t.Fatalf("must not build a roost without ruling the clearing (%s)", a.Clearing)
+		}
+	}
+
+	// Remove the setup roost at C3 (ED rules C3) and use a Rabbit card: now
+	// the roost may be built there.
+	cl := g.Clearings["C3"]
+	for i, b := range cl.Buildings {
+		if b.Owner == ED && b.Type == "roost" {
+			cl.Buildings = append(cl.Buildings[:i], cl.Buildings[i+1:]...)
+			break
+		}
+	}
+	p.Decree = map[string][]string{"BUILD": {"R01"}}
+	g.buildDecreeQueue()
+	found := false
+	for _, a := range g.LegalActions() {
+		if a.Kind == "decree-build" && a.Clearing == "C3" {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatal("should be able to build a roost in a ruled, roost-free clearing")
+	}
+}
+
+func TestEyrieCornerOppositeMC(t *testing.T) {
+	g := NewGame([]Faction{MC, ED, WA, VB}, MC, 1)
+	BeginSetup(g)
+	for _, a := range g.LegalActions() {
+		if a.ID == "setup-mc-keep|C2" {
+			if err := g.Apply(a); err != nil {
+				t.Fatal(err)
+			}
+		}
+	}
+	for {
+		placed := false
+		for _, a := range g.LegalActions() {
+			if a.Kind == "setup-mc-build" {
+				if err := g.Apply(a); err != nil {
+					t.Fatal(err)
+				}
+				placed = true
+				break
+			}
+		}
+		if !placed {
+			break
+		}
+	}
+	if g.SetupStage != "ED_CORNER" {
+		t.Fatalf("stage = %s", g.SetupStage)
+	}
+	var corners []string
+	for _, a := range g.LegalActions() {
+		if a.Kind == "setup-ed-corner" {
+			corners = append(corners, a.Clearing)
+		}
+	}
+	if len(corners) != 1 || corners[0] != "C4" {
+		t.Fatalf("with MC at C2, Eyrie must start at C4 (opposite); got %v", corners)
 	}
 }

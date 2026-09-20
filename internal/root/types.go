@@ -150,6 +150,7 @@ type Game struct {
 	EDBirdAdded    bool
 	EDNeedsLeader  bool
 	EDTurmoilRest  bool
+	EDDayStage     string
 	WAEveningDrawn bool
 	Winner         []Faction
 	Log            []LogEntry
@@ -169,7 +170,7 @@ type Game struct {
 func NewGame(factions []Faction, first Faction, seed uint64) *Game {
 	g := &Game{
 		Map:       "autumn",
-		Relaxed:   true,
+		Relaxed:   false,
 		Clearings: map[string]*Clearing{},
 		Players:   map[Faction]*Player{},
 		Deck:      []string{},

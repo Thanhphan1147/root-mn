@@ -66,8 +66,11 @@ func Setup(g *Game, opt SetupOptions) {
 		}
 	}
 	corner := opt.EDCorner
-	if corner == "" {
-		corner = oppositeCorner(keep)
+	if g.Players[MC] != nil && g.Players[MC].KeepClearing != "" {
+		// The Eyrie must start diagonally opposite the Marquise.
+		corner = oppositeCorner(g.Players[MC].KeepClearing)
+	} else if corner == "" {
+		corner = "C3"
 	}
 	g.setupEDCorner(corner)
 	leader := opt.EDLeader
@@ -225,15 +228,20 @@ func (g *Game) legalSetup() []Action {
 			}
 		}
 	case "ED_CORNER":
-		keep := g.Players[MC].KeepClearing
-		for _, c := range []string{"C1", "C2", "C3", "C4"} {
-			if c == keep {
-				continue
-			}
+		if mc := g.Players[MC]; mc != nil && mc.KeepClearing != "" {
+			// Must be diagonally opposite the Marquise's keep.
+			c := oppositeCorner(mc.KeepClearing)
 			acts = append(acts, Action{
-				ID: actID("setup-ed-corner", c), Label: "Place roost at " + c,
+				ID: actID("setup-ed-corner", c), Label: "Place roost at " + c + " (opposite the Marquise)",
 				Kind: "setup-ed-corner", Faction: ED, Clearing: c,
 			})
+		} else {
+			for _, c := range []string{"C1", "C2", "C3", "C4"} {
+				acts = append(acts, Action{
+					ID: actID("setup-ed-corner", c), Label: "Place roost at " + c,
+					Kind: "setup-ed-corner", Faction: ED, Clearing: c,
+				})
+			}
 		}
 	case "ED_LEADER":
 		for name := range Leaders {

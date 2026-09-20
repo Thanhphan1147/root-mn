@@ -83,7 +83,7 @@ func (g *Game) newRoost(p *Player) {
 	bestN := 1 << 30
 	for _, c := range g.clearingsSorted() {
 		cl := g.Clearings[c]
-		if len(cl.Buildings) >= cl.Slots {
+		if g.isKeep(c) || len(cl.Buildings) >= cl.Slots {
 			continue
 		}
 		n := 0
@@ -131,6 +131,7 @@ func (g *Game) beginDaylight() {
 		g.MarchMovesLeft = 0
 	case ED:
 		g.buildDecreeQueue()
+		g.EDDayStage = "craft"
 	}
 	g.grantCommandWarren(g.Current)
 	g.Logf(g.Current, "daylight", "%s begins Daylight", g.Current)
@@ -141,9 +142,6 @@ func (g *Game) buildDecreeQueue() {
 	g.DecreeQueue = nil
 	for _, col := range DecreeColumns {
 		for _, card := range p.Decree[col] {
-			if card == "VIZIER" {
-				continue
-			}
 			g.DecreeQueue = append(g.DecreeQueue, DecreeItem{col, card})
 		}
 	}
