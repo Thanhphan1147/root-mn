@@ -436,9 +436,18 @@ button:focus-visible, a:focus-visible, .clearing:focus-visible {
   .bench { grid-template-columns: minmax(190px, 220px) minmax(380px, 1.6fr) minmax(300px, 1fr); }
 }
 
+/* Medium: players stay visible beside the board; the right column drops below. */
 @media (max-width: 1180px) {
+  .bench { grid-template-columns: minmax(190px, 220px) minmax(0, 1fr); }
+  .players { grid-column: 1; grid-row: 1 / span 2; }
+  .boardwrap { grid-column: 2; grid-row: 1; }
+  .rightcol { grid-column: 2; grid-row: 2; }
+}
+
+/* Small: the players list collapses into a drawer. */
+@media (max-width: 900px) {
   .bench { grid-template-columns: minmax(0, 1fr); }
-  .boardwrap, .rightcol { grid-column: 1; }
+  .players, .boardwrap, .rightcol { grid-column: 1; grid-row: auto; }
 
   #toggleplayers { display: inline-block; }
 
@@ -471,19 +480,14 @@ button:focus-visible, a:focus-visible, .clearing:focus-visible {
   }
   .players-open .players { transform: none; }
   .drawer-backdrop[hidden] { display: none; }
-}
 
-@media (max-width: 820px) {
-  .bench { grid-template-columns: minmax(0, 1fr); }
-  .boardwrap, .rightcol { grid-column: 1; }
   .turnbar { margin-left: 0; text-align: left; white-space: normal; }
   .brand { flex-basis: 100%; }
   .actions { max-height: 46vh; }
   .log, .rmn { max-height: 40vh; }
 }
 
-/* On small viewports the map switches to a flowing grid so clearings never
-   overlap; the board grows vertically instead. */
+/* Table layout (with minimap) below 720px. */
 @media (max-width: 720px) {
   .minimap {
     display: block;
