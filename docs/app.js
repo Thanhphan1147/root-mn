@@ -6,19 +6,19 @@ const PHASE = { S: "Setup", B: "Birdsong", D: "Daylight", E: "Evening" };
 
 // Autumn map: clearing positions (percent) and the 18 printed paths.
 const POS = {
-  C1: [12, 15], C2: [88, 15], C3: [88, 85], C4: [12, 85],
-  C5: [50, 7], C6: [93, 48], C7: [56, 83], C8: [28, 95],
-  C9: [5, 48], C10: [50, 32], C11: [71, 60], C12: [32, 55],
+  C1: [13, 16], C2: [87, 16], C3: [87, 84], C4: [13, 84],
+  C5: [50, 10], C6: [90, 48], C7: [57, 82], C8: [29, 88],
+  C9: [11, 48], C10: [50, 33], C11: [70, 61], C12: [33, 55],
 };
 // Forest regions (centroids) and their adjacent clearings.
 const FORESTS = {
-  AutumnN:  [50, 17],
-  AutumnNW: [25, 37],
-  AutumnW:  [16, 63],
-  AutumnSW: [32, 80],
-  AutumnS:  [62, 71],
-  AutumnE:  [84, 64],
-  Witchwood:[67, 42],
+  AutumnN:  [50, 19],
+  AutumnNW: [27, 38],
+  AutumnW:  [19, 62],
+  AutumnSW: [33, 77],
+  AutumnS:  [62, 70],
+  AutumnE:  [82, 64],
+  Witchwood:[66, 43],
 };
 const EDGES = [
   ["C1","C5"],["C1","C9"],["C1","C10"],["C2","C5"],["C2","C6"],["C2","C10"],

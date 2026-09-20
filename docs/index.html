@@ -3,28 +3,31 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>ROOT · Root Machine Notation</title>
+<meta name="color-scheme" content="light" />
+<meta name="description" content="Root Machine Notation — a serverless rules engine and analysis bench for the board game ROOT." />
+<title>Root Machine Notation · ROOT analysis bench</title>
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 <header class="masthead">
-  <div class="brand">
-    <span class="mark">R</span>
-    <div>
-      <h1>ROOT <span class="thin">· base game</span></h1>
-      <p class="sub">rules engine + analysis bench</p>
+  <div class="masthead-inner">
+    <div class="brand">
+      <h1>Root Machine Notation</h1>
+      <p class="sub">ROOT · base game · rules engine &amp; analysis bench</p>
+    </div>
+    <div class="turnbar" id="turnbar" aria-live="polite"></div>
+    <div class="topactions">
+      <button id="autosetup" class="btn ghost" type="button">Quick setup</button>
+      <button id="newgame" class="btn ghost" type="button">New manual setup</button>
     </div>
   </div>
-  <div class="turnbar" id="turnbar"></div>
-  <button id="autosetup" class="ghost">Quick setup</button>
-  <button id="newgame" class="ghost">New manual setup</button>
 </header>
 
 <main class="bench">
-  <aside class="players" id="players"></aside>
+  <aside class="players" id="players" aria-label="Players"></aside>
 
   <section class="boardwrap">
-    <div class="board" id="board"></div>
+    <div class="board" id="board" aria-label="Woodland map"></div>
     <div class="boardfoot" id="boardfoot"></div>
   </section>
 
@@ -33,16 +36,22 @@
       <div class="panel-head"><h2 id="actionhead">Actions</h2><span class="hint" id="pendhint"></span></div>
       <div class="actions" id="actions"></div>
     </div>
-    <div class="panel logpanel">
-      <div class="panel-head"><h2>Logs</h2></div>
+    <div class="panel">
+      <div class="panel-head"><h2>Logs</h2><span class="hint">human-readable events</span></div>
       <ol class="log" id="log"></ol>
     </div>
-    <div class="panel rmnpanel">
+    <div class="panel">
       <div class="panel-head"><h2>Annotations</h2><span class="hint">Root Machine Notation</span></div>
       <ol class="rmn" id="rmn"></ol>
     </div>
   </section>
 </main>
+
+<footer class="sitefoot">
+  <span>Unofficial fan project — not affiliated with Leder Games.</span>
+  <a href="https://github.com/Thanhphan1147/root-mn" target="_blank" rel="noopener">github.com/Thanhphan1147/root-mn</a>
+</footer>
+
 <script src="wasm_exec.js"></script>
 <script src="app.js"></script>
 </body>
