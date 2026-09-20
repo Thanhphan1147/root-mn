@@ -5,6 +5,7 @@ import "fmt"
 // Apply executes an action (by ID) after re-validating it against legal actions.
 func (g *Game) Apply(a Action) error {
 	defer g.checkWin()
+	defer g.maybeFieldHospitals()
 	legal := g.LegalActions()
 	var found *Action
 	for i := range legal {
@@ -48,7 +49,7 @@ func (g *Game) Apply(a Action) error {
 		return g.startBattle(a)
 	case "dominance":
 		return g.applyDominance(a)
-	case "mc-recruit", "mc-build", "mc-overwork", "spend-bird":
+	case "mc-recruit", "mc-build", "mc-overwork", "spend-bird", "mc-done-crafting":
 		return g.applyMC(a)
 	case "decree-add", "decree-recruit", "decree-move", "decree-battle", "decree-build", "leader", "ed-turmoil", "ed-done-crafting":
 		return g.applyED(a)
@@ -69,6 +70,19 @@ func (g *Game) Apply(a Action) error {
 }
 
 // applyMove performs a standard move.
+// maybeFieldHospitals offers Field Hospitals after any removal of Marquise
+// warriors outside of a battle (battles set the pending at their end).
+func (g *Game) maybeFieldHospitals() {
+	if len(g.FH) == 0 || g.Battle != nil || g.Pending != nil || g.SetupMode || len(g.Winner) > 0 {
+		return
+	}
+	if !g.hasKeep() {
+		g.FH = nil
+		return
+	}
+	g.Pending = &Pending{Kind: PendingFieldHospitals, Player: MC}
+}
+
 // applyFieldHospitals saves removed Marquise warriors to the keep clearing.
 func (g *Game) applyFieldHospitals(a Action) error {
 	p := g.Players[MC]
@@ -121,15 +135,21 @@ func (g *Game) applyMove(a Action) error {
 }
 
 // removePiece removes one piece of owner in clearing, warriors first.
+// remover is the faction causing the removal (for Hostile/Outrage triggers).
 // Returns (kind, removed) where kind is "warrior","building","token".
-func (g *Game) removePiece(owner Faction, c string) (string, bool) {
+func (g *Game) removePiece(remover, owner Faction, c string) (string, bool) {
 	cl := g.Clearings[c]
 	if cl.Warriors[owner] > 0 {
 		cl.Warriors[owner]--
 		if cl.Warriors[owner] == 0 {
 			delete(cl.Warriors, owner)
 		}
-		g.vbHostilityOnWarriorRemoval(owner)
+		if remover == VB {
+			g.vbHostilityOnWarriorRemoval(owner)
+		}
+		if owner == MC {
+			g.FH = append(g.FH, FHRec{Clearing: c, Count: 1})
+		}
 		return "warrior", true
 	}
 	for i, b := range cl.Buildings {
@@ -138,12 +158,30 @@ func (g *Game) removePiece(owner Faction, c string) (string, bool) {
 			if owner == WA && isBaseBuilding(b.Type) {
 				g.waBaseRemoved(b.Type)
 			}
+			if owner == MC {
+				// Destroyed buildings return to the rightmost empty track slot.
+				p := g.Players[MC]
+				switch b.Type {
+				case "sawmill":
+					p.Sawmills++
+				case "workshop":
+					p.Workshops++
+				case "recruiter":
+					p.Recruiters++
+				}
+			}
 			return "building", true
 		}
 	}
 	for i, t := range cl.Tokens {
 		if t.Owner == owner {
 			cl.Tokens = append(cl.Tokens[:i], cl.Tokens[i+1:]...)
+			if t.Type == "sympathy" {
+				cl.Sympathy = ""
+				if remover != WA {
+					g.outrage(remover, c)
+				}
+			}
 			return "token", true
 		}
 	}

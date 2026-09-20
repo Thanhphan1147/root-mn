@@ -6,8 +6,16 @@ import "fmt"
 
 func (g *Game) legalMCDaylight() []Action {
 	p := g.Players[MC]
+	// Daylight step 1: craft with workshops before taking actions.
+	if g.MCDayStage == "craft" {
+		acts := g.craftActions(p)
+		acts = append(acts, Action{
+			ID: "mc-done-crafting", Label: "Done crafting — take actions",
+			Kind: "mc-done-crafting", Faction: MC,
+		})
+		return acts
+	}
 	var acts []Action
-	acts = append(acts, g.craftActions(p)...)
 	acts = append(acts, g.spendBirdActions(p)...)
 
 	// Dominance activation (>=10 VP).
@@ -143,6 +151,9 @@ func (g *Game) availableWood(p *Player, start string) int {
 func (g *Game) applyMC(a Action) error {
 	p := g.Players[MC]
 	switch a.Kind {
+	case "mc-done-crafting":
+		g.MCDayStage = "actions"
+		g.Logf(MC, "daylight", "Finished crafting; taking actions")
 	case "mc-recruit":
 		n := g.totalBuildings(MC, "recruiter")
 		for _, c := range g.clearingsSorted() {

@@ -21,8 +21,11 @@ func TestMCBirdsongAndBuild(t *testing.T) {
 	if g.Clearings["C1"].Wood != 1 {
 		t.Fatalf("C1 wood after birdsong = %d, want 1", g.Clearings["C1"].Wood)
 	}
-	// Advance to Daylight.
+	// Advance to Daylight, then finish the craft step.
 	if err := g.Apply(Action{ID: "pass"}); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.Apply(Action{ID: "mc-done-crafting"}); err != nil {
 		t.Fatal(err)
 	}
 	if g.Phase != "D" || g.ActionsLeft != 3 {
@@ -59,6 +62,7 @@ func totalWood(g *Game) int {
 func TestOverwork(t *testing.T) {
 	g := newTestGame(t)
 	_ = g.Apply(Action{ID: "pass"}) // Daylight
+	_ = g.Apply(Action{ID: "mc-done-crafting"})
 	p := g.Players[MC]
 	// Give MC a card matching C1's suit (Fox) and clear its hand.
 	c1suit := g.Clearings["C1"].Suit
@@ -165,6 +169,7 @@ func TestCraftItem(t *testing.T) {
 	g.Current = MC
 	g.Phase = "D"
 	g.ActionsLeft = 3
+	g.MCDayStage = "craft"
 	// Give MC a craftable item card with a matching workshop.
 	// C5 has a workshop (Rabbit suit). Give a card costing 1 Rabbit (R06 boot).
 	g.Players[MC].Hand = []string{"R06"}
@@ -259,7 +264,8 @@ func TestLongSelfPlay(t *testing.T) {
 
 func TestDominanceGoesAvailable(t *testing.T) {
 	g := newTestGame(t)
-	_ = g.Apply(Action{ID: "pass"})      // Daylight
+	_ = g.Apply(Action{ID: "pass"}) // Daylight
+	_ = g.Apply(Action{ID: "mc-done-crafting"})
 	g.Players[MC].Hand = []string{"F02"} // Fox Dominance, matches C1 (Fox) sawmill
 	oa := findAction(g, "mc-overwork")
 	if oa == nil {
@@ -749,5 +755,180 @@ func TestEyrieCornerOppositeMC(t *testing.T) {
 	}
 	if len(corners) != 1 || corners[0] != "C4" {
 		t.Fatalf("with MC at C2, Eyrie must start at C4 (opposite); got %v", corners)
+	}
+}
+
+func TestVBHostilityOnlyWhenVBActs(t *testing.T) {
+	g := newTestGame(t)
+	vb := g.Players[VB]
+	g.addWarrior(ED, "C3", 1)
+	// MC removes an ED warrior: ED must NOT become hostile to the Vagabond.
+	g.removePiece(MC, ED, "C3")
+	if vb.Relationships[ED] == "hostile" {
+		t.Fatal("a warrior removed by another faction must not make that faction Hostile to the Vagabond")
+	}
+	// The Vagabond removes an MC warrior: MC becomes hostile.
+	g.addWarrior(MC, "C5", 1)
+	g.removePiece(VB, MC, "C5")
+	if vb.Relationships[MC] != "hostile" {
+		t.Fatal("Vagabond removing a warrior should make that faction Hostile")
+	}
+}
+
+func TestOutrageOnSympathyRemoval(t *testing.T) {
+	g := newTestGame(t)
+	cl := g.Clearings["C5"]
+	cl.Sympathy = WA
+	cl.Tokens = append(cl.Tokens, Token{WA, "sympathy"})
+	g.Players[MC].Hand = []string{"M01"} // Mouse; C5 is Rabbit, so no match
+	before := len(g.Players[WA].Supporters)
+	g.removePiece(MC, WA, "C5") // e.g. via a Favor/Revolt effect
+	if cl.Sympathy == WA {
+		t.Fatal("sympathy token was not removed")
+	}
+	if len(g.Players[WA].Supporters) != before+1 {
+		t.Fatalf("Outrage should add a supporter when another player removes sympathy (%d -> %d)", before, len(g.Players[WA].Supporters))
+	}
+}
+
+func TestVBAidTakeItem(t *testing.T) {
+	g := newTestGame(t)
+	p := g.Players[VB]
+	p.Pawn = "C3" // ED roost + warriors here (Rabbit)
+	p.Hand = []string{"R01"}
+	g.giveVBItem(p, "hammer")
+	g.Players[ED].CraftedItems = []string{"sword"}
+	g.Current = VB
+	g.Phase = "D"
+
+	var pick *Action
+	for _, a := range g.LegalActions() {
+		if a.Kind == "vb-aid" && a.Item == "sword" {
+			aa := a
+			pick = &aa
+		}
+	}
+	if pick == nil {
+		t.Fatal("Aid should offer taking a crafted item")
+	}
+	if err := g.Apply(*pick); err != nil {
+		t.Fatal(err)
+	}
+	if len(g.Players[ED].CraftedItems) != 0 {
+		t.Fatalf("crafted item should have been taken: %v", g.Players[ED].CraftedItems)
+	}
+	found := false
+	for _, it := range p.Items {
+		if it.Type == "sword" {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatal("Vagabond did not receive the sword")
+	}
+}
+
+func TestFieldHospitalsOnEffectRemoval(t *testing.T) {
+	g := newTestGame(t)
+	g.addWarrior(MC, "C5", 2)
+	g.Players[MC].Hand = []string{"R01"} // Rabbit, matches C5
+	g.removePiece(ED, MC, "C5")          // as if removed by a card effect
+	if len(g.FH) == 0 {
+		t.Fatal("Field Hospitals record not created")
+	}
+	g.maybeFieldHospitals()
+	if g.Pending == nil || g.Pending.Kind != PendingFieldHospitals {
+		t.Fatalf("Field Hospitals should be offered after a non-battle removal, pending=%+v", g.Pending)
+	}
+	var fh *Action
+	for _, a := range g.LegalActions() {
+		if a.Kind == "field-hospitals" {
+			aa := a
+			fh = &aa
+		}
+	}
+	if fh == nil {
+		t.Fatal("no Field Hospitals action offered")
+	}
+	if err := g.Apply(*fh); err != nil {
+		t.Fatal(err)
+	}
+	if g.Clearings[g.Players[MC].KeepClearing].Warriors[MC] < 1 {
+		t.Fatal("saved warrior did not reach the keep clearing")
+	}
+}
+
+func TestMCCraftBeforeActions(t *testing.T) {
+	g := newTestGame(t)
+	if err := g.Apply(Action{ID: "pass"}); err != nil {
+		t.Fatal(err)
+	}
+	if g.MCDayStage != "craft" {
+		t.Fatalf("stage = %q, want craft", g.MCDayStage)
+	}
+	hasDone, hasBuild := false, false
+	for _, a := range g.LegalActions() {
+		if a.Kind == "mc-done-crafting" {
+			hasDone = true
+		}
+		if a.Kind == "mc-build" {
+			hasBuild = true
+		}
+	}
+	if !hasDone {
+		t.Fatal("craft step should offer 'done crafting'")
+	}
+	if hasBuild {
+		t.Fatal("no actions should be available during the craft step")
+	}
+	if err := g.Apply(Action{ID: "mc-done-crafting"}); err != nil {
+		t.Fatal(err)
+	}
+	if g.MCDayStage != "actions" {
+		t.Fatalf("stage = %q, want actions", g.MCDayStage)
+	}
+}
+
+func TestMCBuildingReturnsToTrack(t *testing.T) {
+	g := newTestGame(t)
+	p := g.Players[MC]
+	total := p.Sawmills + p.Workshops + p.Recruiters
+	// Clear the garrison warrior at C1 so a building can be removed.
+	for g.Clearings["C1"].Warriors[MC] > 0 {
+		g.removePiece(ED, MC, "C1")
+	}
+	if _, ok := g.removePiece(ED, MC, "C1"); !ok {
+		t.Fatal("expected a building at C1")
+	}
+	if got := p.Sawmills + p.Workshops + p.Recruiters; got != total+1 {
+		t.Fatalf("destroyed building should return to its track: %d -> %d", total, got)
+	}
+}
+
+func TestWABaseRemovedInBattle(t *testing.T) {
+	g := newTestGame(t)
+	p := g.Players[WA]
+	g.Clearings["C5"].Buildings = append(g.Clearings["C5"].Buildings, Building{WA, "base-rabbit"})
+	p.Bases[Rabbit] = true
+	p.Officers = 3
+	p.Supporters = []string{"R01", "R02", "M01"}
+	idx := -1
+	for i, b := range g.Clearings["C5"].Buildings {
+		if b.Owner == WA {
+			idx = i
+		}
+	}
+	g.Battle = &BattleState{Clearing: "C5", Attacker: MC, Defender: WA, Stage: StageHits, HitSide: WA, Remaining: 1}
+	g.applyBattleHit(Action{Kind: "battle-hit", Piece: "building", Amount: idx, Faction: WA})
+	if p.Officers != 1 {
+		t.Fatalf("officers should be 1 after losing half (rounded up) of 3, got %d", p.Officers)
+	}
+	for _, c := range p.Supporters {
+		if matches(cardSuit(c), Rabbit) {
+			t.Fatalf("matching supporter should be discarded on base removal: %s", c)
+		}
+	}
+	if p.Bases[Rabbit] {
+		t.Fatal("base should no longer be considered placed")
 	}
 }

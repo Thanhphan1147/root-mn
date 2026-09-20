@@ -33,7 +33,7 @@ func (g *Game) resolveFavor(p *Player, c *CardDef) {
 				continue
 			}
 			for {
-				kind, ok := g.removePiece(f, cl)
+				kind, ok := g.removePiece(p.Faction, f, cl)
 				if !ok {
 					break
 				}

@@ -72,6 +72,9 @@ func (g *Game) passAllowed() bool {
 	if g.SetupMode || g.Pending != nil || len(g.Winner) > 0 {
 		return false
 	}
+	if g.Current == MC && g.Phase == "D" && g.MCDayStage == "craft" {
+		return false
+	}
 	if g.Current == ED {
 		if g.EDNeedsLeader {
 			return false

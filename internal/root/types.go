@@ -151,6 +151,7 @@ type Game struct {
 	EDNeedsLeader  bool
 	EDTurmoilRest  bool
 	EDDayStage     string
+	MCDayStage     string
 	WAEveningDrawn bool
 	Winner         []Faction
 	Log            []LogEntry

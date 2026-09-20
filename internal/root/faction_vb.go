@@ -149,6 +149,13 @@ func (g *Game) legalVBDaylight() []Action {
 					Label: fmt.Sprintf("Aid %s with %s", f, cardName(id)),
 					Kind:  "vb-aid", Faction: VB, Target: f, Card: id,
 				})
+				for _, it := range g.Players[f].CraftedItems {
+					acts = append(acts, Action{
+						ID:    actID("vb-aid", string(f), id, it),
+						Label: fmt.Sprintf("Aid %s with %s, take %s", f, cardName(id), it),
+						Kind:  "vb-aid", Faction: VB, Target: f, Card: id, Item: it,
+					})
+				}
 			}
 		}
 	}
@@ -339,6 +346,13 @@ func (g *Game) applyVB(a Action) error {
 		if takeStr(&p.Hand, a.Card) {
 			g.Players[a.Target].Hand = append(g.Players[a.Target].Hand, a.Card)
 		}
+		if a.Item != "" {
+			tp := g.Players[a.Target]
+			if takeStr(&tp.CraftedItems, a.Item) {
+				g.giveVBItem(p, a.Item)
+				g.Logf(VB, "aid", "Took a %s from %s's crafted items", a.Item, a.Target)
+			}
+		}
 		g.vbAidRelationship(a.Target)
 		g.Logf(VB, "aid", "Aided %s with %s", a.Target, cardName(a.Card))
 	case "vb-quest":
@@ -364,7 +378,7 @@ func (g *Game) applyVB(a Action) error {
 			g.Logf(VB, "quest", "Completed %s: +%d VP", q.Name, n)
 		}
 	case "vb-strike":
-		kind, ok := g.removePiece(a.Target, a.Clearing)
+		kind, ok := g.removePiece(VB, a.Target, a.Clearing)
 		if ok && (kind == "building" || kind == "token") {
 			g.Score(VB, 1)
 		}
@@ -515,10 +529,12 @@ func (g *Game) vbEveningRest(p *Player) {
 	for _, it := range p.Items {
 		if it.Damaged {
 			it.Damaged = false
-			if it.Zone == "damaged" {
+			it.FaceUp = true
+			if (it.Type == "tea" || it.Type == "coin" || it.Type == "bag") && trackCount(p, it.Type) < 3 {
+				it.Zone = "track"
+			} else {
 				it.Zone = "satchel"
 			}
-			it.FaceUp = true
 		}
 	}
 	g.Logf(VB, "rest", "Evening's Rest in forest")

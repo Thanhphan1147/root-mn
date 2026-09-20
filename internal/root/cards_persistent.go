@@ -168,6 +168,7 @@ func (g *Game) vbInfamy(vb Faction, victim Faction, kind string) {
 func (g *Game) waBaseRemoved(baseType string) {
 	p := g.Players[WA]
 	s := baseSuit(baseType)
+	p.Bases[s] = false // the base returns to the faction board
 	// Discard all supporters matching the base suit, including birds.
 	var kept []string
 	for _, c := range p.Supporters {

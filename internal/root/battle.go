@@ -363,6 +363,7 @@ func (g *Game) applyBattleHit(a Action) {
 		return
 	}
 	cl := g.Clearings[b.Clearing]
+	wasHostile := g.Players[VB].Relationships[side] == "hostile"
 	removed := false
 	kind := ""
 	switch a.Piece {
@@ -372,7 +373,6 @@ func (g *Game) applyBattleHit(a Action) {
 			if cl.Warriors[side] == 0 {
 				delete(cl.Warriors, side)
 			}
-			g.vbHostilityOnWarriorRemoval(side)
 			removed, kind = true, "warrior"
 			if side == MC {
 				b.FH = append(b.FH, FHRec{Clearing: b.Clearing, Count: 1})
@@ -380,8 +380,23 @@ func (g *Game) applyBattleHit(a Action) {
 		}
 	case "building":
 		if a.Amount < len(cl.Buildings) && cl.Buildings[a.Amount].Owner == side {
+			bd := cl.Buildings[a.Amount]
 			cl.Buildings = append(cl.Buildings[:a.Amount], cl.Buildings[a.Amount+1:]...)
 			removed, kind = true, "building"
+			if side == WA && isBaseBuilding(bd.Type) {
+				g.waBaseRemoved(bd.Type)
+			}
+			if side == MC {
+				p := g.Players[MC]
+				switch bd.Type {
+				case "sawmill":
+					p.Sawmills++
+				case "workshop":
+					p.Workshops++
+				case "recruiter":
+					p.Recruiters++
+				}
+			}
 		}
 	case "token":
 		if a.Amount < len(cl.Tokens) && cl.Tokens[a.Amount].Owner == side {
@@ -390,7 +405,13 @@ func (g *Game) applyBattleHit(a Action) {
 			removed, kind = true, "token"
 			if tok.Type == "sympathy" {
 				cl.Sympathy = ""
-				g.outrage(b.Attacker, b.Clearing)
+				remover := b.Attacker
+				if side == b.Attacker {
+					remover = b.Defender
+				}
+				if remover != WA {
+					g.outrage(remover, b.Clearing)
+				}
 			}
 			if tok.Type == "keep" {
 				// keep removed permanently
@@ -399,19 +420,28 @@ func (g *Game) applyBattleHit(a Action) {
 	}
 	if removed {
 		b.Remaining--
-		if kind == "building" || kind == "token" {
-			// The opponent of the side that lost the piece scores.
-			scorer := b.Attacker
-			if side == b.Attacker {
-				scorer = b.Defender
+		// The opponent of the side that lost the piece is the remover.
+		scorer := b.Attacker
+		if side == b.Attacker {
+			scorer = b.Defender
+		}
+		switch kind {
+		case "warrior":
+			if scorer == VB {
+				if wasHostile {
+					g.Score(VB, 1) // Infamy (not for the warrior that caused Hostility)
+				}
+				g.vbHostilityOnWarriorRemoval(side)
 			}
+		case "building", "token":
 			g.Score(scorer, 1)
 			if scorer == ED && g.Players[ED].Leader == "despot" && !b.DespotDone {
 				g.Score(ED, 1)
 				b.DespotDone = true
 			}
-			if scorer == VB {
-				g.vbInfamy(VB, side, kind)
+			// Infamy: +1 per Hostile piece removed in battle on the Vagabond's turn.
+			if scorer == VB && g.Current == VB && g.Players[VB].Relationships[side] == "hostile" {
+				g.Score(VB, 1)
 			}
 			g.Logf(scorer, "battle", "Removed %s %s (+1 VP)", side, kind)
 		}

@@ -129,6 +129,7 @@ func (g *Game) beginDaylight() {
 	case MC:
 		g.ActionsLeft = 3
 		g.MarchMovesLeft = 0
+		g.MCDayStage = "craft"
 	case ED:
 		g.buildDecreeQueue()
 		g.EDDayStage = "craft"

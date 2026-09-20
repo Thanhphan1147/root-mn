@@ -215,7 +215,7 @@ func (g *Game) applyWA(a Action) error {
 				continue
 			}
 			for {
-				kind, ok := g.removePiece(f, a.Clearing)
+				kind, ok := g.removePiece(WA, f, a.Clearing)
 				if !ok {
 					break
 				}
