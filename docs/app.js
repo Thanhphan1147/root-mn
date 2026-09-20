@@ -10,6 +10,16 @@ const POS = {
   C5: [50, 7], C6: [93, 48], C7: [56, 83], C8: [28, 95],
   C9: [5, 48], C10: [50, 32], C11: [71, 60], C12: [32, 55],
 };
+// Forest regions (centroids) and their adjacent clearings.
+const FORESTS = {
+  AutumnN:  [50, 17],
+  AutumnNW: [25, 37],
+  AutumnW:  [16, 63],
+  AutumnSW: [32, 80],
+  AutumnS:  [62, 71],
+  AutumnE:  [84, 64],
+  Witchwood:[67, 42],
+};
 const EDGES = [
   ["C1","C5"],["C1","C9"],["C1","C10"],["C2","C5"],["C2","C6"],["C2","C10"],
   ["C3","C6"],["C3","C7"],["C3","C11"],["C4","C8"],["C4","C9"],["C4","C12"],
@@ -168,8 +178,19 @@ function renderBoard(g) {
   }
   el.append(svg);
 
+  // Forest region labels.
+  for (const [name, pos] of Object.entries(FORESTS)) {
+    const f = document.createElement("div");
+    f.className = "forest";
+    f.style.left = pos[0] + "%";
+    f.style.top = pos[1] + "%";
+    f.textContent = name;
+    el.append(f);
+  }
+
   const ids = Object.keys(g.clearings).sort((a, b) => parseInt(a.slice(1)) - parseInt(b.slice(1)));
   const hl = new Set((g.legal || []).map(a => a.clearing || a.to || a.from).filter(Boolean));
+  const vbPawn = (g.players && g.players.VB) ? g.players.VB.Pawn : "";
 
   for (const id of ids) {
     const c = g.clearings[id];
@@ -191,6 +212,7 @@ function renderBoard(g) {
     for (const b of (c.Buildings || [])) chips += `<span class="chip ${b.Owner}">${b.Type}</span>`;
     for (const t of (c.Tokens || [])) chips += `<span class="chip ${t.Owner}">${t.Type}</span>`;
     if (c.Sympathy) chips += `<span class="chip WA">sympathy</span>`;
+    if (vbPawn === id) chips += `<span class="chip VB">pawn</span>`;
     const wood = c.Wood ? `<span class="wood">wood ${c.Wood}</span>` : "";
     const ruin = c.Ruin ? `<span class="ruin">ruin${c.RuinItem ? " " + c.RuinItem : ""}</span>` : "";
     div.innerHTML =
@@ -198,8 +220,21 @@ function renderBoard(g) {
       `<div class="crowd">${chips}${wood}</div>${ruin}`;
     el.append(div);
   }
+  // Vagabond pawn in a forest.
+  if (vbPawn && FORESTS[vbPawn]) {
+    const pos = FORESTS[vbPawn];
+    const pd = document.createElement("div");
+    pd.className = "pawn";
+    pd.style.left = pos[0] + "%";
+    pd.style.top = (pos[1] + 8) + "%";
+    pd.textContent = "VB pawn";
+    pd.title = "Vagabond in " + vbPawn;
+    el.append(pd);
+  }
+
   document.getElementById("boardfoot").textContent =
-    "roads: " + EDGES.map(([a, b]) => a + "–" + b).join("  ");
+    "roads: " + EDGES.map(([a, b]) => a + "–" + b).join("  ") +
+    "   ·   forests: " + Object.keys(FORESTS).join(", ");
 }
 
 function highlightRoads(svg, id, on) {
