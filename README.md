@@ -136,9 +136,11 @@ go run ./cmd/rmn canonical testdata/worked.rmn
 **Phase 1 (done):** RMN v3.0 spec, parser/validator, rules-complete base-game
 engine, and the serverless web bench (single-device hotseat).
 
-**Phase 2 (planned):** a room/session sync layer for live multiplayer, replay
-import/export from the RMN log, and expansion factions (Riverfolk, Underworld,
-Marauders, hirelings, landmarks).
+**Phase 2 (in progress):** correspondence multiplayer lives in a separate repo,
+[**root-multiplayer**](https://github.com/Thanhphan1147/root-multiplayer) — rooms,
+per-seat JWT tokens, faction picks logged in the `.rmn` header, turn-enforced
+writes, and per-viewer hidden-information redaction. Still to come: a live
+(WebSocket) channel, replay import/export, and expansion factions.
 
 ## Contributing
 
