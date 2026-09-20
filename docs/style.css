@@ -399,6 +399,22 @@ button:focus-visible, a:focus-visible, .clearing:focus-visible {
   * { transition: none !important; animation: none !important; }
 }
 
+/* ---------- Minimap (graph view for small viewports) ---------- */
+
+.minimap { display: none; }
+
+.minimap .mm-svg { display: block; width: 100%; height: auto; }
+.minimap .mm-road { stroke: #7a5a37; stroke-width: 1.6; stroke-linecap: round; opacity: 0.85; }
+.minimap .mm-node { fill: var(--paper); stroke: var(--ink); stroke-width: 1; }
+.minimap .mm-node.mm-suit-F { fill: rgba(181, 71, 31, 0.20); stroke: var(--mc); }
+.minimap .mm-node.mm-suit-R { fill: rgba(154, 118, 20, 0.20); stroke: var(--vb); }
+.minimap .mm-node.mm-suit-M { fill: rgba(91, 100, 114, 0.20); stroke: #5b6472; }
+.minimap .mm-node.mm-suit-B { fill: rgba(40, 82, 122, 0.20); stroke: var(--ed); }
+.minimap .mm-node.mm-hl { stroke-width: 2.6; }
+.minimap .mm-label { font-family: var(--mono); font-size: 6px; font-weight: 700; text-anchor: middle; dominant-baseline: central; fill: var(--ink); }
+.minimap .mm-forest { font-family: var(--mono); font-size: 4.2px; text-anchor: middle; fill: var(--wa); opacity: 0.7; }
+.minimap .mm-pawn { fill: var(--vb); stroke: var(--paper); stroke-width: 0.8; }
+
 /* ---------- Page-load fade ---------- */
 
 @keyframes fadeIn {
@@ -468,6 +484,14 @@ button:focus-visible, a:focus-visible, .clearing:focus-visible {
 /* On small viewports the map switches to a flowing grid so clearings never
    overlap; the board grows vertically instead. */
 @media (max-width: 720px) {
+  .minimap {
+    display: block;
+    margin-bottom: 0.6rem;
+    padding: 0.5rem;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.05));
+  }
   .board {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(138px, 1fr));

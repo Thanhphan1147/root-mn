@@ -62,6 +62,7 @@ function render() {
     `<div>current <b>${g.current}</b>${g.winner && g.winner.length ? " · winner " + g.winner.join("+") : ""}</div>`;
 
   renderPlayers(g);
+  renderMinimap(g);
   renderBoard(g);
   renderActions(g);
   renderLog(g);
@@ -237,6 +238,70 @@ function renderBoard(g) {
     "roads: " + EDGES.map(([a, b]) => a + "–" + b).join("  ") +
     "   ·   forests: " + Object.keys(FORESTS).join(", ") +
     (vbPawn ? "   ·   VB pawn: " + vbPawn : "");
+}
+
+// Compact graph view (shown on small viewports where the board becomes a table).
+function renderMinimap(g) {
+  const el = document.getElementById("minimap");
+  if (!el) return;
+  el.innerHTML = "";
+  const NS = "http://www.w3.org/2000/svg";
+  const SX = 1.6, SY = 1.1; // match the 16:11 board so circles stay round
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", "0 0 160 110");
+  svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+  svg.setAttribute("class", "mm-svg");
+
+  const hl = new Set((g.legal || []).map(a => a.clearing || a.to || a.from).filter(Boolean));
+
+  for (const [a, b] of EDGES) {
+    if (!POS[a] || !POS[b]) continue;
+    const ln = document.createElementNS(NS, "line");
+    ln.setAttribute("x1", POS[a][0] * SX); ln.setAttribute("y1", POS[a][1] * SY);
+    ln.setAttribute("x2", POS[b][0] * SX); ln.setAttribute("y2", POS[b][1] * SY);
+    ln.setAttribute("class", "mm-road");
+    svg.append(ln);
+  }
+
+  for (const [name, pos] of Object.entries(FORESTS)) {
+    const t = document.createElementNS(NS, "text");
+    t.setAttribute("x", pos[0] * SX);
+    t.setAttribute("y", pos[1] * SY);
+    t.setAttribute("class", "mm-forest");
+    t.textContent = name === "Witchwood" ? "Witchwood" : name.replace("Autumn", "");
+    svg.append(t);
+  }
+
+  for (const [id, pos] of Object.entries(POS)) {
+    const c = g.clearings[id];
+    const suit = c ? c.Suit : "B";
+    const node = document.createElementNS(NS, "circle");
+    node.setAttribute("cx", pos[0] * SX);
+    node.setAttribute("cy", pos[1] * SY);
+    node.setAttribute("r", 6);
+    node.setAttribute("class", "mm-node mm-suit-" + suit + (hl.has(id) ? " mm-hl" : ""));
+    svg.append(node);
+    const t = document.createElementNS(NS, "text");
+    t.setAttribute("x", pos[0] * SX);
+    t.setAttribute("y", pos[1] * SY);
+    t.setAttribute("class", "mm-label");
+    t.textContent = id.slice(1);
+    svg.append(t);
+  }
+
+  const vb = g.players && g.players.VB;
+  if (vb && vb.Pawn) {
+    const p = POS[vb.Pawn] || FORESTS[vb.Pawn];
+    if (p) {
+      const dot = document.createElementNS(NS, "circle");
+      dot.setAttribute("cx", p[0] * SX + 4.2);
+      dot.setAttribute("cy", p[1] * SY - 4.2);
+      dot.setAttribute("r", 3);
+      dot.setAttribute("class", "mm-pawn");
+      svg.append(dot);
+    }
+  }
+  el.append(svg);
 }
 
 function highlightRoads(svg, id, on) {
