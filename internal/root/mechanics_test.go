@@ -3,6 +3,7 @@ package root
 import (
 	"encoding/json"
 	"math/rand"
+	"strings"
 	"testing"
 )
 
@@ -959,5 +960,59 @@ func TestMCBattleTargets(t *testing.T) {
 	}
 	if !vsVB {
 		t.Fatal("MC should be able to battle the Vagabond pawn")
+	}
+}
+
+func TestWASympathySpendRecorded(t *testing.T) {
+	g := newTestGame(t)
+	g.Current = WA
+	g.beginTurn()
+	p := g.Players[WA]
+	// Two Fox supporters and a wild Bird; C6 is a Fox clearing with no sympathy.
+	p.Supporters = []string{"F04", "F05", "B11"}
+
+	found := map[string]bool{}
+	for _, a := range g.LegalActions() {
+		if a.Kind == "spread" && a.Clearing == "C6" && len(a.Cards) == 1 {
+			found[a.Cards[0]] = true
+		}
+	}
+	for _, want := range []string{"F04", "F05", "B11"} {
+		if !found[want] {
+			t.Fatalf("expected a spread option spending %s; got %v", want, found)
+		}
+	}
+
+	// Spend the Bird specifically.
+	var pick *Action
+	for _, a := range g.LegalActions() {
+		if a.Kind == "spread" && a.Clearing == "C6" && len(a.Cards) == 1 && a.Cards[0] == "B11" {
+			aa := a
+			pick = &aa
+		}
+	}
+	if pick == nil {
+		t.Fatal("no spread action spending the Bird")
+	}
+	if err := g.Apply(*pick); err != nil {
+		t.Fatal(err)
+	}
+	for _, c := range p.Supporters {
+		if c == "B11" {
+			t.Fatal("the spent Bird should have been removed")
+		}
+	}
+	if len(p.Supporters) != 2 {
+		t.Fatalf("supporters = %v", p.Supporters)
+	}
+	// The log records which card was spent.
+	last := g.Log[len(g.Log)-1].Text
+	if !strings.Contains(last, "B11") {
+		t.Fatalf("log should record the spent supporter: %q", last)
+	}
+	// And the RMN annotation records it.
+	rmn := g.RMNLog[len(g.RMNLog)-1]
+	if !strings.Contains(rmn, "spend=B11") {
+		t.Fatalf("RMN should record spend=B11: %q", rmn)
 	}
 }

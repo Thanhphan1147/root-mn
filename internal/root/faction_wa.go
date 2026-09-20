@@ -1,6 +1,9 @@
 package root
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // ---- Woodland Alliance ----
 
@@ -19,11 +22,24 @@ func (g *Game) legalWABirdsong() []Action {
 		if !g.hasBaseInHand(p, cl.Suit) {
 			continue
 		}
-		if g.matchingSupporters(p, cl.Suit) >= 2 {
-			acts = append(acts, Action{
-				ID: actID("revolt", c), Label: "Revolt at " + c, Kind: "revolt",
-				Faction: WA, Clearing: c,
-			})
+		matching := g.matchingSupporterCards(p, cl.Suit)
+		if len(matching) >= 2 {
+			combos := supporterCombos(matching, 2, 120)
+			for _, combo := range combos {
+				acts = append(acts, Action{
+					ID:    actID("revolt", c, strings.Join(combo, "+")),
+					Label: fmt.Sprintf("Revolt at %s (spend %s)", c, strings.Join(combo, "+")),
+					Kind:  "revolt", Faction: WA, Clearing: c, Cards: combo,
+				})
+			}
+			if len(matching) > 2 {
+				auto := canonicalSelection(matching, 2)
+				acts = append(acts, Action{
+					ID:    actID("revolt", c, "auto"),
+					Label: fmt.Sprintf("Revolt at %s (auto-spend %s)", c, strings.Join(auto, "+")),
+					Kind:  "revolt", Faction: WA, Clearing: c, Cards: auto,
+				})
+			}
 		}
 	}
 	// Spread sympathy options.
@@ -43,15 +59,27 @@ func (g *Game) legalWABirdsong() []Action {
 					continue
 				}
 			}
-			extra := 0
+			total := cost
 			if g.martialLaw(c) {
-				extra = 1
+				total++
 			}
-			if g.matchingSupporters(p, cl.Suit) >= cost+extra {
+			matching := g.matchingSupporterCards(p, cl.Suit)
+			if len(matching) < total {
+				continue
+			}
+			for _, combo := range supporterCombos(matching, total, 120) {
 				acts = append(acts, Action{
-					ID:    actID("spread", c),
-					Label: fmt.Sprintf("Spread sympathy at %s (cost %d, %d VP)", c, cost+extra, SympathyVP[k]),
-					Kind:  "spread", Faction: WA, Clearing: c,
+					ID:    actID("spread", c, strings.Join(combo, "+")),
+					Label: fmt.Sprintf("Spread sympathy at %s (spend %s, %d VP)", c, strings.Join(combo, "+"), SympathyVP[k]),
+					Kind:  "spread", Faction: WA, Clearing: c, Cards: combo,
+				})
+			}
+			if len(matching) > total {
+				auto := canonicalSelection(matching, total)
+				acts = append(acts, Action{
+					ID:    actID("spread", c, "auto"),
+					Label: fmt.Sprintf("Spread sympathy at %s (auto-spend %s, %d VP)", c, strings.Join(auto, "+"), SympathyVP[k]),
+					Kind:  "spread", Faction: WA, Clearing: c, Cards: auto,
 				})
 			}
 		}
@@ -88,6 +116,69 @@ func (g *Game) martialLaw(c string) bool {
 		}
 	}
 	return false
+}
+
+// matchingSupporterCards returns the supporter card ids that match a suit
+// (Bird is wild).
+func (g *Game) matchingSupporterCards(p *Player, s Suit) []string {
+	var out []string
+	for _, c := range p.Supporters {
+		if matches(cardSuit(c), s) {
+			out = append(out, c)
+		}
+	}
+	return out
+}
+
+// spendSpecific removes the given supporter cards and discards them.
+func (g *Game) spendSpecific(p *Player, cards []string) {
+	for _, c := range cards {
+		if takeStr(&p.Supporters, c) {
+			g.Discard = append(g.Discard, c)
+		}
+	}
+}
+
+// supporterCombos returns up to limit combinations of size k.
+func supporterCombos(items []string, k, limit int) [][]string {
+	var out [][]string
+	var rec func(start int, cur []string)
+	rec = func(start int, cur []string) {
+		if len(out) >= limit {
+			return
+		}
+		if len(cur) == k {
+			out = append(out, append([]string{}, cur...))
+			return
+		}
+		for i := start; i < len(items); i++ {
+			rec(i+1, append(cur, items[i]))
+			if len(out) >= limit {
+				return
+			}
+		}
+	}
+	if k <= len(items) {
+		rec(0, nil)
+	}
+	return out
+}
+
+// canonicalSelection prefers non-Bird supporters, then Birds.
+func canonicalSelection(matching []string, k int) []string {
+	var nonBird, bird []string
+	for _, c := range matching {
+		if cardSuit(c) == Bird {
+			bird = append(bird, c)
+		} else {
+			nonBird = append(nonBird, c)
+		}
+	}
+	out := append(append([]string{}, nonBird...), bird...)
+	if len(out) > k {
+		out = out[:k]
+	}
+	return out
 }
 
 func (g *Game) matchingSupporters(p *Player, s Suit) int {
@@ -208,7 +299,7 @@ func (g *Game) applyWA(a Action) error {
 	case "revolt":
 		cl := g.Clearings[a.Clearing]
 		s := cl.Suit
-		g.spendSupporters(p, s, 2)
+		g.spendSpecific(p, a.Cards)
 		vp := 0
 		for _, f := range g.Order {
 			if f == WA {
@@ -235,18 +326,16 @@ func (g *Game) applyWA(a Action) error {
 		g.addWarrior(WA, a.Clearing, warriors)
 		p.Officers++
 		g.Score(WA, vp)
-		g.Logf(WA, "revolt", "Revolt at %s: base placed, %d enemy piece(s) removed (+%d VP)", a.Clearing, vp, vp)
+		g.Logf(WA, "revolt", "Revolt at %s spending %s: base placed, %d enemy piece(s) removed (+%d VP)",
+			a.Clearing, strings.Join(a.Cards, "+"), vp, vp)
 	case "spread":
 		cl := g.Clearings[a.Clearing]
 		k := g.sympathyOnMap() + 1
-		cost := SympathyCost[k]
-		if g.martialLaw(a.Clearing) {
-			cost++
-		}
-		g.spendSupporters(p, cl.Suit, cost)
+		g.spendSpecific(p, a.Cards)
 		cl.Sympathy = WA
 		g.Score(WA, SympathyVP[k])
-		g.Logf(WA, "sympathy", "Spread sympathy at %s (+%d VP)", a.Clearing, SympathyVP[k])
+		g.Logf(WA, "sympathy", "Spread sympathy at %s spending %s (+%d VP)",
+			a.Clearing, strings.Join(a.Cards, "+"), SympathyVP[k])
 	case "mobilize":
 		if takeStr(&p.Hand, a.Card) {
 			g.addSupporter(p, a.Card)

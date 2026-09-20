@@ -1008,7 +1008,7 @@ March is the universal `move`; battle is universal `battle`.
 |---|---|---|---|---|---|
 | `A:mobilize` [S] | `cards:unit-group` | O | `revealed:card-id-list` | Birdsong; cards in hand | move cards to `BOARD:A:SUPPORTERS` |
 | `A:spend-supporters` | `cards:unit-group` | O | `revealed:card-id-list` | cost paid | supporters to `DISCARD` |
-| `A:place-sympathy` | `at:location, spend:card` | — | — | rule/adjacency; `spend` is a supporter card | discard `spend`; place sympathy; score |
+| `A:place-sympathy` | `at:location, spend:unit-group` | — | — | rule/adjacency; `spend` is a supporter card | discard `spend`; place sympathy; score |
 | `A:revolt` | `at:location, base:unit, cards:unit-group` | — | — | 2+ supporters of suit; base in supply | spend `cards` to `DISCARD`; place base + warriors; remove enemy pieces; score |
 | `A:organize` | `group:unit-group, from:location, to:location` | — | — | officers available | move warriors |
 | `A:train` | `card:card` | — | — | spend supporter | gain officer |

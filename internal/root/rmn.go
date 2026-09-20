@@ -114,9 +114,9 @@ func (g *Game) rmnIntent(a Action) (string, string) {
 		if cl := g.Clearings[a.Clearing]; cl != nil {
 			suit = strings.ToLower(string(cl.Suit))
 		}
-		return "A:revolt", fmt.Sprintf("at=%s base=A.b.base-%s", a.Clearing, suit)
+		return "A:revolt", fmt.Sprintf("at=%s base=A.b.base-%s cards=%s", a.Clearing, suit, rmnCards(a.Cards))
 	case "spread":
-		return "A:place-sympathy", fmt.Sprintf("at=%s", a.Clearing)
+		return "A:place-sympathy", fmt.Sprintf("at=%s spend=%s", a.Clearing, rmnCards(a.Cards))
 	case "mobilize":
 		return "A:mobilize", fmt.Sprintf("cards=%s", a.Card)
 	case "train":
@@ -183,6 +183,17 @@ func (g *Game) rmnIntent(a Action) (string, string) {
 		return "place", fmt.Sprintf("group=? to=%s", a.Clearing)
 	}
 	return "notify", fmt.Sprintf("text=\"%s\"", a.Kind)
+}
+
+// rmnCards renders a card list as an RMN unit-group.
+func rmnCards(cards []string) string {
+	switch len(cards) {
+	case 0:
+		return "?"
+	case 1:
+		return cards[0]
+	}
+	return "(" + strings.Join(cards, "+") + ")"
 }
 
 func countRuled(g *Game, f Faction) int {

@@ -157,7 +157,7 @@ func init() {
 	// ---- Woodland Alliance (§11.3) ----
 	ext("A", "mobilize", []OperandDef{op("cards", TUnitGroup)}, []OutcomeDef{out("revealed", TCardIDList)}, "optional", true)
 	ext("A", "spend-supporters", []OperandDef{op("cards", TUnitGroup)}, []OutcomeDef{out("revealed", TCardIDList)}, "optional", false)
-	ext("A", "place-sympathy", []OperandDef{op("at", TLocation), op("spend", TCard)}, nil, "", false)
+	ext("A", "place-sympathy", []OperandDef{op("at", TLocation), op("spend", TUnitGroup)}, nil, "", false)
 	ext("A", "revolt", []OperandDef{op("at", TLocation), op("base", TUnit), op("cards", TUnitGroup)}, nil, "", false)
 	ext("A", "organize", []OperandDef{op("group", TUnitGroup), op("from", TLocation), op("to", TLocation)}, nil, "", false)
 	ext("A", "train", []OperandDef{op("card", TCard)}, nil, "", false)

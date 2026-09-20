@@ -773,7 +773,17 @@ func foldSpendSupporters(s *State, ev *Event, res *FoldResult) {
 func foldPlaceSympathy(s *State, ev *Event, res *FoldResult) {
 	at, _ := ev.Str("at")
 	f := s.Faction("A")
-	if spend, ok := ev.Str("spend"); ok {
+	if g, ok := ev.Group("spend"); ok {
+		for _, a := range g {
+			for i := 0; i < a.Qty; i++ {
+				if takeCard(&f.Supporters, a.Ref) {
+					s.Discard = append(s.Discard, a.Ref)
+				} else {
+					res.warnf("place-sympathy: %s not a supporter", a.Ref)
+				}
+			}
+		}
+	} else if spend, ok := ev.Str("spend"); ok {
 		if takeCard(&f.Supporters, spend) {
 			s.Discard = append(s.Discard, spend)
 		} else {

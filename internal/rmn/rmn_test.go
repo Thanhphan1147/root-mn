@@ -65,8 +65,9 @@ func TestParseEventKinds(t *testing.T) {
 			}
 		}},
 		{"5 1.D A A:place-sympathy at=C5 spend=M03", "A:place-sympathy", func(t *testing.T, e *Event) {
-			if s, _ := e.Str("spend"); s != "M03" {
-				t.Fatalf("spend = %s", s)
+			g, _ := e.Group("spend")
+			if len(g) != 1 || g[0].Ref != "M03" {
+				t.Fatalf("spend = %+v", g)
 			}
 		}},
 		{"6 1.D V V:relationship target=C status=1", "V:relationship", func(t *testing.T, e *Event) {
