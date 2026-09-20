@@ -78,8 +78,12 @@ function renderPlayers(g) {
     div.className = "pcard " + f + (f === g.current ? " current" : "");
     let extra = "";
     if (f === "MC") {
-      extra = `<div class="row"><span>wood supply</span><span>${p.WoodSupply}</span></div>` +
-        `<div class="row"><span>saw/ws/rec</span><span>${p.Sawmills}/${p.Workshops}/${p.Recruiters}</span></div>` +
+      // Wood on the board (spendable) vs the off-board supply reserve.
+      const woodBoard = Object.values(g.clearings).reduce((n, c) => n + (c.Wood || 0), 0);
+      extra =
+        `<div class="row"><span>wood (board)</span><span>${woodBoard}</span></div>` +
+        `<div class="row"><span>wood (supply)</span><span>${p.WoodSupply}</span></div>` +
+        `<div class="row"><span>buildings left</span><span>${p.Sawmills}/${p.Workshops}/${p.Recruiters}</span></div>` +
         `<div class="row"><span>keep</span><span>${p.KeepClearing}</span></div>`;
     } else if (f === "ED") {
       extra = `<div class="row"><span>leader</span><span>${p.Leader}</span></div>` +
