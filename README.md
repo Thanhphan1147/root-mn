@@ -21,8 +21,8 @@ streamed.
 
 - **`SPEC.md`** — the RMN v3.0 specification: grammar, JSON encoding, intent
   dictionaries, validation, replay, and an error taxonomy.
-- **`internal/rmn`** — a Go parser/validator for the RMN text and JSON forms.
-- **`internal/root`** — a rules-complete **base-game engine** for Marquise de
+- **`pkg/rmn`** — a Go parser/validator for the RMN text and JSON forms.
+- **`pkg/root`** — a rules-complete **base-game engine** for Marquise de
   Cat, Eyrie Dynasties, Woodland Alliance, and Vagabond.
 - **`docs/`** — a serverless web tool: the engine compiled to WebAssembly with
   state in `localStorage`, so it is pure static files.
@@ -88,8 +88,8 @@ included workflow builds the wasm and deploys it).
 SPEC.md                 RMN v3.0 specification
 cmd/rmn                 CLI (parse / validate / replay / canonical / apply / serve)
 cmd/rootwasm            WebAssembly entry point exposing window.RootEngine
-internal/rmn            RMN parser, validator, and state replay
-internal/root           ROOT base-game rules engine
+pkg/rmn            RMN parser, validator, and state replay
+pkg/root           ROOT base-game rules engine
 docs/                   static web tool (GitHub Pages root)
 scripts/build-web.sh    rebuilds docs/root.wasm + wasm_exec.js
 testdata/               RMN fixtures + real recorded games (Rootlog corpus)

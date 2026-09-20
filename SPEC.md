@@ -1914,10 +1914,10 @@ F0 + the §18 prefix.
 ## Appendix A — Standard deck manifest (RMN reference) [CORE]
 
 > **CORRECTION (v3.0, errata):** the table below is the original placeholder and is
-> **superseded** by the verified base-game manifest in `internal/root/data.go`
+> **superseded** by the verified base-game manifest in `pkg/root/data.go`
 > (`buildDeck`). The real deck is **54 cards: 14 Fox (F01–F14), 14 Bird (B01–B14),
 > 13 Rabbit (R01–R13), 13 Mouse (M01–M13)** with the exact suits, craft costs, and
-> VP from the official Crafting Chart. Use `internal/root/data.go` as normative.
+> VP from the official Crafting Chart. Use `pkg/root/data.go` as normative.
 
 Format: `id,suit,name,kind`. Serial assignment is by this order and is stable
 per deck ID. `kind` ∈ `normal`,`ambush`,`dominance`,`favor`,`quest`.
@@ -2002,7 +2002,7 @@ Total base items: 13. `club` is an extension item.
 
 > **CORRECTION (v3.0, errata):** the original table below was a placeholder. The
 > verified Autumn data (from the official numbered map card and the
-> `haunt-roll-fail` reference engine) is normative in `internal/root/data.go`.
+> `haunt-roll-fail` reference engine) is normative in `pkg/root/data.go`.
 
 Clearings and fixed suits:
 

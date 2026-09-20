@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 	"syscall/js"
 
-	"github.com/Thanhphan1147/root-mn/internal/root"
+	"github.com/Thanhphan1147/root-mn/pkg/root"
 )
 
 var current *root.Game

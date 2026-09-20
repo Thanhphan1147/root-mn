@@ -20,8 +20,8 @@ the web tool is vanilla JS plus the Go engine compiled to WebAssembly.
 
 - `SPEC.md` — the notation spec. Changes here are design changes; open an issue
   first so we can talk through the grammar/JSON implications.
-- `internal/rmn` — parser, validator, replay for the notation.
-- `internal/root` — the ROOT rules engine. Faction rules should cite the Law of
+- `pkg/rmn` — parser, validator, replay for the notation.
+- `pkg/root` — the ROOT rules engine. Faction rules should cite the Law of
   Root (or the wiki) in the PR description.
 - `docs/` — the static web client. `docs/root.wasm` is generated; run
   `scripts/build-web.sh` after engine changes.

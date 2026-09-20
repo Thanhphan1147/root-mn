@@ -1,6 +1,7 @@
 package root
 
 import (
+	"encoding/json"
 	"fmt"
 	"sort"
 )
@@ -384,6 +385,19 @@ func (g *Game) DayStage() string {
 		return g.EDDayStage
 	}
 	return ""
+}
+
+// Clone returns a deep copy of the game (via a JSON round trip).
+func (g *Game) Clone() *Game {
+	b, err := json.Marshal(g)
+	if err != nil {
+		return g
+	}
+	out := &Game{}
+	if err := json.Unmarshal(b, out); err != nil {
+		return g
+	}
+	return out
 }
 
 // Logf appends a log entry (capped so persisted state stays small).

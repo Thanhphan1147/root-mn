@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Thanhphan1147/root-mn/internal/rmn"
+	"github.com/Thanhphan1147/root-mn/pkg/rmn"
 )
 
 const usage = `rmn - Root Machine Notation (RMN) v3.0 tool
