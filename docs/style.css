@@ -406,10 +406,10 @@ button:focus-visible, a:focus-visible, .clearing:focus-visible {
 .minimap .mm-svg { display: block; width: 100%; height: auto; }
 .minimap .mm-road { stroke: #7a5a37; stroke-width: 1.6; stroke-linecap: round; opacity: 0.85; }
 .minimap .mm-node { fill: var(--paper); stroke: var(--ink); stroke-width: 1; }
-.minimap .mm-node.mm-suit-F { fill: rgba(181, 71, 31, 0.20); stroke: var(--mc); }
-.minimap .mm-node.mm-suit-R { fill: rgba(154, 118, 20, 0.20); stroke: var(--vb); }
-.minimap .mm-node.mm-suit-M { fill: rgba(91, 100, 114, 0.20); stroke: #5b6472; }
-.minimap .mm-node.mm-suit-B { fill: rgba(40, 82, 122, 0.20); stroke: var(--ed); }
+.minimap .mm-node.mm-suit-F { fill: #eccfc2; stroke: var(--mc); }
+.minimap .mm-node.mm-suit-R { fill: #ece2c2; stroke: var(--vb); }
+.minimap .mm-node.mm-suit-M { fill: #d9dde1; stroke: #5b6472; }
+.minimap .mm-node.mm-suit-B { fill: #cfdbe8; stroke: var(--ed); }
 .minimap .mm-node.mm-hl { stroke-width: 2.6; }
 .minimap .mm-label { font-family: var(--mono); font-size: 6px; font-weight: 700; text-anchor: middle; dominant-baseline: central; fill: var(--ink); }
 .minimap .mm-forest { font-family: var(--mono); font-size: 4.2px; text-anchor: middle; fill: var(--wa); opacity: 0.7; }
@@ -427,7 +427,8 @@ button:focus-visible, a:focus-visible, .clearing:focus-visible {
 
 /* Players drawer toggle (hidden on wide screens) */
 #toggleplayers { display: none; }
-.drawer-backdrop { position: fixed; inset: 0; z-index: 55; background: rgba(22, 36, 27, 0.35); }
+/* Transparent click-catcher: closes the drawer without dimming the page. */
+.drawer-backdrop { position: fixed; inset: 0; z-index: 55; background: transparent; }
 
 /* ---------- Responsive ---------- */
 
