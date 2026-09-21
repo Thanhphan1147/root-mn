@@ -1070,3 +1070,125 @@ func TestSetupFactionSubsets(t *testing.T) {
 		}
 	}
 }
+
+// TestBattleHitsWithoutVagabond covers the nil-pointer crash when a game has no
+// Vagabond but a battle hit is assigned (battle.go read g.Players[VB] directly).
+func TestBattleHitsWithoutVagabond(t *testing.T) {
+	subsets := [][]Faction{{MC, ED}, {MC, WA}, {ED, WA}, {MC, ED, WA}}
+	for _, fs := range subsets {
+		g := NewGame(fs, fs[0], 5)
+		BeginSetup(g)
+		for g.SetupMode {
+			acts := g.LegalActions()
+			if len(acts) == 0 {
+				t.Fatalf("%v: setup stalled", fs)
+			}
+			if err := g.Apply(acts[0]); err != nil {
+				t.Fatalf("%v: setup: %v", fs, err)
+			}
+		}
+		att, def := fs[0], fs[1]
+		g.addWarrior(att, "C1", 3)
+		g.addWarrior(def, "C1", 3)
+		g.Battle = &BattleState{
+			Clearing: "C1", Attacker: att, Defender: def,
+			Stage: StageHits, HitSide: def, Remaining: 1, AtkHits: 1,
+		}
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					t.Fatalf("%v: panic assigning a battle hit: %v", fs, r)
+				}
+			}()
+			g.applyBattleHit(Action{Kind: "battle-hit", Faction: def, Piece: "warrior", Clearing: "C1"})
+		}()
+		if got := g.Clearings["C1"].Warriors[def]; got != 2 {
+			t.Fatalf("%v: defender warriors = %d, want 2", fs, got)
+		}
+	}
+}
+
+// TestFullBattleWithoutVagabond drives a complete battle through the action
+// pipeline in a two-player MC-vs-ED game (the reported crash).
+func TestFullBattleWithoutVagabond(t *testing.T) {
+	g := NewGame([]Faction{MC, ED}, MC, 99)
+	BeginSetup(g)
+	for g.SetupMode {
+		acts := g.LegalActions()
+		if len(acts) == 0 {
+			t.Fatal("setup stalled")
+		}
+		if err := g.Apply(acts[0]); err != nil {
+			t.Fatalf("setup: %v", err)
+		}
+	}
+	g.Current = MC
+	g.Phase = "D"
+	g.MCDayStage = "actions"
+	g.ActionsLeft = 3
+	g.addWarrior(MC, "C1", 5)
+	g.addWarrior(ED, "C1", 5)
+
+	var battle *Action
+	for _, a := range g.LegalActions() {
+		if a.Kind == "battle" && a.Clearing == "C1" && a.Target == ED {
+			aa := a
+			battle = &aa
+			break
+		}
+	}
+	if battle == nil {
+		t.Fatal("no MC battle action against ED in C1")
+	}
+	if err := g.Apply(*battle); err != nil {
+		t.Fatalf("start battle: %v", err)
+	}
+	steps := 0
+	for g.Pending != nil && steps < 100 {
+		acts := g.LegalActions()
+		if len(acts) == 0 {
+			break
+		}
+		pick := acts[0]
+		for _, a := range acts {
+			if a.Kind == "battle-skip" {
+				pick = a
+				break
+			}
+		}
+		if err := g.Apply(pick); err != nil {
+			t.Fatalf("battle step: %v", err)
+		}
+		steps++
+	}
+	if g.Battle != nil {
+		t.Fatal("battle did not end")
+	}
+}
+
+// TestRandomPlayAcrossSubsets fuzzes every 2-4 player faction combination,
+// including battles, to catch any other player-count assumptions.
+func TestRandomPlayAcrossSubsets(t *testing.T) {
+	rng := rand.New(rand.NewSource(11))
+	subsets := [][]Faction{
+		{MC, ED}, {MC, WA}, {MC, VB}, {ED, WA}, {ED, VB}, {WA, VB},
+		{MC, ED, WA}, {MC, ED, VB}, {MC, WA, VB}, {ED, WA, VB},
+		{MC, ED, WA, VB},
+	}
+	for _, fs := range subsets {
+		g := NewGame(fs, fs[0], uint64(len(fs)*17+3))
+		BeginSetup(g)
+		for step := 0; step < 2000; step++ {
+			if _, ok := g.WinnerFaction(); ok {
+				break
+			}
+			acts := g.LegalActions()
+			if len(acts) == 0 {
+				break
+			}
+			if err := g.Apply(acts[rng.Intn(len(acts))]); err != nil {
+				t.Fatalf("%v step %d: %v", fs, step, err)
+			}
+		}
+	}
+}

@@ -363,7 +363,10 @@ func (g *Game) applyBattleHit(a Action) {
 		return
 	}
 	cl := g.Clearings[b.Clearing]
-	wasHostile := g.Players[VB].Relationships[side] == "hostile"
+	wasHostile := false
+	if vb := g.Players[VB]; vb != nil {
+		wasHostile = vb.Relationships[side] == "hostile"
+	}
 	removed := false
 	kind := ""
 	switch a.Piece {

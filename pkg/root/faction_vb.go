@@ -423,8 +423,12 @@ func (g *Game) exhaustQuestItems(p *Player, q QuestDef) {
 }
 
 func (g *Game) hostileWarriorsAt(c string) bool {
+	vb := g.Players[VB]
+	if vb == nil {
+		return false
+	}
 	for f, n := range g.Clearings[c].Warriors {
-		if f != VB && n > 0 && g.Players[VB].Relationships[f] == "hostile" {
+		if f != VB && n > 0 && vb.Relationships[f] == "hostile" {
 			return true
 		}
 	}
