@@ -1036,3 +1036,37 @@ func TestRuinOccupiesBuildSlot(t *testing.T) {
 		t.Fatalf("free slots = %d, want 1", cl.FreeSlots())
 	}
 }
+
+func TestSetupFactionSubsets(t *testing.T) {
+	subsets := [][]Faction{
+		{MC, ED}, {MC, ED, VB}, {MC, WA, VB}, {ED, WA, VB}, {MC, ED, WA}, {MC, ED, WA, VB},
+	}
+	for _, fs := range subsets {
+		g := NewGame(fs, fs[0], 7)
+		BeginSetup(g)
+		steps := 0
+		for g.SetupMode && steps < 60 {
+			acts := g.LegalActions()
+			if len(acts) == 0 {
+				t.Fatalf("%v: stuck at stage %s", fs, g.SetupStage)
+			}
+			if err := g.Apply(acts[0]); err != nil {
+				t.Fatalf("%v: apply %s: %v", fs, acts[0].ID, err)
+			}
+			steps++
+		}
+		if g.SetupMode {
+			t.Fatalf("%v: setup did not finish", fs)
+		}
+		// Play a few turns to be sure nothing else assumes all four factions.
+		for i := 0; i < 40; i++ {
+			acts := g.LegalActions()
+			if len(acts) == 0 || len(g.Winner) > 0 {
+				break
+			}
+			if err := g.Apply(acts[0]); err != nil {
+				t.Fatalf("%v: turn apply: %v", fs, err)
+			}
+		}
+	}
+}

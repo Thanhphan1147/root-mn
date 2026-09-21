@@ -33,11 +33,66 @@ func BeginSetup(g *Game) {
 		g.QuestDeck = g.QuestDeck[1:]
 	}
 	g.SetupMode = true
-	g.SetupStage = "MC_KEEP"
 	g.Round = 0
 	g.Phase = "S"
-	g.Current = MC
-	g.Logf(MC, "setup", "Setup: Marquise chooses the keep clearing")
+	g.startSetup()
+}
+
+// has reports whether a faction is in this game.
+func (g *Game) has(f Faction) bool {
+	_, ok := g.Players[f]
+	return ok
+}
+
+// startSetup begins the faction setup sequence for the factions present,
+// skipping any that are not in the game.
+func (g *Game) startSetup() {
+	switch {
+	case g.has(MC):
+		g.SetupStage = "MC_KEEP"
+		g.Current = MC
+		g.Logf(MC, "setup", "Setup: Marquise chooses the keep clearing")
+	case g.has(ED):
+		g.SetupStage = "ED_CORNER"
+		g.Current = ED
+		g.Logf(ED, "setup", "Setup: Eyrie chooses a corner")
+	case g.has(WA):
+		g.waSetup()
+	case g.has(VB):
+		g.SetupStage = "VB_CHARACTER"
+		g.Current = VB
+		g.Logf(VB, "setup", "Setup: Vagabond chooses a character")
+	default:
+		g.finishSetup()
+	}
+}
+
+func (g *Game) afterMC() {
+	if g.has(ED) {
+		g.SetupStage = "ED_CORNER"
+		g.Current = ED
+		g.Logf(ED, "setup", "Setup: Eyrie chooses a corner")
+		return
+	}
+	g.afterED()
+}
+
+func (g *Game) afterED() {
+	if g.has(WA) {
+		g.waSetup()
+		return
+	}
+	g.afterWA()
+}
+
+func (g *Game) afterWA() {
+	if g.has(VB) {
+		g.SetupStage = "VB_CHARACTER"
+		g.Current = VB
+		g.Logf(VB, "setup", "Setup: Vagabond chooses a character")
+		return
+	}
+	g.finishSetup()
 }
 
 // Setup runs the standard automatic setup (used by tests and quick play).
@@ -120,9 +175,7 @@ func (g *Game) setupMCBuild(typ, clearing string) bool {
 	g.SetupPlaced[typ] = true
 	g.Logf(MC, "setup", "Marquise placed a %s at %s", typ, clearing)
 	if g.SetupPlaced["sawmill"] && g.SetupPlaced["workshop"] && g.SetupPlaced["recruiter"] {
-		g.SetupStage = "ED_CORNER"
-		g.Current = ED
-		g.Logf(ED, "setup", "Setup: Eyrie chooses a corner")
+		g.afterMC()
 	}
 	return true
 }
@@ -144,10 +197,8 @@ func (g *Game) setupEDLeader(leader string) {
 		p.Decree[col] = append(p.Decree[col], "VIZIER")
 		p.Viziers = append(p.Viziers, "VIZIER")
 	}
-	g.SetupStage = "WA_SETUP"
-	g.Current = WA
 	g.Logf(ED, "setup", "Eyrie chose leader %s", leader)
-	g.waSetup()
+	g.afterED()
 }
 
 func (g *Game) waSetup() {
@@ -155,10 +206,8 @@ func (g *Game) waSetup() {
 	p := g.Players[WA]
 	p.Supporters = append(p.Supporters, p.Hand...)
 	p.Hand = nil
-	g.SetupStage = "VB_CHARACTER"
-	g.Current = VB
 	g.Logf(WA, "setup", "Alliance drew 3 supporters")
-	g.Logf(VB, "setup", "Setup: Vagabond chooses a character")
+	g.afterWA()
 }
 
 func (g *Game) setupVBCharacter(ch string) {
