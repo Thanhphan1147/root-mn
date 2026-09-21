@@ -1192,3 +1192,46 @@ func TestRandomPlayAcrossSubsets(t *testing.T) {
 		}
 	}
 }
+
+func TestRemoveFaction(t *testing.T) {
+	g := newTestGame(t)
+	// ED is the current, mid-battle player with pieces on the board.
+	g.addWarrior(ED, "C1", 3)
+	g.Clearings["C1"].Buildings = append(g.Clearings["C1"].Buildings, Building{ED, "roost"})
+	g.Current = ED
+	g.Phase = "D"
+	g.Pending = &Pending{Kind: PendingBattleHits, Player: ED}
+	g.Battle = &BattleState{Clearing: "C1", Attacker: MC, Defender: ED, HitSide: ED, Remaining: 1}
+
+	g.RemoveFaction(ED)
+
+	if _, ok := g.Players[ED]; ok {
+		t.Fatal("ED should be removed from Players")
+	}
+	for _, f := range g.Order {
+		if f == ED {
+			t.Fatal("ED should be removed from Order")
+		}
+	}
+	if g.Battle != nil {
+		t.Fatal("a battle referencing ED should be cleared")
+	}
+	if g.Pending != nil {
+		t.Fatal("a pending choice for ED should be cleared")
+	}
+	cl := g.Clearings["C1"]
+	if cl.Warriors[ED] != 0 {
+		t.Fatalf("ED warriors should be gone: %v", cl.Warriors)
+	}
+	for _, b := range cl.Buildings {
+		if b.Owner == ED {
+			t.Fatal("ED buildings should be gone")
+		}
+	}
+	if g.Current == ED || g.Current == "" {
+		t.Fatalf("turn should advance to a remaining faction, got %q", g.Current)
+	}
+	if len(g.LegalActions()) == 0 {
+		t.Fatal("game should continue with legal actions after removal")
+	}
+}
