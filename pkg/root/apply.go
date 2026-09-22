@@ -88,20 +88,27 @@ func (g *Game) maybeFieldHospitals() {
 	g.Pending = &Pending{Kind: PendingFieldHospitals, Player: MC}
 }
 
-// applyFieldHospitals saves removed Marquise warriors to the keep clearing.
+// applyFieldHospitals returns every Marquise warrior removed in a clearing to
+// the keep for a single card that matches the clearing's suit.
 func (g *Game) applyFieldHospitals(a Action) error {
 	p := g.Players[MC]
-	for i, rec := range g.FH {
-		if rec.Clearing != a.Clearing {
+	saved := 0
+	rest := g.FH[:0:0]
+	for _, rec := range g.FH {
+		if rec.Clearing == a.Clearing {
+			saved += rec.Count
 			continue
 		}
-		takeStr(&p.Hand, a.Card)
-		g.Discard = append(g.Discard, a.Card)
-		g.addWarrior(MC, p.KeepClearing, rec.Count)
-		g.FH = append(g.FH[:i:i], g.FH[i+1:]...)
-		g.Logf(MC, "field-hospitals", "Saved %d warrior(s) to %s", rec.Count, p.KeepClearing)
-		break
+		rest = append(rest, rec)
 	}
+	if saved == 0 {
+		return nil
+	}
+	takeStr(&p.Hand, a.Card)
+	g.Discard = append(g.Discard, a.Card)
+	g.addWarrior(MC, p.KeepClearing, saved)
+	g.FH = rest
+	g.Logf(MC, "field-hospitals", "Spent %s to save %d warrior(s) to %s", cardName(a.Card), saved, p.KeepClearing)
 	if len(g.FH) == 0 {
 		g.Pending = nil
 	}

@@ -209,10 +209,12 @@ func (g *Game) applyMC(a Action) error {
 }
 
 // spendWood removes wood from the chosen clearing and connected ruled clearings.
+// Spent wood returns to the supply (the Marquise's wood is a fixed pool).
 func (g *Game) spendWood(start string, n int) {
 	if n <= 0 {
 		return
 	}
+	p := g.Players[MC]
 	// order: start first, then BFS ruled neighbours.
 	order := []string{start}
 	seen := map[string]bool{start: true}
@@ -239,5 +241,6 @@ func (g *Game) spendWood(start string, n int) {
 		}
 		g.Clearings[c].Wood -= take
 		n -= take
+		p.WoodSupply += take
 	}
 }

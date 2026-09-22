@@ -466,11 +466,33 @@ func (g *Game) hasDominance(f Faction) bool {
 }
 
 func (g *Game) addWarrior(f Faction, c string, n int) {
+	if n > 0 {
+		// Placements are limited by the faction's warrior supply.
+		if room := g.warriorSupplyLeft(f); room < n {
+			n = room
+		}
+		if n <= 0 {
+			return
+		}
+	}
 	cl := g.Clearings[c]
 	cl.Warriors[f] += n
 	if cl.Warriors[f] <= 0 {
 		delete(cl.Warriors, f)
 	}
+}
+
+// warriorSupplyLeft returns how many warrior pieces a faction can still place.
+func (g *Game) warriorSupplyLeft(f Faction) int {
+	supply := WarriorSupply[f]
+	if supply <= 0 {
+		return 1 << 30 // no supply limit (e.g. the Vagabond)
+	}
+	left := supply - g.warriorsOnMap(f)
+	if left < 0 {
+		left = 0
+	}
+	return left
 }
 
 func (g *Game) removeWarrior(f Faction, c string, n int) int {

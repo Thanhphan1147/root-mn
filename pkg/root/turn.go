@@ -74,7 +74,9 @@ func (g *Game) birdsongWood(p *Player) {
 	}
 }
 
-// newRoost places a roost + 3 warriors in the clearing with the fewest warriors.
+// newRoost implements A New Roost: if the Eyrie has no roosts, place a roost and
+// three warriors in the clearing with the fewest warriors where all of those
+// pieces can be placed (i.e. the roost has a free building slot).
 func (g *Game) newRoost(p *Player) {
 	if g.totalBuildings(ED, "roost") >= 7 {
 		return
@@ -83,7 +85,7 @@ func (g *Game) newRoost(p *Player) {
 	bestN := 1 << 30
 	for _, c := range g.clearingsSorted() {
 		cl := g.Clearings[c]
-		if g.isKeep(c) || cl.FreeSlots() <= 0 {
+		if cl.FreeSlots() <= 0 {
 			continue
 		}
 		n := 0

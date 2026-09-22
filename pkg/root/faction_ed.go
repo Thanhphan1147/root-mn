@@ -91,6 +91,15 @@ func (g *Game) legalEDDaylight() []Action {
 		suit := decreeSuit(it.Card)
 		switch col {
 		case "RECRUIT":
+			// A recruit that the supply cannot cover is unresolvable, so the
+			// only legal move for the column becomes Turmoil.
+			need := 1
+			if p.Leader == "charismatic" {
+				need = 2
+			}
+			if g.warriorSupplyLeft(ED) < need {
+				continue
+			}
 			for _, c := range g.clearingsSorted() {
 				if g.buildingsOf(ED, c, "roost") > 0 && matches(g.Clearings[c].Suit, suit) {
 					acts = append(acts, Action{

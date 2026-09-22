@@ -297,6 +297,14 @@ var EDRoostVP = []int{0, 0, 1, 2, 3, 4, 4, 5}
 // EDRoostDrawBonus indexed by roosts on map 0..7.
 var EDRoostDrawBonus = []int{0, 0, 0, 1, 1, 1, 2, 2}
 
+// WarriorSupply is the number of warrior pieces each faction has. Placing
+// warriors beyond the supply does nothing — the pieces are not available.
+var WarriorSupply = map[Faction]int{
+	MC: 25,
+	ED: 20,
+	WA: 10,
+}
+
 // Quests is the base-game quest deck.
 var Quests = []QuestDef{
 	{"q.F01", Fox, "Fundraising", []string{"tea", "coin"}},

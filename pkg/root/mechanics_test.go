@@ -1235,3 +1235,176 @@ func TestRemoveFaction(t *testing.T) {
 		t.Fatal("game should continue with legal actions after removal")
 	}
 }
+
+func TestWoodReturnsToSupply(t *testing.T) {
+	g := newTestGame(t)
+	p := g.Players[MC]
+	keep := p.KeepClearing
+	g.Clearings[keep].Wood = 5
+	p.WoodSupply = 3
+
+	g.spendWood(keep, 4)
+
+	if p.WoodSupply != 7 {
+		t.Fatalf("supply = %d, want 7 (spent wood must return to the pool)", p.WoodSupply)
+	}
+	if g.Clearings[keep].Wood != 1 {
+		t.Fatalf("board wood = %d, want 1", g.Clearings[keep].Wood)
+	}
+}
+
+func TestFieldHospitalsSavesAll(t *testing.T) {
+	g := newTestGame(t)
+	p := g.Players[MC]
+	clearing := "C6"
+	suit := g.Clearings[clearing].Suit
+	card := ""
+	for _, id := range p.Hand {
+		if matches(cardSuit(id), suit) {
+			card = id
+			break
+		}
+	}
+	if card == "" {
+		for _, id := range g.Deck {
+			if matches(cardSuit(id), suit) {
+				card = id
+				break
+			}
+		}
+		p.Hand = append(p.Hand, card)
+	}
+	if card == "" {
+		t.Fatal("no card matching the clearing suit")
+	}
+
+	// Three warriors were removed in the clearing this turn.
+	g.FH = []FHRec{
+		{Clearing: clearing, Count: 1},
+		{Clearing: clearing, Count: 1},
+		{Clearing: clearing, Count: 1},
+	}
+	g.Pending = &Pending{Kind: PendingFieldHospitals, Player: MC}
+
+	var fh *Action
+	acts := g.LegalActions()
+	for i := range acts {
+		if acts[i].Kind == "field-hospitals" && acts[i].Clearing == clearing {
+			fh = &acts[i]
+			break
+		}
+	}
+	if fh == nil {
+		t.Fatal("no field-hospitals action offered")
+	}
+	keepBefore := g.Clearings[p.KeepClearing].Warriors[MC]
+	if err := g.Apply(*fh); err != nil {
+		t.Fatal(err)
+	}
+	if got := g.Clearings[p.KeepClearing].Warriors[MC] - keepBefore; got != 3 {
+		t.Fatalf("saved %d warriors, want 3 (one card saves them all)", got)
+	}
+	if len(g.FH) != 0 || g.Pending != nil {
+		t.Fatalf("field hospitals should be resolved: FH=%+v pending=%v", g.FH, g.Pending)
+	}
+}
+
+func TestNewRoostFewestWarriors(t *testing.T) {
+	g := newTestGame(t)
+	// Remove every roost.
+	for _, c := range g.Clearings {
+		kept := c.Buildings[:0:0]
+		for _, b := range c.Buildings {
+			if !(b.Owner == ED && b.Type == "roost") {
+				kept = append(kept, b)
+			}
+		}
+		c.Buildings = kept
+	}
+	if g.totalBuildings(ED, "roost") != 0 {
+		t.Fatal("roosts should be gone")
+	}
+
+	// Empty the board, then leave one warrior in C2 so the keep clearing (C1)
+	// has the fewest. Guarantee the keep clearing has a free building slot.
+	keep := g.Players[MC].KeepClearing
+	for _, c := range g.Clearings {
+		c.Warriors = map[Faction]int{}
+	}
+	g.Clearings[keep].Buildings = nil
+	g.Clearings[keep].Ruin = false
+	g.addWarrior(MC, "C2", 1)
+
+	g.Current = ED
+	g.beginTurn()
+
+	if g.buildingsOf(ED, keep, "roost") != 1 {
+		t.Fatalf("A New Roost should be allowed in the keep clearing %s", keep)
+	}
+	if got := g.Clearings[keep].Warriors[ED]; got != 3 {
+		t.Fatalf("placed %d warriors, want 3", got)
+	}
+}
+
+func TestWarriorSupplyCap(t *testing.T) {
+	g := newTestGame(t)
+	for _, c := range g.Clearings {
+		c.Warriors = map[Faction]int{}
+	}
+	g.Clearings["C1"].Warriors[ED] = 20
+	g.Clearings["C2"].Warriors[MC] = 25
+	g.Clearings["C3"].Warriors[WA] = 10
+
+	g.addWarrior(ED, "C4", 5)
+	if got := g.warriorsOnMap(ED); got != 20 {
+		t.Fatalf("ED = %d, want the 20 supply cap", got)
+	}
+	g.addWarrior(MC, "C5", 1)
+	if got := g.warriorsOnMap(MC); got != 25 {
+		t.Fatalf("MC = %d, want the 25 supply cap", got)
+	}
+	g.addWarrior(WA, "C6", 1)
+	if got := g.warriorsOnMap(WA); got != 10 {
+		t.Fatalf("WA = %d, want the 10 supply cap", got)
+	}
+
+	// Removing warriors frees supply for later placements.
+	g.removeWarrior(ED, "C1", 3)
+	g.addWarrior(ED, "C4", 5)
+	if got := g.warriorsOnMap(ED); got != 20 {
+		t.Fatalf("ED after removal+add = %d, want 20", got)
+	}
+}
+
+func TestDecreeRecruitTurmoilsWhenSupplyEmpty(t *testing.T) {
+	g := newTestGame(t)
+	if g.buildingsOf(ED, "C3", "roost") == 0 {
+		g.Clearings["C3"].Buildings = append(g.Clearings["C3"].Buildings, Building{ED, "roost"})
+	}
+	g.DecreeQueue = []DecreeItem{{Column: "RECRUIT", Card: "VIZIER"}}
+	g.EDDayStage = "decree"
+	g.Current = ED
+	g.Phase = "D"
+	for _, c := range g.Clearings {
+		c.Warriors[ED] = 0
+	}
+
+	// One warrior left in supply: the recruit can be resolved.
+	g.Clearings["C1"].Warriors[ED] = 19
+	found := false
+	for _, a := range g.LegalActions() {
+		if a.Kind == "decree-recruit" {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatal("expected a recruit action while the supply has a warrior")
+	}
+
+	// Supply exhausted: the Decree cannot be resolved, so only Turmoil remains.
+	g.Clearings["C1"].Warriors[ED] = 20
+	acts := g.LegalActions()
+	if len(acts) != 1 || acts[0].Kind != "ed-turmoil" {
+		t.Fatalf("expected only Turmoil when the supply is empty, got %+v", acts)
+	}
+}
