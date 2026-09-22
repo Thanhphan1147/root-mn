@@ -25,6 +25,7 @@ func (g *Game) beginTurn() {
 	for _, p := range g.Players {
 		p.UsedThisTurn = map[string]bool{}
 		p.AidCount = map[Faction]int{}
+		p.Revealed = map[Faction]bool{}
 	}
 	f := g.Current
 	p := g.Players[f]

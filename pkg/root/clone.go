@@ -67,6 +67,7 @@ func (p *Player) clone() *Player {
 	out.Crafted = cloneSlice(p.Crafted)
 	out.CraftedItems = cloneSlice(p.CraftedItems)
 	out.UsedThisTurn = cloneMap(p.UsedThisTurn)
+	out.Revealed = cloneMap(p.Revealed)
 	out.Viziers = cloneSlice(p.Viziers)
 	out.RetiredLeaders = cloneSlice(p.RetiredLeaders)
 	out.Supporters = cloneSlice(p.Supporters)

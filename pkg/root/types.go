@@ -51,6 +51,7 @@ type Player struct {
 	Crafted      []string // persistent effect card ids in play
 	CraftedItems []string // item types crafted (non-VB)
 	UsedThisTurn map[string]bool
+	Revealed     map[Faction]bool // hands this player has looked at this turn
 
 	// Marquise
 	WoodSupply   int
@@ -191,7 +192,7 @@ func NewGame(factions []Faction, first Faction, seed uint64) *Game {
 			Faction: f, Hand: []string{}, Decree: map[string][]string{},
 			Bases: map[Suit]bool{}, Items: map[string]*ItemState{},
 			Relationships: map[Faction]string{}, AidCount: map[Faction]int{},
-			UsedThisTurn: map[string]bool{},
+			UsedThisTurn: map[string]bool{}, Revealed: map[Faction]bool{},
 		}
 		g.Order = append(g.Order, f)
 	}

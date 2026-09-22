@@ -1460,3 +1460,50 @@ func TestDecreeRecruitNeedsMatchingRoost(t *testing.T) {
 		t.Fatalf("a Fox Recruit with no Fox roost should force Turmoil, got %+v", acts)
 	}
 }
+
+func TestCodebreakersRevealsHand(t *testing.T) {
+	g := newTestGame(t)
+	mc := g.Players[MC]
+	mc.Crafted = append(mc.Crafted, "M12") // Codebreakers
+	g.Current = MC
+	g.Phase = "D"
+	g.MCDayStage = "actions"
+	g.ActionsLeft = 3
+
+	hands := func(viewer string) map[Faction]*Player {
+		return Redact(g, viewer)["players"].(map[Faction]*Player)
+	}
+	if got := hands("MC")[ED].Hand; len(got) == 0 || got[0] != "??" {
+		t.Fatalf("ED's hand should start hidden, got %v", got)
+	}
+
+	var cb *Action
+	acts := g.LegalActions()
+	for i := range acts {
+		if acts[i].Kind == "codebreakers" && acts[i].Target == ED {
+			cb = &acts[i]
+			break
+		}
+	}
+	if cb == nil {
+		t.Fatal("no Codebreakers action against the Eyrie")
+	}
+	if err := g.Apply(*cb); err != nil {
+		t.Fatal(err)
+	}
+
+	if got := hands("MC")[ED].Hand; len(got) == 0 || got[0] == "??" {
+		t.Fatalf("Codebreakers should reveal ED's hand to MC, got %v", got)
+	}
+	// A third faction still cannot see it.
+	if got := hands("WA")[ED].Hand; len(got) == 0 || got[0] != "??" {
+		t.Fatalf("WA should not see ED's hand, got %v", got)
+	}
+
+	// The reveal lasts only for MC's turn.
+	g.Current = ED
+	g.beginTurn()
+	if got := hands("MC")[ED].Hand; len(got) == 0 || got[0] != "??" {
+		t.Fatalf("the reveal should expire on the next turn, got %v", got)
+	}
+}

@@ -25,8 +25,13 @@ var hiddenRMNIntents = map[string]bool{
 // faction id (or "" for a spectator, which hides all hands).
 func Redact(g *Game, viewer string) map[string]any {
 	cp := g.Clone()
+	viewerPlayer := cp.Players[Faction(viewer)]
 	for f, p := range cp.Players {
 		if string(f) == viewer {
+			continue
+		}
+		// Hands the viewer has looked at (e.g. Codebreakers) stay visible.
+		if viewerPlayer != nil && viewerPlayer.Revealed[f] {
 			continue
 		}
 		for i := range p.Hand {

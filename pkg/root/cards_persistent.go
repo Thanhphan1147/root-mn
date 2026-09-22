@@ -103,6 +103,10 @@ func (g *Game) applyPersistent(a Action) error {
 		g.Logf(a.Faction, "stand-deliver", "Stand and Deliver!: took a card from %s (they scored 1 VP)", a.Target)
 	case "codebreakers":
 		p.UsedThisTurn["codebreakers"] = true
+		if p.Revealed == nil {
+			p.Revealed = map[Faction]bool{}
+		}
+		p.Revealed[a.Target] = true
 		g.Logf(a.Faction, "codebreakers", "Codebreakers: looked at %s's hand", a.Target)
 	case "tax-collector":
 		if g.TaxUsed {
