@@ -1,7 +1,6 @@
 package root
 
 import (
-	"encoding/json"
 	"fmt"
 	"sort"
 )
@@ -258,6 +257,15 @@ func (g *Game) Clearing(id string) *Clearing { return g.Clearings[id] }
 // Player returns a player by faction.
 func (g *Game) Player(f Faction) *Player { return g.Players[f] }
 
+// Actor returns the faction that must act now: the pending player when the
+// engine is waiting on a deferred choice, otherwise the current player.
+func (g *Game) Actor() Faction {
+	if g.Pending != nil {
+		return g.Pending.Player
+	}
+	return g.Current
+}
+
 // Rules reports whether f rules clearing c (Eyrie wins ties).
 func (g *Game) Rules(f Faction, c string) bool {
 	cl := g.Clearings[c]
@@ -385,19 +393,6 @@ func (g *Game) DayStage() string {
 		return g.EDDayStage
 	}
 	return ""
-}
-
-// Clone returns a deep copy of the game (via a JSON round trip).
-func (g *Game) Clone() *Game {
-	b, err := json.Marshal(g)
-	if err != nil {
-		return g
-	}
-	out := &Game{}
-	if err := json.Unmarshal(b, out); err != nil {
-		return g
-	}
-	return out
 }
 
 // Logf appends a log entry (capped so persisted state stays small).
