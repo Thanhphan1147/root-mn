@@ -1408,3 +1408,55 @@ func TestDecreeRecruitTurmoilsWhenSupplyEmpty(t *testing.T) {
 		t.Fatalf("expected only Turmoil when the supply is empty, got %+v", acts)
 	}
 }
+
+func TestDecreeRecruitNeedsMatchingRoost(t *testing.T) {
+	g := newTestGame(t)
+	// Leave the Eyrie with a single Rabbit roost.
+	for _, c := range g.Clearings {
+		kept := c.Buildings[:0:0]
+		for _, b := range c.Buildings {
+			if !(b.Owner == ED && b.Type == "roost") {
+				kept = append(kept, b)
+			}
+		}
+		c.Buildings = kept
+	}
+	g.Clearings["C3"].Buildings = append(g.Clearings["C3"].Buildings, Building{ED, "roost"})
+	g.EDDayStage = "decree"
+	g.Current = ED
+	g.Phase = "D"
+
+	rabbit, fox := "", ""
+	for _, id := range g.Deck {
+		if c, ok := Card(id); ok {
+			if c.Suit == Rabbit && rabbit == "" {
+				rabbit = id
+			}
+			if c.Suit == Fox && fox == "" {
+				fox = id
+			}
+		}
+	}
+	if rabbit == "" || fox == "" {
+		t.Fatal("deck is missing a Rabbit or Fox card")
+	}
+
+	// A Rabbit card resolves at the Rabbit roost.
+	g.DecreeQueue = []DecreeItem{{Column: "RECRUIT", Card: rabbit}}
+	resolvable := false
+	for _, a := range g.LegalActions() {
+		if a.Kind == "decree-recruit" {
+			resolvable = true
+		}
+	}
+	if !resolvable {
+		t.Fatal("a Rabbit Recruit should resolve at a Rabbit roost")
+	}
+
+	// A Fox card cannot, so the Decree forces Turmoil.
+	g.DecreeQueue = []DecreeItem{{Column: "RECRUIT", Card: fox}}
+	acts := g.LegalActions()
+	if len(acts) != 1 || acts[0].Kind != "ed-turmoil" {
+		t.Fatalf("a Fox Recruit with no Fox roost should force Turmoil, got %+v", acts)
+	}
+}
