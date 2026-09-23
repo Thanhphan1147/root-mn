@@ -57,6 +57,9 @@ func (g *Game) mcBuildActions(p *Player) []Action {
 			continue
 		}
 		for _, typ := range types {
+			if g.buildingsOf(MC, c, typ) > 0 {
+				continue // only one of each building type per clearing
+			}
 			remaining := p.Sawmills
 			switch typ {
 			case "workshop":

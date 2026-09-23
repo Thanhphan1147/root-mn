@@ -23,6 +23,16 @@ func (g *Game) rmnLine(a Action) string {
 		actor = g.Current
 	}
 	intent, operands := g.rmnIntent(a)
+	// Record drawn cards only on the draw intent: other intents (pass, setup)
+	// may draw as a side effect, and leaking hidden cards through them would be
+	// wrong. Redact scrubs draw lines for opponents.
+	if intent == "draw" && len(g.DrawnThisAction) > 0 {
+		out := fmt.Sprintf("-> {drawn=[%s]}", strings.Join(g.DrawnThisAction, ","))
+		if operands != "" {
+			operands += " "
+		}
+		operands += out
+	}
 	line := fmt.Sprintf("%d %d.%s %s %s", len(g.RMNLog)+1, g.Round, g.Phase, actor, intent)
 	if operands != "" {
 		line += " " + operands
@@ -96,13 +106,13 @@ func (g *Game) rmnIntent(a Action) (string, string) {
 	case "decree-add":
 		return "E:decree-add", fmt.Sprintf("column=%s cards=%s", strings.ToUpper(a.Column), a.Card)
 	case "decree-recruit":
-		return "E:recruit", fmt.Sprintf("at=[%s]", a.Clearing)
+		return "E:recruit", fmt.Sprintf("at=[%s] card=%s", a.Clearing, a.Card)
 	case "decree-move":
-		return "E:move", fmt.Sprintf("group=%s from=%s to=%s", rmnWarrior(ED, a.Amount), a.From, a.To)
+		return "E:move", fmt.Sprintf("group=%s from=%s to=%s card=%s", rmnWarrior(ED, a.Amount), a.From, a.To, a.Card)
 	case "decree-battle":
-		return "E:battle", fmt.Sprintf("defender=%s at=%s", a.Target, a.Clearing)
+		return "E:battle", fmt.Sprintf("defender=%s at=%s card=%s", a.Target, a.Clearing, a.Card)
 	case "decree-build":
-		return "E:build", fmt.Sprintf("building=ED.b.roost at=%s", a.Clearing)
+		return "E:build", fmt.Sprintf("building=ED.b.roost at=%s card=%s", a.Clearing, a.Card)
 	case "ed-done-crafting":
 		return "notify", "who=ED text=\"done crafting\""
 	case "ed-turmoil":
@@ -160,8 +170,17 @@ func (g *Game) rmnIntent(a Action) (string, string) {
 		if g.Battle != nil {
 			cl = g.Battle.Clearing
 		}
-		if a.Piece == "warrior" {
+		switch a.Piece {
+		case "warrior":
 			return "remove", fmt.Sprintf("group=%s at=%s", rmnWarrior(f, 1), cl)
+		case "building":
+			if a.Building != "" {
+				return "remove", fmt.Sprintf("group=%s.b.%s at=%s", f, rmnBuilding(a.Building), cl)
+			}
+		case "token":
+			if a.Item != "" {
+				return "remove", fmt.Sprintf("group=%s.t.%s at=%s", f, a.Item, cl)
+			}
 		}
 		return "remove", fmt.Sprintf("group=%s at=%s", a.Piece, cl)
 	case "battle-skip":
@@ -180,9 +199,32 @@ func (g *Game) rmnIntent(a Action) (string, string) {
 		return "notify", fmt.Sprintf("who=%s text=\"looked at %s hand\"", f, a.Target)
 	}
 	if strings.HasPrefix(a.Kind, "setup-") {
-		return "place", fmt.Sprintf("group=? to=%s", a.Clearing)
+		return setupIntent(a)
 	}
 	return "notify", fmt.Sprintf("text=\"%s\"", a.Kind)
+}
+
+// setupIntent renders a setup action's RMN intent. Before this, every setup
+// step logged an identical "place group=? to=X", which made a replay
+// undecidable — the whole point of RMN is that a log reconstructs the game
+// exactly. Each setup choice now names the piece (or leader/character) it
+// placed, so replay is deterministic.
+func setupIntent(a Action) (string, string) {
+	switch a.Kind {
+	case "setup-mc-keep":
+		return "place", fmt.Sprintf("group=MC.b.keep#1 to=%s", a.Clearing)
+	case "setup-mc-build":
+		return "place", fmt.Sprintf("group=MC.b.%s#1 to=%s", rmnBuilding(a.Building), a.Clearing)
+	case "setup-ed-corner":
+		return "place", fmt.Sprintf("group=(ED.b.roost#1+6ED.w) to=%s", a.Clearing)
+	case "setup-ed-leader":
+		return "E:appoint-leader", "leader=ED.ldr." + a.Leader
+	case "setup-vb-character":
+		return "V:choose-character", "character=V.character." + a.Character
+	case "setup-vb-forest":
+		return "V:move-pawn", fmt.Sprintf("to=%s", a.To)
+	}
+	return "place", fmt.Sprintf("group=? to=%s", a.Clearing)
 }
 
 // rmnCards renders a card list as an RMN unit-group.

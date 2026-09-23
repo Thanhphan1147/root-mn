@@ -146,11 +146,11 @@ func init() {
 	ext("E", "discard-decree", nil, nil, "", false)
 	ext("E", "appoint-leader", []OperandDef{op("leader", TUnit)}, nil, "", true)
 	ext("E", "turmoil", []OperandDef{op("reason", TEnum)}, nil, "", false)
-	ext("E", "recruit", []OperandDef{op("at", TLocationList)}, nil, "", false)
-	ext("E", "move", []OperandDef{op("group", TUnitGroup), op("from", TLocation), op("to", TLocation)}, nil, "", false)
-	ext("E", "battle", []OperandDef{op("defender", TFaction), op("at", TLocation)},
+	ext("E", "recruit", []OperandDef{op("at", TLocationList), opOpt("card", TCardID)}, nil, "", false)
+	ext("E", "move", []OperandDef{op("group", TUnitGroup), op("from", TLocation), op("to", TLocation), opOpt("card", TCardID)}, nil, "", false)
+	ext("E", "battle", []OperandDef{op("defender", TFaction), op("at", TLocation), opOpt("card", TCardID)},
 		[]OutcomeDef{out("atk", TInt), out("def", TInt), out("extra_atk", TInt), out("extra_def", TInt)}, "explicit", false)
-	ext("E", "build", []OperandDef{op("building", TUnit), op("at", TLocation)}, nil, "", false)
+	ext("E", "build", []OperandDef{op("building", TUnit), op("at", TLocation), opOpt("card", TCardID)}, nil, "", false)
 	ext("E", "add-vizier", []OperandDef{op("card", TCard)}, nil, "", false)
 	ext("E", "score-roosts", []OperandDef{op("amount", TInt)}, nil, "", false)
 

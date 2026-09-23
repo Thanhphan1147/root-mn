@@ -245,7 +245,7 @@ func (g *Game) legalBattleHits() []Action {
 		if bd.Owner == side {
 			acts = append(acts, Action{
 				ID: actID("battle-hit", "building", itoa(i)), Label: "Remove " + bd.Type,
-				Kind: "battle-hit", Faction: side, Piece: "building", Clearing: b.Clearing, Amount: i,
+				Kind: "battle-hit", Faction: side, Piece: "building", Clearing: b.Clearing, Amount: i, Building: bd.Type,
 			})
 		}
 	}
@@ -253,7 +253,7 @@ func (g *Game) legalBattleHits() []Action {
 		if t.Owner == side {
 			acts = append(acts, Action{
 				ID: actID("battle-hit", "token", itoa(i)), Label: "Remove " + t.Type,
-				Kind: "battle-hit", Faction: side, Piece: "token", Clearing: b.Clearing, Amount: i,
+				Kind: "battle-hit", Faction: side, Piece: "token", Clearing: b.Clearing, Amount: i, Item: t.Type,
 			})
 		}
 	}

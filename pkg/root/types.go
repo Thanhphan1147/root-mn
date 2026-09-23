@@ -167,6 +167,12 @@ type Game struct {
 	// last removal for Outrage
 	LastRemoveSeq       int
 	LastRemovedSympathy map[string]Faction // clearing -> offender (unused, kept simple)
+
+	// DrawnThisAction collects cards drawn during the current action so the RMN
+	// line can record them as the `drawn` outcome (redaction hides them from
+	// opponents). Without it, several different draw effects produced identical
+	// `draw ...` lines and a replay could not tell them apart.
+	DrawnThisAction []string
 }
 
 // NewGame creates a game for the given factions (2-4, base only) on autumn.
@@ -540,6 +546,7 @@ func (g *Game) drawCards(f Faction, n int) {
 			return
 		}
 		p.Hand = append(p.Hand, g.Deck[0])
+		g.DrawnThisAction = append(g.DrawnThisAction, g.Deck[0])
 		g.Deck = g.Deck[1:]
 	}
 }
