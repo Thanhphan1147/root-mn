@@ -1,11 +1,6 @@
 package root
 
-import (
-	"regexp"
-	"strings"
-)
-
-var reCardID = regexp.MustCompile(`[FRMB][0-9]{2}`)
+import "strings"
 
 // hiddenLogKinds are log entries whose text can reveal hidden cards.
 var hiddenLogKinds = map[string]bool{
@@ -108,6 +103,27 @@ func rmnOwner(fields []string) string {
 	return fields[2]
 }
 
+// redactCardIDs replaces card ids (a suit letter F/R/M/B followed by two
+// digits) with "??". It scans manually instead of using regexp, which is large
+// in the WebAssembly build.
 func redactCardIDs(s string) string {
-	return reCardID.ReplaceAllString(s, "??")
+	if !strings.ContainsAny(s, "FRMB") {
+		return s
+	}
+	var b strings.Builder
+	for i := 0; i < len(s); i++ {
+		if i+2 < len(s) && isSuitLetter(s[i]) && isASCIIDigit(s[i+1]) && isASCIIDigit(s[i+2]) {
+			b.WriteString("??")
+			i += 2
+			continue
+		}
+		b.WriteByte(s[i])
+	}
+	return b.String()
 }
+
+func isSuitLetter(c byte) bool {
+	return c == 'F' || c == 'R' || c == 'M' || c == 'B'
+}
+
+func isASCIIDigit(c byte) bool { return c >= '0' && c <= '9' }
