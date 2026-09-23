@@ -23,7 +23,21 @@ func (g *Game) Apply(a Action) (err error) {
 			g.recordRMN(a, false)
 		}
 	}()
+	return g.applyResolved(a)
+}
 
+// ApplyFast executes an action that is already known to be legal — one taken
+// straight from the parent's LegalActions — without re-deriving and scanning the
+// legal set and without recording RMN. It is the path a search should use: the
+// parent already produced this exact action, so re-validating it is wasted work.
+func (g *Game) ApplyFast(a Action) error {
+	defer g.checkWin()
+	defer g.maybeFieldHospitals()
+	return g.applyResolved(a)
+}
+
+// applyResolved dispatches an already-validated action.
+func (g *Game) applyResolved(a Action) error {
 	if a.Kind == "battle-skip" && g.Pending != nil && g.Pending.Kind == PendingFieldHospitals {
 		g.FH = nil
 		g.Pending = nil
