@@ -182,6 +182,9 @@ func (g *Game) setupMCBuild(typ, clearing string) bool {
 
 func (g *Game) setupEDCorner(clearing string) {
 	p := g.Players[ED]
+	// The corner diagonal to the Marquise's keep is reserved for the Eyrie, so
+	// no Marquise warriors may be there.
+	delete(g.Clearings[clearing].Warriors, MC)
 	g.Clearings[clearing].Buildings = append(g.Clearings[clearing].Buildings, Building{ED, "roost"})
 	g.addWarrior(ED, clearing, 6)
 	p.Leader = ""
