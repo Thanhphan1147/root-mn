@@ -141,33 +141,39 @@ func (g *Game) legalVBDaylight() []Action {
 			})
 		}
 	}
-	// Aid
-	if _, ok := g.readyItemAny(p); ok {
+	// Aid (9.5.4): exhaust one item of your choice, give a matching card, and
+	// optionally take a crafted item. Offer one action per exhaust choice and
+	// per item to take.
+	if exhausts := g.readyItemIDs(p); len(exhausts) > 0 {
 		for _, f := range g.Order {
 			if f == VB || g.pieceCount(f, p.Pawn) == 0 {
 				continue
 			}
 			s := g.Clearings[p.Pawn].Suit
+			seen := map[string]bool{}
+			var takeList []string
+			for _, it := range g.Players[f].CraftedItems {
+				if !seen[it] {
+					seen[it] = true
+					takeList = append(takeList, it)
+				}
+			}
+			sort.Strings(takeList)
 			for _, id := range p.Hand {
 				if !matches(cardSuit(id), s) {
 					continue
 				}
-				acts = append(acts, Action{
-					ID:    actID("vb-aid", string(f), id),
-					Label: fmt.Sprintf("Aid %s with %s", f, cardName(id)),
-					Kind:  "vb-aid", Faction: VB, Target: f, Card: id,
-				})
-				seenItems := map[string]bool{}
-				for _, it := range g.Players[f].CraftedItems {
-					if seenItems[it] {
-						continue // one action per crafted item type
-					}
-					seenItems[it] = true
+				for _, ex := range exhausts {
 					acts = append(acts, Action{
-						ID:    actID("vb-aid", string(f), id, it),
-						Label: fmt.Sprintf("Aid %s with %s, take %s", f, cardName(id), it),
-						Kind:  "vb-aid", Faction: VB, Target: f, Card: id, Item: it,
+						ID: actID("vb-aid", string(f), id, ex), Label: fmt.Sprintf("Aid %s with %s (exhaust %s)", f, cardName(id), ex),
+						Kind: "vb-aid", Faction: VB, Target: f, Card: id, Exhaust: ex,
 					})
+					for _, it := range takeList {
+						acts = append(acts, Action{
+							ID: actID("vb-aid", string(f), id, ex, it), Label: fmt.Sprintf("Aid %s with %s (exhaust %s), take %s", f, cardName(id), ex, it),
+							Kind: "vb-aid", Faction: VB, Target: f, Card: id, Exhaust: ex, Item: it,
+						})
+					}
 				}
 			}
 		}
@@ -254,17 +260,24 @@ func (g *Game) coalitionTargets() []Faction {
 }
 
 func (g *Game) readyItemAny(p *Player) (string, bool) {
+	ids := g.readyItemIDs(p)
+	if len(ids) == 0 {
+		return "", false
+	}
+	return ids[0], true
+}
+
+// readyItemIDs returns every usable item (face-up, undamaged), sorted so the
+// choice is deterministic.
+func (g *Game) readyItemIDs(p *Player) []string {
 	var ids []string
 	for id, it := range p.Items {
 		if !it.Damaged && it.FaceUp {
 			ids = append(ids, id)
 		}
 	}
-	if len(ids) == 0 {
-		return "", false
-	}
-	sort.Strings(ids) // deterministic: map order would vary between runs
-	return ids[0], true
+	sort.Strings(ids)
+	return ids
 }
 
 func (g *Game) canCompleteQuest(p *Player, q QuestDef) bool {
@@ -373,7 +386,9 @@ func (g *Game) applyVB(a Action) error {
 			g.Logf(VB, "explore", "Explored %s: took item (+1 VP)", a.Clearing)
 		}
 	case "vb-aid":
-		if id, ok := g.readyItemAny(p); ok {
+		if a.Exhaust != "" {
+			g.exhaustItem(p, a.Exhaust)
+		} else if id, ok := g.readyItemAny(p); ok {
 			g.exhaustItem(p, id)
 		}
 		if takeStr(&p.Hand, a.Card) {

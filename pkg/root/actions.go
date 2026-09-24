@@ -28,6 +28,7 @@ type Action struct {
 	Piece     string   `json:"piece,omitempty"`
 	Character string   `json:"character,omitempty"`
 	Leader    string   `json:"leader,omitempty"`
+	Exhaust   string   `json:"exhaust,omitempty"`
 }
 
 func actID(kind string, parts ...string) string {

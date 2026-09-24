@@ -159,7 +159,7 @@ func (g *Game) rmnIntent(a Action) (string, string) {
 		if a.Item != "" {
 			take = "i." + a.Item
 		}
-		return "V:aid", fmt.Sprintf("target=%s card=%s take=%s", a.Target, a.Card, take)
+		return "V:aid", fmt.Sprintf("target=%s card=%s exhaust=%s take=%s", a.Target, a.Card, a.Exhaust, take)
 	case "vb-quest":
 		return "V:complete-quest", fmt.Sprintf("quest=%s reward=%s", a.Quest, a.Item)
 	case "vb-repair":

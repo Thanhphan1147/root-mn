@@ -168,7 +168,7 @@ func init() {
 	// ---- Vagabond (§11.4) ----
 	ext("V", "choose-character", []OperandDef{op("character", TUnit)}, nil, "", true)
 	ext("V", "move-pawn", []OperandDef{op("to", TLocation)}, nil, "", true)
-	ext("V", "aid", []OperandDef{op("target", TFaction), op("card", TCard), op("take", TOptionalUnit)}, nil, "", false)
+	ext("V", "aid", []OperandDef{op("target", TFaction), op("card", TCard), opOpt("exhaust", TUnitGroup), op("take", TOptionalUnit)}, nil, "", false)
 	ext("V", "explore", []OperandDef{op("at", TLocation)}, []OutcomeDef{out("item", TItemRef)}, "explicit", false)
 	ext("V", "take-quest", []OperandDef{op("quest", TQuestID)}, []OutcomeDef{out("quest", TQuestID)}, "explicit", false)
 	ext("V", "complete-quest", []OperandDef{op("quest", TQuestID), op("items", TUnitGroup), opOpt("reward", TEnum)}, nil, "", false)
