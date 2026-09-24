@@ -482,23 +482,34 @@ func (g *Game) vbAidRelationship(target Faction) {
 	case "hostile":
 		// no relationship change
 	default:
+		// 9.2.9.I: to advance one space you must Aid the number of times listed
+		// between the current and next space, in the same turn, and each Aid
+		// counts toward only one improvement. So the count is per improvement
+		// (1, then 2, then 3), resetting when the marker advances.
 		p.AidCount[target]++
+		need := 0
 		switch rel {
 		case "indifferent":
-			if p.AidCount[target] >= 1 {
-				p.Relationships[target] = "amiable"
-				g.Score(VB, 1)
-			}
+			need = 1
 		case "amiable":
-			if p.AidCount[target] >= 2 {
-				p.Relationships[target] = "friendly"
-				g.Score(VB, 2)
-			}
+			need = 2
 		case "friendly":
-			if p.AidCount[target] >= 3 {
-				p.Relationships[target] = "allied"
-				g.Score(VB, 2)
-			}
+			need = 3
+		}
+		if p.AidCount[target] < need {
+			return
+		}
+		p.AidCount[target] = 0
+		switch rel {
+		case "indifferent":
+			p.Relationships[target] = "amiable"
+			g.Score(VB, 1)
+		case "amiable":
+			p.Relationships[target] = "friendly"
+			g.Score(VB, 2)
+		case "friendly":
+			p.Relationships[target] = "allied"
+			g.Score(VB, 2)
 		}
 	}
 }
