@@ -1,6 +1,9 @@
 package root
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 // ---- Persistent card effects (base game) ----
 
@@ -207,14 +210,21 @@ func (g *Game) vbCapacityCheck(p *Player) {
 		return
 	}
 	remove := count - limit
+	ids := make([]string, 0, len(p.Items))
 	for id, it := range p.Items {
+		if it.Zone == "satchel" || it.Zone == "damaged" {
+			ids = append(ids, id)
+		}
+	}
+	// Deterministic order: deleting items in map order made the game (and its
+	// replay) depend on Go's map iteration.
+	sort.Strings(ids)
+	for _, id := range ids {
 		if remove <= 0 {
 			break
 		}
-		if it.Zone == "satchel" || it.Zone == "damaged" {
-			delete(p.Items, id)
-			remove--
-		}
+		delete(p.Items, id)
+		remove--
 	}
 	g.Logf(VB, "capacity", "Removed excess items (limit %d)", limit)
 }

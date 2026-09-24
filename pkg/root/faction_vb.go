@@ -1,6 +1,9 @@
 package root
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 // ---- Vagabond ----
 
@@ -312,11 +315,19 @@ func (g *Game) applyVB(a Action) error {
 			cost = 2
 		}
 		exhausted := 0
+		boots := make([]string, 0, len(p.Items))
 		for id, it := range p.Items {
-			if it.Type == "boot" && it.FaceUp && !it.Damaged && exhausted < cost {
-				g.exhaustItem(p, id)
-				exhausted++
+			if it.Type == "boot" && it.FaceUp && !it.Damaged {
+				boots = append(boots, id)
 			}
+		}
+		sort.Strings(boots) // deterministic choice
+		for _, id := range boots {
+			if exhausted >= cost {
+				break
+			}
+			g.exhaustItem(p, id)
+			exhausted++
 		}
 		if a.Ally != "" {
 			from := p.Pawn
