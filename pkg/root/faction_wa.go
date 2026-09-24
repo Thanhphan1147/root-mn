@@ -2,6 +2,7 @@ package root
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -67,20 +68,32 @@ func (g *Game) legalWABirdsong() []Action {
 			if len(matching) < total {
 				continue
 			}
-			for _, combo := range supporterCombos(matching, total, 120) {
+			combos := supporterCombos(matching, total, 120)
+			seen := map[string]bool{}
+			for _, combo := range combos {
+				key := cardSetKey(combo)
+				if seen[key] {
+					continue
+				}
+				seen[key] = true
 				acts = append(acts, Action{
 					ID:    actID("spread", c, strings.Join(combo, "+")),
 					Label: fmt.Sprintf("Spread sympathy at %s (spend %s, %d VP)", c, strings.Join(combo, "+"), SympathyVP[k]),
 					Kind:  "spread", Faction: WA, Clearing: c, Cards: combo,
 				})
 			}
+			// Offer the canonical selection only if the combo list did not
+			// already include it, so two actions never spend the same cards.
 			if len(matching) > total {
 				auto := canonicalSelection(matching, total)
-				acts = append(acts, Action{
-					ID:    actID("spread", c, "auto"),
-					Label: fmt.Sprintf("Spread sympathy at %s (auto-spend %s, %d VP)", c, strings.Join(auto, "+"), SympathyVP[k]),
-					Kind:  "spread", Faction: WA, Clearing: c, Cards: auto,
-				})
+				if key := cardSetKey(auto); !seen[key] {
+					seen[key] = true
+					acts = append(acts, Action{
+						ID:    actID("spread", c, "auto"),
+						Label: fmt.Sprintf("Spread sympathy at %s (auto-spend %s, %d VP)", c, strings.Join(auto, "+"), SympathyVP[k]),
+						Kind:  "spread", Faction: WA, Clearing: c, Cards: auto,
+					})
+				}
 			}
 		}
 	}
@@ -403,4 +416,12 @@ func (g *Game) outrage(offender Faction, clearing string) {
 		g.addSupporter(g.Players[WA], c)
 		g.Logf(WA, "outrage", "Outrage: %s had no matching card; WA drew one", offender)
 	}
+}
+
+// cardSetKey is an order-independent key for a set of cards, so the same set is
+// never offered twice.
+func cardSetKey(cards []string) string {
+	cp := append([]string(nil), cards...)
+	sort.Strings(cp)
+	return strings.Join(cp, "+")
 }
