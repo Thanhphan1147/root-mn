@@ -67,6 +67,7 @@ function render() {
   renderActions(g);
   renderLog(g);
   renderRMN(g);
+  if (howtoIsOpen()) howtoRender(g.current);
 }
 
 function renderPlayers(g) {
@@ -427,7 +428,12 @@ function setDrawer(open) {
 }
 playersToggle.onclick = () => setDrawer(!document.body.classList.contains("players-open"));
 backdrop.onclick = () => setDrawer(false);
-window.addEventListener("keydown", e => { if (e.key === "Escape") setDrawer(false); });
+window.addEventListener("keydown", e => { if (e.key === "Escape") { setDrawer(false); howtoClose(); } });
+
+// How to play: shows the current turn player's faction.
+document.getElementById("togglehowto").onclick = () => howtoToggle(game && game.current);
+document.getElementById("howtoclose").onclick = howtoClose;
+document.getElementById("howtobackdrop").onclick = howtoClose;
 
 async function boot() {
   const status = document.getElementById("actions");
