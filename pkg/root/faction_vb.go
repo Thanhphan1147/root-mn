@@ -26,12 +26,17 @@ func (g *Game) forestsAdjacentTo(c string) []string {
 }
 
 func (g *Game) readyItem(p *Player, typ string) (string, bool) {
+	var ids []string
 	for id, it := range p.Items {
 		if it.Type == typ && !it.Damaged && it.FaceUp {
-			return id, true
+			ids = append(ids, id)
 		}
 	}
-	return "", false
+	if len(ids) == 0 {
+		return "", false
+	}
+	sort.Strings(ids) // deterministic: map order would vary between runs
+	return ids[0], true
 }
 
 func (g *Game) hasItem(p *Player, typ string) bool {
@@ -244,12 +249,17 @@ func (g *Game) coalitionTargets() []Faction {
 }
 
 func (g *Game) readyItemAny(p *Player) (string, bool) {
+	var ids []string
 	for id, it := range p.Items {
 		if !it.Damaged && it.FaceUp {
-			return id, true
+			ids = append(ids, id)
 		}
 	}
-	return "", false
+	if len(ids) == 0 {
+		return "", false
+	}
+	sort.Strings(ids) // deterministic: map order would vary between runs
+	return ids[0], true
 }
 
 func (g *Game) canCompleteQuest(p *Player, q QuestDef) bool {
@@ -424,12 +434,17 @@ func (g *Game) applyVB(a Action) error {
 func (g *Game) exhaustQuestItems(p *Player, q QuestDef) {
 	need := append([]string{}, q.Items...)
 	for _, n := range need {
+		var ids []string
 		for id, it := range p.Items {
 			if it.Type == n && !it.Damaged && it.FaceUp {
-				g.exhaustItem(p, id)
-				break
+				ids = append(ids, id)
 			}
 		}
+		if len(ids) == 0 {
+			continue
+		}
+		sort.Strings(ids)
+		g.exhaustItem(p, ids[0])
 	}
 }
 
@@ -483,14 +498,23 @@ func (g *Game) vbSpecial(a Action) {
 			g.exhaustItem(p, id)
 		}
 		repaired := 0
-		for _, it := range p.Items {
-			if it.Damaged && repaired < 3 {
-				it.Damaged = false
-				if it.Zone == "damaged" {
-					it.Zone = "satchel"
-				}
-				repaired++
+		var dmg []string
+		for id, it := range p.Items {
+			if it.Damaged {
+				dmg = append(dmg, id)
 			}
+		}
+		sort.Strings(dmg)
+		for _, id := range dmg {
+			if repaired >= 3 {
+				break
+			}
+			it := p.Items[id]
+			it.Damaged = false
+			if it.Zone == "damaged" {
+				it.Zone = "satchel"
+			}
+			repaired++
 		}
 		g.Logf(VB, "special", "Hideout: repaired %d items; Daylight ends", repaired)
 		g.beginEvening()
