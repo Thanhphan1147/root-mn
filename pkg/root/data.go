@@ -334,6 +334,23 @@ func QuestByID(id string) (QuestDef, bool) {
 	return QuestDef{}, false
 }
 
+// QuestInfo is the client-facing quest description (public information).
+type QuestInfo struct {
+	ID    string   `json:"id"`
+	Name  string   `json:"name"`
+	Suit  string   `json:"suit"`
+	Items []string `json:"items"`
+}
+
+// QuestInfoMap returns descriptions for every quest.
+func QuestInfoMap() map[string]QuestInfo {
+	out := make(map[string]QuestInfo, len(Quests))
+	for _, q := range Quests {
+		out[q.ID] = QuestInfo{ID: q.ID, Name: q.Name, Suit: string(q.Suit), Items: q.Items}
+	}
+	return out
+}
+
 // CardInfo is the client-facing card description.
 type CardInfo struct {
 	ID     string `json:"id"`
