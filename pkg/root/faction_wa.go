@@ -25,8 +25,13 @@ func (g *Game) legalWABirdsong() []Action {
 		}
 		matching := g.matchingSupporterCards(p, cl.Suit)
 		if len(matching) >= 2 {
-			combos := supporterCombos(matching, 2, 120)
-			for _, combo := range combos {
+			seen := map[string]bool{}
+			for _, combo := range supporterCombos(matching, 2, 120) {
+				key := cardSetKey(combo)
+				if seen[key] {
+					continue
+				}
+				seen[key] = true
 				acts = append(acts, Action{
 					ID:    actID("revolt", c, strings.Join(combo, "+")),
 					Label: fmt.Sprintf("Revolt at %s (spend %s)", c, strings.Join(combo, "+")),
@@ -35,11 +40,13 @@ func (g *Game) legalWABirdsong() []Action {
 			}
 			if len(matching) > 2 {
 				auto := canonicalSelection(matching, 2)
-				acts = append(acts, Action{
-					ID:    actID("revolt", c, "auto"),
-					Label: fmt.Sprintf("Revolt at %s (auto-spend %s)", c, strings.Join(auto, "+")),
-					Kind:  "revolt", Faction: WA, Clearing: c, Cards: auto,
-				})
+				if key := cardSetKey(auto); !seen[key] {
+					acts = append(acts, Action{
+						ID:    actID("revolt", c, "auto"),
+						Label: fmt.Sprintf("Revolt at %s (auto-spend %s)", c, strings.Join(auto, "+")),
+						Kind:  "revolt", Faction: WA, Clearing: c, Cards: auto,
+					})
+				}
 			}
 		}
 	}
