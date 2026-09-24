@@ -2,63 +2,67 @@ package root
 
 import "testing"
 
-// TestVagabondRefresh checks the Birdsong refresh: flip 3 exhausted items face
-// up, plus 2 for each tea face up on the Refresh Track.
-func TestVagabondRefresh(t *testing.T) {
+// TestVagabondRefreshChoice checks the Birdsong refresh is an interactive choice
+// (9.4.1): 3 + 2 per tea, the player picks a specific item each time, and a
+// refreshed coin/tea/bag returns to its track.
+func TestVagabondRefreshChoice(t *testing.T) {
 	g := NewGame([]Faction{MC, ED, WA, VB}, MC, 1)
 	p := g.Players[VB]
+	p.Pawn = "AutumnN"
 	p.Items = map[string]*ItemState{
 		"torch#1": {Type: "torch", Zone: "satchel", FaceUp: false},
+		"coin#1":  {Type: "coin", Zone: "satchel", FaceUp: false},
 		"boot#1":  {Type: "boot", Zone: "satchel", FaceUp: false},
 		"boot#2":  {Type: "boot", Zone: "satchel", FaceUp: false},
-		"boot#3":  {Type: "boot", Zone: "satchel", FaceUp: false},
-		"boot#4":  {Type: "boot", Zone: "satchel", FaceUp: false},
-		"sword#1": {Type: "sword", Zone: "satchel", FaceUp: true},
+		"tea#1":   {Type: "tea", Zone: "track", FaceUp: true},
 	}
-	g.vbRefresh(p)
-	up := 0
-	for _, it := range p.Items {
-		if it.FaceUp {
-			up++
-		}
-	}
-	// 3 refreshed + the already-up sword = 4.
-	if up != 4 {
-		t.Fatalf("refresh flipped to %d face-up, want 4", up)
-	}
+	g.SetupMode = false
+	g.Current = VB
+	g.Phase = "B"
+	g.VBRefreshLeft = 3 + 2*trackCount(p, "tea")
 
-	// With a tea on the track, 3+2 = 5 exhausted items refresh.
-	p.Items["tea#1"] = &ItemState{Type: "tea", Zone: "track", FaceUp: true}
-	for _, id := range []string{"torch#1", "boot#1", "boot#2", "boot#3", "boot#4"} {
-		p.Items[id].FaceUp = false
+	acts := g.legalVBRefresh()
+	if len(acts) != 4 {
+		t.Fatalf("refresh offered %d options, want 4", len(acts))
 	}
-	g.vbRefresh(p)
-	up = 0
-	for _, it := range p.Items {
-		if it.FaceUp {
-			up++
+	for _, a := range acts {
+		if a.Item == "coin#1" {
+			if err := g.Apply(a); err != nil {
+				t.Fatal(err)
+			}
 		}
 	}
-	// tea + sword already up (2), plus 5 refreshed = 7.
-	if up != 7 {
-		t.Fatalf("with one tea, refresh flipped to %d face-up, want 7", up)
+	if !p.Items["coin#1"].FaceUp || p.Items["coin#1"].Zone != "track" {
+		t.Fatalf("refreshed coin should be face up on its track: %+v", p.Items["coin#1"])
+	}
+	if g.VBRefreshLeft != 4 {
+		t.Fatalf("refresh allowance = %d, want 4", g.VBRefreshLeft)
 	}
 }
 
-// TestVagabondRefreshOnTurnStart checks the refresh actually runs when the
-// Vagabond's turn begins.
-func TestVagabondRefreshOnTurnStart(t *testing.T) {
+// TestVagabondRefreshIsNotAutomatic checks the refresh is not done for the
+// player: after the Vagabond's turn begins, the exhausted item is still down and
+// a refresh action is offered.
+func TestVagabondRefreshIsNotAutomatic(t *testing.T) {
 	g := NewGame([]Faction{MC, ED, WA, VB}, MC, 1)
 	g.SetupMode = false
 	p := g.Players[VB]
+	p.Pawn = "AutumnN"
 	p.Items = map[string]*ItemState{"torch#1": {Type: "torch", Zone: "satchel", FaceUp: false}}
 	g.Current = WA
 	g.Phase = "E"
-	g.endTurn() // advances to VB and begins its turn
+	g.endTurn() // advances to the Vagabond and begins its Birdsong
+
 	if g.Current != VB {
 		t.Fatalf("expected to advance to VB, got %s", g.Current)
 	}
-	if !p.Items["torch#1"].FaceUp {
-		t.Fatalf("VB Birdsong did not refresh the exhausted torch")
+	if g.VBRefreshLeft != 3 {
+		t.Fatalf("refresh allowance = %d, want 3", g.VBRefreshLeft)
+	}
+	if p.Items["torch#1"].FaceUp {
+		t.Fatalf("refresh must be a choice, not automatic")
+	}
+	if len(g.legalVBRefresh()) == 0 {
+		t.Fatalf("no refresh action offered")
 	}
 }

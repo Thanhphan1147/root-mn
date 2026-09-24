@@ -173,6 +173,10 @@ type Game struct {
 	// opponents). Without it, several different draw effects produced identical
 	// `draw ...` lines and a replay could not tell them apart.
 	DrawnThisAction []string
+
+	// VBRefreshLeft is how many exhausted items the Vagabond may still flip up
+	// this Birdsong (3 + 2 per tea on the Refresh track at the start).
+	VBRefreshLeft int
 }
 
 // NewGame creates a game for the given factions (2-4, base only) on autumn.

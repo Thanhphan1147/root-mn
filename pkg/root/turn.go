@@ -41,7 +41,10 @@ func (g *Game) beginTurn() {
 			g.newRoost(p)
 		}
 	case VB:
-		g.vbRefresh(p)
+		// 9.4.1 Refresh: the Vagabond flips up 3 + 2 per tea (tea on the track
+		// at the start, so tea flipped during this step does not count). The
+		// player chooses which items, so this becomes interactive actions.
+		g.VBRefreshLeft = 3 + 2*trackCount(p, "tea")
 	}
 	g.applyBetterBurrowBank(f)
 	g.checkDominanceWin(f)

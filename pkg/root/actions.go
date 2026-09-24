@@ -91,6 +91,10 @@ func (g *Game) passAllowed() bool {
 			return len(g.DecreeQueue) == 0
 		}
 	}
+	if g.Current == VB && g.Phase == "B" {
+		// The refresh (9.4.1) must be completed before ending Birdsong.
+		return !(g.VBRefreshLeft > 0 && g.hasExhaustedItem(g.Players[VB]))
+	}
 	return true
 }
 
@@ -210,7 +214,8 @@ func (g *Game) legalBirdsong(f Faction) []Action {
 	case WA:
 		acts = g.legalWABirdsong()
 	case VB:
-		acts = g.legalVBSlip()
+		acts = append(acts, g.legalVBRefresh()...)
+		acts = append(acts, g.legalVBSlip()...)
 	}
 	acts = append(acts, g.persistentBirdsongActions(f)...)
 	return acts

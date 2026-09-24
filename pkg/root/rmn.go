@@ -138,6 +138,8 @@ func (g *Game) rmnIntent(a Action) (string, string) {
 		return "A:organize", fmt.Sprintf("at=%s", a.Clearing)
 	case "wa-recruit":
 		return "place", fmt.Sprintf("group=WA.w to=%s", a.Clearing)
+	case "vb-refresh":
+		return "V:refresh", fmt.Sprintf("items=%s", a.Item)
 	case "vb-slip":
 		return "V:move-pawn", fmt.Sprintf("to=%s", a.To)
 	case "vb-move":

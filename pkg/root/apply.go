@@ -77,7 +77,7 @@ func (g *Game) applyResolved(a Action) error {
 		return g.applyED(a)
 	case "revolt", "spread", "mobilize", "train", "organize", "wa-move", "wa-battle", "wa-recruit":
 		return g.applyWA(a)
-	case "vb-move", "vb-slip", "vb-explore", "vb-aid", "vb-quest", "vb-strike", "vb-repair", "vb-special", "vb-battle", "vb-battle-ally", "coalition":
+	case "vb-move", "vb-slip", "vb-refresh", "vb-explore", "vb-aid", "vb-quest", "vb-strike", "vb-repair", "vb-special", "vb-battle", "vb-battle-ally", "coalition":
 		return g.applyVB(a)
 	case "battle-ambush", "battle-foil", "battle-hit", "battle-skip", "battle-effect":
 		return g.applyBattlePending(a)

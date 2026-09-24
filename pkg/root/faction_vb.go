@@ -314,6 +314,13 @@ func (g *Game) vbSpecialActions(p *Player) []Action {
 func (g *Game) applyVB(a Action) error {
 	p := g.Players[VB]
 	switch a.Kind {
+	case "vb-refresh":
+		if it, ok := p.Items[a.Item]; ok && !it.FaceUp && !it.Damaged && g.VBRefreshLeft > 0 {
+			it.FaceUp = true
+			g.placeFaceUpItem(p, it)
+			g.VBRefreshLeft--
+			g.Logf(VB, "refresh", "Refreshed %s", a.Item)
+		}
 	case "vb-slip":
 		p.Pawn = a.To
 		g.VBSlipped = true
@@ -545,19 +552,44 @@ func (g *Game) vbSpecial(a Action) {
 	}
 }
 
-// vbRefresh flips face-up 3 + 2*tea exhausted items. Damaged items are not
-// refreshed (they are repaired by Repair or the Evening rest).
-func (g *Game) vbRefresh(p *Player) {
-	tea := trackCount(p, "tea")
-	n := 3 + 2*tea
-	for _, it := range p.Items {
-		if n <= 0 {
-			break
-		}
+// legalVBRefresh offers flipping one exhausted item up, while the Birdsong
+// refresh allowance remains (9.4.1). The player chooses which items.
+func (g *Game) legalVBRefresh() []Action {
+	if g.VBRefreshLeft <= 0 {
+		return nil
+	}
+	p := g.Players[VB]
+	var ids []string
+	for id, it := range p.Items {
 		if !it.FaceUp && !it.Damaged {
-			it.FaceUp = true
-			n--
+			ids = append(ids, id)
 		}
+	}
+	sort.Strings(ids)
+	acts := make([]Action, 0, len(ids))
+	for _, id := range ids {
+		acts = append(acts, Action{
+			ID: actID("vb-refresh", id), Label: "Refresh " + id, Kind: "vb-refresh", Faction: VB, Item: id,
+		})
+	}
+	return acts
+}
+
+// exhaustedItemLeft reports whether a refresh is still possible/needed.
+func (g *Game) hasExhaustedItem(p *Player) bool {
+	for _, it := range p.Items {
+		if !it.FaceUp && !it.Damaged {
+			return true
+		}
+	}
+	return false
+}
+
+// placeFaceUpItem sends a freshly refreshed tea/coin/bag to its track if there
+// is room (9.2.5.I).
+func (g *Game) placeFaceUpItem(p *Player, it *ItemState) {
+	if (it.Type == "tea" || it.Type == "coin" || it.Type == "bag") && trackCount(p, it.Type) < 3 {
+		it.Zone = "track"
 	}
 }
 
