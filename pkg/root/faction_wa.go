@@ -226,7 +226,9 @@ func (g *Game) legalWADaylight() []Action {
 			Faction: WA, Card: id,
 		})
 	}
-	// Train: spend a card matching a base clearing suit.
+	// Train: spend a card matching a base clearing suit. The clearing only
+	// provides the suit match, so one action per card is enough; offering one
+	// per matching base made the RMN line (which names only the card) ambiguous.
 	for _, id := range p.Hand {
 		for _, c := range g.clearingsSorted() {
 			if g.buildingsOf(WA, c, "base-"+string(g.Clearings[c].Suit)) > 0 && matches(cardSuit(id), g.Clearings[c].Suit) {
@@ -234,6 +236,7 @@ func (g *Game) legalWADaylight() []Action {
 					ID: actID("train", id, c), Label: fmt.Sprintf("Train: spend %s → officer", cardName(id)),
 					Kind: "train", Faction: WA, Card: id, Clearing: c,
 				})
+				break
 			}
 		}
 	}
