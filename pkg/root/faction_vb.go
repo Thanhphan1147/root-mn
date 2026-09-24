@@ -157,7 +157,12 @@ func (g *Game) legalVBDaylight() []Action {
 					Label: fmt.Sprintf("Aid %s with %s", f, cardName(id)),
 					Kind:  "vb-aid", Faction: VB, Target: f, Card: id,
 				})
+				seenItems := map[string]bool{}
 				for _, it := range g.Players[f].CraftedItems {
+					if seenItems[it] {
+						continue // one action per crafted item type
+					}
+					seenItems[it] = true
 					acts = append(acts, Action{
 						ID:    actID("vb-aid", string(f), id, it),
 						Label: fmt.Sprintf("Aid %s with %s, take %s", f, cardName(id), it),
