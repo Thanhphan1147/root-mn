@@ -6,6 +6,8 @@ import "fmt"
 func (g *Game) Apply(a Action) (err error) {
 	defer g.checkWin()
 	defer g.maybeFieldHospitals()
+	// Capture the round/phase before the action: it may end the phase or round.
+	round, phase := g.Round, g.Phase
 	legal := g.LegalActions()
 	var found *Action
 	for i := range legal {
@@ -20,7 +22,7 @@ func (g *Game) Apply(a Action) (err error) {
 	a = *found
 	defer func() {
 		if err == nil {
-			g.recordRMN(a, false)
+			g.recordRMN(a, round, phase)
 		}
 	}()
 	return g.applyResolved(a)

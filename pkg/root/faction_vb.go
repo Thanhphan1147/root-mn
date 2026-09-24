@@ -510,7 +510,8 @@ func (g *Game) vbSpecial(a Action) {
 	}
 }
 
-// vbRefresh flips face-up 3 + 2*tea exhausted items.
+// vbRefresh flips face-up 3 + 2*tea exhausted items. Damaged items are not
+// refreshed (they are repaired by Repair or the Evening rest).
 func (g *Game) vbRefresh(p *Player) {
 	tea := trackCount(p, "tea")
 	n := 3 + 2*tea
@@ -518,7 +519,7 @@ func (g *Game) vbRefresh(p *Player) {
 		if n <= 0 {
 			break
 		}
-		if !it.FaceUp {
+		if !it.FaceUp && !it.Damaged {
 			it.FaceUp = true
 			n--
 		}
