@@ -169,7 +169,12 @@ func (g *Game) rmnIntent(a Action) (string, string) {
 	case "battle-effect":
 		return "CARD:effect", fmt.Sprintf("who=%s card=%s", f, a.Card)
 	case "battle-hit":
-		cl := ""
+		// The Vagabond takes hits by damaging an item; the action has no piece
+		// type, only the item id.
+		if a.Piece == "" && a.Item != "" {
+			return "V:damage", fmt.Sprintf("items=%s", a.Item)
+		}
+		cl := a.Clearing
 		if g.Battle != nil {
 			cl = g.Battle.Clearing
 		}
