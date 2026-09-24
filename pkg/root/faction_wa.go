@@ -84,7 +84,8 @@ func (g *Game) legalWABirdsong() []Action {
 			}
 		}
 	}
-	acts = append(acts, Action{ID: "pass", Label: "End Birdsong", Kind: "pass", Faction: WA})
+	// The generic end-of-phase pass is added by LegalActions via passAllowed, so
+	// adding one here would offer two identical "pass" actions.
 	return acts
 }
 

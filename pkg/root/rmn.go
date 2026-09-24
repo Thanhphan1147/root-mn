@@ -148,11 +148,11 @@ func (g *Game) rmnIntent(a Action) (string, string) {
 		}
 		return "V:aid", fmt.Sprintf("target=%s card=%s take=%s", a.Target, a.Card, take)
 	case "vb-quest":
-		return "V:complete-quest", fmt.Sprintf("quest=%s", a.Quest)
+		return "V:complete-quest", fmt.Sprintf("quest=%s reward=%s", a.Quest, a.Item)
 	case "vb-repair":
 		return "V:repair", fmt.Sprintf("items=%s", a.Item)
 	case "vb-strike":
-		return "notify", fmt.Sprintf("who=VB text=\"strike %s at %s\"", a.Target, a.Clearing)
+		return "V:strike", fmt.Sprintf("target=%s at=%s", a.Target, a.Clearing)
 	case "vb-special":
 		return "notify", fmt.Sprintf("who=VB text=\"special action %s\"", g.Players[VB].Character)
 	case "coalition":
@@ -188,7 +188,7 @@ func (g *Game) rmnIntent(a Action) (string, string) {
 	case "field-hospitals":
 		return "field-hospitals", fmt.Sprintf("at=%s spend=%s to=%s", a.Clearing, a.Card, g.Players[MC].KeepClearing)
 	case "take-dominance":
-		return "notify", fmt.Sprintf("who=%s text=\"took available %s\"", f, a.Item)
+		return "notify", fmt.Sprintf("who=%s text=\"took available %s spending %s\"", f, a.Item, a.Card)
 	case "royal-claim":
 		return "score", fmt.Sprintf("who=%s amount=%d", f, countRuled(g, f))
 	case "stand-deliver":
