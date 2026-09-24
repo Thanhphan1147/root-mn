@@ -54,6 +54,11 @@ func Redact(g *Game, viewer string) map[string]any {
 	}
 	if string(actor) != viewer {
 		snap["legal"] = []Action{}
+	} else {
+		// Legal actions must come from the true state: computing them on the
+		// redacted clone would drop options that depend on hidden information
+		// (e.g. the Vagabond exploring a ruin needs to see the ruin's item).
+		snap["legal"] = g.LegalActions()
 	}
 	if g.Pending != nil {
 		pend := *g.Pending
