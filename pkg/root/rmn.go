@@ -159,6 +159,14 @@ func (g *Game) rmnIntent(a Action) (string, string) {
 	case "vb-strike":
 		return "V:strike", fmt.Sprintf("target=%s at=%s", a.Target, a.Clearing)
 	case "vb-special":
+		switch {
+		case a.Card != "":
+			return "V:day-labor", fmt.Sprintf("card=%s", a.Card)
+		case a.Target != "":
+			return "notify", fmt.Sprintf("who=VB text=\"steal from %s\"", a.Target)
+		case a.ID == "vb-special|hideout":
+			return "notify", "who=VB text=\"hideout\""
+		}
 		return "notify", fmt.Sprintf("who=VB text=\"special action %s\"", g.Players[VB].Character)
 	case "coalition":
 		return "V:coalition", fmt.Sprintf("target=%s", a.Target)
