@@ -173,6 +173,8 @@ func init() {
 	ext("V", "take-quest", []OperandDef{op("quest", TQuestID)}, []OutcomeDef{out("quest", TQuestID)}, "explicit", false)
 	ext("V", "complete-quest", []OperandDef{op("quest", TQuestID), op("items", TUnitGroup), opOpt("reward", TEnum)}, nil, "", false)
 	ext("V", "strike", []OperandDef{op("target", TFaction), op("at", TLocation)}, nil, "", false)
+	ext("V", "steal", []OperandDef{op("target", TFaction)}, []OutcomeDef{outOpt("revealed", TCardIDList)}, "optional", false)
+	ext("V", "hideout", nil, nil, "", false)
 	ext("V", "repair", []OperandDef{op("items", TUnitGroup)}, nil, "", false)
 	ext("V", "rest", []OperandDef{op("items", TUnitGroup)}, nil, "", false)
 	ext("V", "refresh", []OperandDef{op("items", TUnitGroup)}, nil, "", false)

@@ -11,7 +11,7 @@ var hiddenLogKinds = map[string]bool{
 // hiddenRMNIntents are RMN intents whose operands can reveal hidden cards.
 var hiddenRMNIntents = map[string]bool{
 	"draw": true, "deal": true, "A:mobilize": true,
-	"V:aid": true, "V:day-labor": true, "stand-deliver": true,
+	"V:aid": true, "V:day-labor": true, "V:steal": true, "stand-deliver": true,
 }
 
 // Redact returns the client-facing snapshot for one viewer: every other
@@ -37,6 +37,10 @@ func Redact(g *Game, viewer string) map[string]any {
 		}
 	}
 	cp.Deck = nil
+	// Ruin contents are hidden from everyone until explored.
+	for _, c := range cp.Clearings {
+		c.RuinItem = ""
+	}
 
 	snap := Snapshot(cp)
 	snap["hash"] = ""
@@ -80,6 +84,11 @@ func redactRMN(lines []string, viewer string) []string {
 	out := make([]string, len(lines))
 	for i, line := range lines {
 		fields := strings.Fields(line)
+		if len(fields) >= 4 && fields[3] == "assign-ruins" {
+			// Which item is under each ruin stays hidden from every player.
+			out[i] = strings.Join(fields[:3], " ") + " SYS assign-ruins -> {items=[?]}"
+			continue
+		}
 		if len(fields) < 4 {
 			out[i] = line
 			continue

@@ -41,6 +41,7 @@ func (g *Game) ApplyFast(a Action) error {
 // applyResolved dispatches an already-validated action.
 func (g *Game) applyResolved(a Action) error {
 	g.DrawnThisAction = nil
+	g.VBStolenThisAction = ""
 	if a.Kind == "battle-skip" && g.Pending != nil && g.Pending.Kind == PendingFieldHospitals {
 		g.FH = nil
 		g.Pending = nil

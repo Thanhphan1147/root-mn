@@ -547,6 +547,7 @@ func (g *Game) vbSpecial(a Action) {
 			c := tp.Hand[0]
 			tp.Hand = tp.Hand[1:]
 			p.Hand = append(p.Hand, c)
+			g.VBStolenThisAction = c
 			g.Logf(VB, "special", "Stole a card from %s", a.Target)
 		}
 	}

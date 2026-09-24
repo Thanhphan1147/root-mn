@@ -177,6 +177,10 @@ type Game struct {
 	// VBRefreshLeft is how many exhausted items the Vagabond may still flip up
 	// this Birdsong (3 + 2 per tea on the Refresh track at the start).
 	VBRefreshLeft int
+
+	// VBStolenThisAction is the card the Vagabond's Thief stole this action, so
+	// the RMN can record it as the `revealed` outcome.
+	VBStolenThisAction string
 }
 
 // NewGame creates a game for the given factions (2-4, base only) on autumn.

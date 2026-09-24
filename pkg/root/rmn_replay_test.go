@@ -3,6 +3,7 @@ package root
 import (
 	"math/rand"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -51,6 +52,9 @@ func TestSetupLogReplaysDeterministically(t *testing.T) {
 		g := NewGame([]Faction{MC, ED}, MC, uint64(seed))
 		BeginSetup(g)
 		for i, line := range orig.RMNLog {
+			if f := strings.Fields(line); len(f) >= 4 && f[2] == "SYS" {
+				continue // setup directive (assign-ruins) already applied
+			}
 			base := len(g.RMNLog)
 			var matches []Action
 			for _, a := range g.LegalActions() {

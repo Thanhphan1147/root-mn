@@ -36,6 +36,14 @@ func (g *Game) rmnLine(a Action, round int, phase string) string {
 		}
 		operands += out
 	}
+	// The Thief's Steal takes a card; record it. Redact scrubs it for opponents.
+	if intent == "V:steal" && g.VBStolenThisAction != "" {
+		out := fmt.Sprintf("-> {revealed=[%s]}", g.VBStolenThisAction)
+		if operands != "" {
+			operands += " "
+		}
+		operands += out
+	}
 	line := fmt.Sprintf("%d %d.%s %s %s", len(g.RMNLog)+1, round, phase, actor, intent)
 	if operands != "" {
 		line += " " + operands
@@ -163,9 +171,9 @@ func (g *Game) rmnIntent(a Action) (string, string) {
 		case a.Card != "":
 			return "V:day-labor", fmt.Sprintf("card=%s", a.Card)
 		case a.Target != "":
-			return "notify", fmt.Sprintf("who=VB text=\"steal from %s\"", a.Target)
+			return "V:steal", fmt.Sprintf("target=%s", a.Target)
 		case a.ID == "vb-special|hideout":
-			return "notify", "who=VB text=\"hideout\""
+			return "V:hideout", ""
 		}
 		return "notify", fmt.Sprintf("who=VB text=\"special action %s\"", g.Players[VB].Character)
 	case "coalition":

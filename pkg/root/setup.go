@@ -1,5 +1,10 @@
 package root
 
+import (
+	"fmt"
+	"strings"
+)
+
 // SetupOptions controls initial faction choices for the automatic setup.
 type SetupOptions struct {
 	MCCorner  string
@@ -19,6 +24,15 @@ func BeginSetup(g *Game) {
 	for i, c := range ruinClearings {
 		g.Clearings[c].RuinItem = items[i%len(items)]
 	}
+	// Record which item is under each ruin (the players' RMN is the full-info
+	// log; Redact hides this from everyone's view).
+	var ruins, ruinItems []string
+	for _, c := range ruinClearings {
+		ruins = append(ruins, c)
+		ruinItems = append(ruinItems, "i."+g.Clearings[c].RuinItem)
+	}
+	g.RMNLog = append(g.RMNLog, fmt.Sprintf("%d 0.S SYS assign-ruins -> {ruins=[%s], items=[%s]}",
+		len(g.RMNLog)+1, strings.Join(ruins, ","), strings.Join(ruinItems, ",")))
 	g.ItemSupply = map[string]int{}
 	for k, v := range ItemCounts {
 		g.ItemSupply[k] = v
