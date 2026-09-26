@@ -85,7 +85,7 @@
 76 2.D WA pass
 77 2.E WA move group=WA.w from=C5 to=C1
 78 2.E WA pass
-79 2.B VB V:move-pawn to=AutumnS
+79 2.B VB V:move-pawn to=AutumnNW
 80 2.B VB V:refresh items=boot#1
 81 2.B VB V:refresh items=sword#4
 82 2.B VB V:refresh items=torch#2

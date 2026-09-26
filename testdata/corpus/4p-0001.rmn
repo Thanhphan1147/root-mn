@@ -230,7 +230,7 @@
 221 5.B VB V:move-pawn to=AutumnSW
 222 5.B VB V:refresh items=torch#2
 223 5.B VB pass
-224 5.D VB V:repair items=boot#1
+224 5.D VB V:repair items=bag#3
 225 5.D VB pass
 226 5.E VB pass
 227 6.B MC pass
@@ -290,7 +290,7 @@
 281 6.E WA pass
 282 6.B VB V:refresh items=hammer#4
 283 6.B VB V:move-pawn to=C4
-284 6.B VB V:refresh items=boot#1
+284 6.B VB V:refresh items=bag#3
 285 6.B VB pass
 286 6.D VB V:aid target=WA card=R08 exhaust=hammer#4 take=i.bag
 287 6.D VB V:aid target=ED card=R01 exhaust=bag#6 take=none

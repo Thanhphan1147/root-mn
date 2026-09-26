@@ -186,4 +186,4 @@
 179 8.D ED craft who=ED card=B13 produce=i.sword
 180 8.D ED notify who=ED text="done crafting"
 181 8.D ED E:turmoil reason=unable
-182 8.D ED E:appoint-leader leader=ED.ldr.charismatic
+182 8.D ED E:appoint-leader leader=ED.ldr.commander

@@ -298,7 +298,7 @@
 289 8.B ED pass
 290 8.D ED notify who=ED text="done crafting"
 291 8.D ED E:turmoil reason=unable
-292 8.D ED E:appoint-leader leader=ED.ldr.commander
+292 8.D ED E:appoint-leader leader=ED.ldr.builder
 293 8.E ED pass
 294 8.B WA A:place-sympathy at=C5 spend=(R11+R10)
 295 8.B WA A:place-sympathy at=C1 spend=(F11+F13+F14)
@@ -344,12 +344,9 @@
 335 9.B ED pass
 336 9.D ED notify who=ED text="took available F02 spending B05"
 337 9.D ED notify who=ED text="done crafting"
-338 9.D ED E:move group=5ED.w from=C7 to=C8 card=B09
-339 9.D ED E:move group=ED.w from=C4 to=C9 card=VIZIER
-340 9.D ED E:battle defender=WA at=C9 card=VIZIER
-341 9.D WA remove group=WA.w at=C9
-342 9.D WA notify text="skip"
-343 9.D ED remove group=ED.w at=C9
-344 9.D ED pass
-345 9.E ED pass
-346 9.B WA A:place-sympathy at=C7 spend=(M11+M01+M02)
+338 9.D ED E:recruit at=[C7] card=VIZIER
+339 9.D ED E:move group=4ED.w from=C7 to=C8 card=B09
+340 9.D ED E:move group=3ED.w from=C7 to=C3 card=VIZIER
+341 9.D ED pass
+342 9.E ED pass
+343 9.B WA A:place-sympathy at=C7 spend=(M11+M01+B12)

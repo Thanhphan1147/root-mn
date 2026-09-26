@@ -120,7 +120,7 @@
 113 6.B ED pass
 114 6.D ED notify who=ED text="done crafting"
 115 6.D ED E:turmoil reason=unable
-116 6.D ED E:appoint-leader leader=ED.ldr.charismatic
+116 6.D ED E:appoint-leader leader=ED.ldr.builder
 117 6.E ED discard who=ED cards=F11
 118 6.E ED discard who=ED cards=B07
 119 6.E ED pass
@@ -139,7 +139,7 @@
 132 7.D ED craft who=ED card=R05 produce=i.tea
 133 7.D ED notify who=ED text="done crafting"
 134 7.D ED E:turmoil reason=unable
-135 7.D ED E:appoint-leader leader=ED.ldr.builder
+135 7.D ED E:appoint-leader leader=ED.ldr.charismatic
 136 7.E ED discard who=ED cards=F01
 137 7.E ED pass
 138 8.B MC pass
@@ -181,22 +181,7 @@
 174 9.D ED E:battle defender=MC at=C2 card=VIZIER
 175 9.D MC notify text="skip"
 176 9.D MC remove group=MC.b.saw at=C2
-177 9.D MC remove group=MC.b.recruiter at=C2
-178 9.D MC remove group=MC.t.keep at=C2
+177 9.D MC remove group=MC.t.keep at=C2
+178 9.D MC remove group=MC.b.recruiter at=C2
 179 9.D MC notify text="skip"
 180 9.D ED pass
-181 9.E ED discard who=ED cards=M13
-182 9.E ED discard who=ED cards=B09
-183 9.E ED pass
-184 10.B MC pass
-185 10.D MC craft who=MC card=F06 produce=i.boot
-186 10.D MC notify who=MC text="done crafting"
-187 10.D MC move group=3MC.w from=C4 to=C12
-188 10.D MC move group=3MC.w from=C10 to=C2
-189 10.D MC C:build who=MC building=MC.b.saw at=C2
-190 10.D MC C:build who=MC building=MC.b.workshop at=C2
-191 10.D MC pass
-192 10.E MC pass
-193 10.B ED E:decree-add column=MOVE cards=M04
-194 10.B ED pass
-195 10.D ED craft who=ED card=F03 produce=card:F03

@@ -224,9 +224,9 @@
 215 5.D VB move group=VB.p to=C5
 216 5.D VB battle attacker=VB defender=MC at=C5 -> {atk=3,def=3}
 217 5.D MC remove group=MC.w at=C5
-218 5.D VB V:damage items=sword#4
+218 5.D VB V:damage items=boot#1
 219 5.D MC field-hospitals at=C5 spend=R11 to=C1
-220 5.D VB V:repair items=sword#4
+220 5.D VB V:repair items=boot#1
 221 5.D VB pass
 222 5.E VB pass
 223 6.B MC pass

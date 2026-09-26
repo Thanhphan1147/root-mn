@@ -75,7 +75,7 @@
 66 2.B VB V:refresh items=boot#1
 67 2.B VB V:refresh items=hammer#4
 68 2.B VB V:refresh items=sword#5
-69 2.B VB V:move-pawn to=Witchwood
+69 2.B VB V:move-pawn to=AutumnE
 70 2.B VB pass
 71 2.D VB move group=VB.p to=C6
 72 2.D VB V:aid target=MC card=F04 exhaust=hammer#4 take=none
@@ -180,7 +180,7 @@
 171 5.B VB V:refresh items=boot#1
 172 5.B VB V:refresh items=hammer#4
 173 5.B VB V:refresh items=torch#2
-174 5.B VB V:move-pawn to=AutumnE
+174 5.B VB V:move-pawn to=Witchwood
 175 5.B VB pass
 176 5.D VB move group=VB.p to=C6
 177 5.D VB V:aid target=MC card=F13 exhaust=hammer#4 take=none

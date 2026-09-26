@@ -261,9 +261,9 @@
 252 6.E WA move group=2WA.w from=C3 to=C7
 253 6.E WA battle attacker=WA defender=VB at=C11 -> {atk=3,def=1}
 254 6.E VB V:damage items=torch#2
-255 6.E VB V:damage items=hammer#4
-256 6.E VB V:damage items=boot#5
-257 6.E VB V:damage items=bag#3
+255 6.E VB V:damage items=bag#3
+256 6.E VB V:damage items=hammer#4
+257 6.E VB V:damage items=boot#1
 258 6.E WA pass
 259 6.B VB V:move-pawn to=AutumnS
 260 6.B VB pass
@@ -309,8 +309,8 @@
 300 7.E WA place group=WA.w to=C3
 301 7.E WA place group=WA.w to=C3
 302 7.E WA pass
-303 7.B VB V:move-pawn to=AutumnS
-304 7.B VB V:refresh items=boot#1
+303 7.B VB V:move-pawn to=AutumnSW
+304 7.B VB V:refresh items=boot#5
 305 7.B VB pass
 306 7.D VB move group=VB.p to=C7
 307 7.D VB pass
@@ -358,7 +358,7 @@
 349 8.E WA place group=WA.w to=C6
 350 8.E WA pass
 351 8.B VB V:move-pawn to=AutumnS
-352 8.B VB V:refresh items=boot#1
+352 8.B VB V:refresh items=boot#5
 353 8.B VB pass
 354 8.D VB move group=VB.p to=C7
 355 8.D VB pass
@@ -394,8 +394,8 @@
 385 9.D WA A:train card=M02
 386 9.D WA pass
 387 9.E WA pass
-388 9.B VB V:move-pawn to=AutumnS
-389 9.B VB V:refresh items=boot#1
+388 9.B VB V:move-pawn to=AutumnSW
+389 9.B VB V:refresh items=boot#5
 390 9.B VB pass
 391 9.D VB move group=VB.p to=C7
 392 9.D VB pass

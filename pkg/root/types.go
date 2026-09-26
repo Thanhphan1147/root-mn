@@ -181,6 +181,10 @@ type Game struct {
 	// VBStolenThisAction is the card the Vagabond's Thief stole this action, so
 	// the RMN can record it as the `revealed` outcome.
 	VBStolenThisAction string
+
+	// NextRoll, when non-empty, supplies the next battle dice so a replayed
+	// line reproduces the recorded roll (see Roll).
+	NextRoll []int
 }
 
 // NewGame creates a game for the given factions (2-4, base only) on autumn.
@@ -255,7 +259,9 @@ func (g *Game) shuffle() {
 	}
 }
 
-// Roll returns two battle dice (0..3).
+// Roll returns two battle dice (0..3). If outcomes were armed from a replay
+// line (see NextRoll) they are consumed here, so replay reproduces the recorded
+// dice instead of re-rolling.
 func (g *Game) Roll() (int, int) {
 	next := func() int {
 		g.RngSeed ^= g.RngSeed << 13
@@ -263,7 +269,14 @@ func (g *Game) Roll() (int, int) {
 		g.RngSeed ^= g.RngSeed << 17
 		return int(g.RngSeed % 4)
 	}
-	return next(), next()
+	a, b := next(), next()
+	if len(g.NextRoll) >= 2 {
+		// A replay line supplied the dice; use them but keep the RNG advancing so
+		// later draws/shuffles stay in sync.
+		a, b = g.NextRoll[0], g.NextRoll[1]
+		g.NextRoll = g.NextRoll[2:]
+	}
+	return a, b
 }
 
 // Clearing returns a clearing by id.

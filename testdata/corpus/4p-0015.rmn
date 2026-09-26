@@ -342,7 +342,7 @@
 333 8.D ED E:recruit at=[C12] card=B14
 334 8.D ED E:recruit at=[C6] card=F12
 335 8.D ED E:turmoil reason=unable
-336 8.D ED E:appoint-leader leader=ED.ldr.builder
+336 8.D ED E:appoint-leader leader=ED.ldr.commander
 337 8.E ED discard who=ED cards=R02
 338 8.E ED discard who=ED cards=F03
 339 8.E ED pass
@@ -393,10 +393,15 @@
 384 9.B ED E:decree-add column=MOVE cards=B02
 385 9.B ED pass
 386 9.D ED notify who=ED text="done crafting"
-387 9.D ED E:turmoil reason=unable
-388 9.D ED E:appoint-leader leader=ED.ldr.charismatic
-389 9.E ED discard who=ED cards=F13
-390 9.E ED discard who=ED cards=M03
-391 9.E ED pass
-392 9.B WA pass
-393 9.D WA craft who=WA card=M08 produce=i.sword
+387 9.D ED E:move group=5ED.w from=C6 to=C3 card=B02
+388 9.D ED E:move group=4ED.w from=C3 to=C11 card=VIZIER
+389 9.D ED E:battle defender=WA at=C12 card=VIZIER
+390 9.D WA remove group=WA.w at=C12
+391 9.D WA notify text="skip"
+392 9.D ED remove group=ED.w at=C12
+393 9.D ED pass
+394 9.E ED discard who=ED cards=F13
+395 9.E ED discard who=ED cards=M03
+396 9.E ED pass
+397 9.B WA pass
+398 9.D WA craft who=WA card=M08 produce=i.sword

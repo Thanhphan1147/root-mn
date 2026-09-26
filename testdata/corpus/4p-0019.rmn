@@ -79,7 +79,7 @@
 70 2.B VB V:refresh items=boot#1
 71 2.B VB V:refresh items=sword#4
 72 2.B VB V:refresh items=tea#3
-73 2.B VB V:move-pawn to=AutumnS
+73 2.B VB V:move-pawn to=AutumnE
 74 2.B VB pass
 75 2.D VB move group=VB.p to=C3
 76 2.D VB battle attacker=VB defender=ED at=C3 -> {atk=2,def=3}
@@ -113,7 +113,7 @@
 104 3.E WA A:organize at=C1
 105 3.E WA pass
 106 3.B VB V:refresh items=sword#4
-107 3.B VB V:move-pawn to=AutumnE
+107 3.B VB V:move-pawn to=AutumnS
 108 3.B VB pass
 109 3.D VB pass
 110 3.E VB pass
@@ -190,9 +190,9 @@
 181 5.D VB move group=VB.p to=C3
 182 5.D VB battle attacker=VB defender=ED at=C3 -> {atk=2,def=2}
 183 5.D ED remove group=ED.w at=C3
-184 5.D VB V:damage items=tea#3
-185 5.D VB V:damage items=boot#1
-186 5.D VB V:aid target=ED card=B06 exhaust=torch#2 take=none
+184 5.D VB V:damage items=boot#1
+185 5.D VB V:damage items=torch#2
+186 5.D VB V:aid target=ED card=B06 exhaust=tea#3 take=none
 187 5.D VB pass
 188 5.E VB pass
 189 6.B MC pass
@@ -235,8 +235,8 @@
 226 6.E WA place group=WA.w to=C1
 227 6.E WA pass
 228 6.B VB V:refresh items=sword#4
-229 6.B VB V:refresh items=torch#2
-230 6.B VB V:move-pawn to=AutumnE
+229 6.B VB V:refresh items=tea#3
+230 6.B VB V:move-pawn to=AutumnS
 231 6.B VB pass
 232 6.D VB pass
 233 6.E VB discard who=VB cards=F11

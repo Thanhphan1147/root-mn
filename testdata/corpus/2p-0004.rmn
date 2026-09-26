@@ -127,7 +127,7 @@
 120 6.D ED E:move group=2ED.w from=C11 to=C12 card=B05
 121 6.D ED E:move group=3ED.w from=C11 to=C12 card=M12
 122 6.D ED E:turmoil reason=unable
-123 6.D ED E:appoint-leader leader=ED.ldr.charismatic
+123 6.D ED E:appoint-leader leader=ED.ldr.builder
 124 6.E ED discard who=ED cards=M03
 125 6.E ED discard who=ED cards=M05
 126 6.E ED pass
@@ -148,75 +148,85 @@
 141 7.D ED craft who=ED card=B11 produce=i.bag
 142 7.D ED notify who=ED text="done crafting"
 143 7.D ED E:recruit at=[C7] card=VIZIER
-144 7.D ED E:move group=3ED.w from=C12 to=C9 card=B01
-145 7.D ED E:battle defender=MC at=C8 card=VIZIER
-146 7.D MC remove group=MC.b.workshop at=C8
-147 7.D MC remove group=MC.b.saw at=C8
-148 7.D ED pass
-149 7.E ED discard who=ED cards=R04
-150 7.E ED pass
-151 8.B MC pass
-152 8.D MC notify who=MC text="done crafting"
-153 8.D MC C:recruit who=MC at=[C5,C9]
-154 8.D MC move group=2MC.w from=C5 to=C1
-155 8.D MC move group=2MC.w from=C2 to=C6
-156 8.D MC battle attacker=MC defender=ED at=C12
-157 8.D ED notify text="skip"
-158 8.D ED remove group=ED.w at=C12
-159 8.D ED remove group=ED.w at=C12
-160 8.D ED remove group=ED.w at=C12
-161 8.D MC remove group=MC.w at=C12
-162 8.D MC remove group=MC.w at=C12
-163 8.D MC notify text="skip"
-164 8.D MC pass
-165 8.E MC discard who=MC cards=R08
-166 8.E MC pass
-167 8.B ED E:decree-add column=RECRUIT cards=B06
-168 8.B ED pass
-169 8.D ED notify who=ED text="done crafting"
-170 8.D ED E:recruit at=[C6] card=VIZIER
-171 8.D ED E:turmoil reason=unable
-172 8.D ED E:appoint-leader leader=ED.ldr.builder
-173 8.E ED discard who=ED cards=F08
-174 8.E ED discard who=ED cards=R05
-175 8.E ED pass
-176 9.B MC pass
-177 9.D MC notify who=MC text="done crafting"
-178 9.D MC C:recruit who=MC at=[C5,C9]
-179 9.D MC move group=MC.w from=C9 to=C1
-180 9.D MC move group=MC.w from=C4 to=C12
-181 9.D MC move group=MC.w from=C2 to=C10
-182 9.D MC move group=MC.w from=C10 to=C12
-183 9.D MC pass
-184 9.E MC discard who=MC cards=F10
-185 9.E MC pass
-186 9.B ED E:decree-add column=RECRUIT cards=R01
-187 9.B ED pass
-188 9.D ED notify who=ED text="done crafting"
-189 9.D ED E:recruit at=[C12] card=VIZIER
-190 9.D ED E:turmoil reason=unable
-191 9.D ED E:appoint-leader leader=ED.ldr.commander
-192 9.E ED discard who=ED cards=B14
-193 9.E ED discard who=ED cards=F01
-194 9.E ED pass
-195 10.B MC pass
-196 10.D MC notify who=MC text="done crafting"
-197 10.D MC C:recruit who=MC at=[C5,C9]
-198 10.D MC move group=MC.w from=C9 to=C12
-199 10.D MC battle attacker=MC defender=ED at=C6
-200 10.D ED notify text="skip"
-201 10.D MC move group=2MC.w from=C12 to=C7
-202 10.D MC pass
-203 10.E MC discard who=MC cards=M04
-204 10.E MC pass
-205 10.B ED E:decree-add column=BUILD cards=B08
-206 10.B ED pass
-207 10.D ED notify who=ED text="done crafting"
-208 10.D ED E:move group=ED.w from=C12 to=C4 card=VIZIER
-209 10.D ED E:battle defender=MC at=C6 card=VIZIER
-210 10.D MC remove group=MC.w at=C6
-211 10.D MC remove group=MC.w at=C6
-212 10.D MC remove group=MC.w at=C6
-213 10.D MC notify text="skip"
-214 10.D ED E:build building=ED.b.roost at=C8 card=B08
-215 10.D ED pass
+144 7.D ED E:move group=ED.w from=C12 to=C10 card=B01
+145 7.D ED E:move group=3ED.w from=C12 to=C4 card=VIZIER
+146 7.D ED pass
+147 7.E ED discard who=ED cards=R04
+148 7.E ED pass
+149 8.B MC pass
+150 8.D MC notify who=MC text="done crafting"
+151 8.D MC move group=MC.w from=C1 to=C10
+152 8.D MC C:recruit who=MC at=[C5,C9]
+153 8.D MC move group=2MC.w from=C9 to=C12
+154 8.D MC move group=MC.w from=C5 to=C2
+155 8.D MC move group=MC.w from=C2 to=C6
+156 8.D MC pass
+157 8.E MC discard who=MC cards=R08
+158 8.E MC pass
+159 8.B ED E:decree-add column=MOVE cards=B06
+160 8.B ED pass
+161 8.D ED notify who=ED text="done crafting"
+162 8.D ED E:recruit at=[C12] card=VIZIER
+163 8.D ED E:move group=4ED.w from=C11 to=C6 card=B01
+164 8.D ED E:move group=ED.w from=C6 to=C2 card=VIZIER
+165 8.D ED E:move group=ED.w from=C4 to=C8 card=B06
+166 8.D ED pass
+167 8.E ED discard who=ED cards=F08
+168 8.E ED discard who=ED cards=R05
+169 8.E ED pass
+170 9.B MC pass
+171 9.D MC notify who=MC text="done crafting"
+172 9.D MC move group=MC.w from=C5 to=C2
+173 9.D MC C:recruit who=MC at=[C5,C9]
+174 9.D MC move group=MC.w from=C9 to=C12
+175 9.D MC battle attacker=MC defender=ED at=C6
+176 9.D ED notify text="skip"
+177 9.D ED remove group=ED.w at=C6
+178 9.D MC remove group=MC.w at=C6
+179 9.D MC field-hospitals at=C6 spend=F10 to=C1
+180 9.D MC pass
+181 9.E MC pass
+182 9.B ED E:decree-add column=MOVE cards=R01
+183 9.B ED pass
+184 9.D ED notify who=ED text="done crafting"
+185 9.D ED E:recruit at=[C12] card=VIZIER
+186 9.D ED E:move group=ED.w from=C6 to=C2 card=VIZIER
+187 9.D ED E:move group=3ED.w from=C2 to=C5 card=B06
+188 9.D ED E:move group=8ED.w from=C12 to=C10 card=B01
+189 9.D ED E:move group=5ED.w from=C10 to=C2 card=R01
+190 9.D ED pass
+191 9.E ED discard who=ED cards=B14
+192 9.E ED discard who=ED cards=F01
+193 9.E ED pass
+194 10.B MC pass
+195 10.D MC notify who=MC text="done crafting"
+196 10.D MC C:recruit who=MC at=[C5,C9]
+197 10.D MC move group=6MC.w from=C12 to=C7
+198 10.D MC move group=2MC.w from=C7 to=C3
+199 10.D MC move group=MC.w from=C9 to=C4
+200 10.D MC move group=2MC.w from=C7 to=C8
+201 10.D MC pass
+202 10.E MC discard who=MC cards=M04
+203 10.E MC pass
+204 10.B ED E:decree-add column=MOVE cards=R11
+205 10.B ED pass
+206 10.D ED notify who=ED text="done crafting"
+207 10.D ED E:turmoil reason=unable
+208 10.D ED E:appoint-leader leader=ED.ldr.charismatic
+209 10.E ED discard who=ED cards=R09
+210 10.E ED discard who=ED cards=R10
+211 10.E ED pass
+212 11.B MC pass
+213 11.D MC notify who=MC text="done crafting"
+214 11.D MC move group=MC.w from=C12 to=C11
+215 11.D MC C:build who=MC building=MC.b.workshop at=C11
+216 11.D MC C:recruit who=MC at=[C5,C9]
+217 11.D MC move group=4MC.w from=C2 to=C5
+218 11.D MC pass
+219 11.E MC discard who=MC cards=M13
+220 11.E MC pass
+221 11.B ED E:decree-add column=MOVE cards=B02
+222 11.B ED pass
+223 11.D ED notify who=ED text="done crafting"
+224 11.D ED E:turmoil reason=unable
+225 11.D ED E:appoint-leader leader=ED.ldr.commander

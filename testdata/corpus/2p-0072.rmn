@@ -179,7 +179,7 @@
 172 7.D ED remove group=ED.w at=C8
 173 7.D MC notify text="skip"
 174 7.D ED E:turmoil reason=unable
-175 7.D ED E:appoint-leader leader=ED.ldr.commander
+175 7.D ED E:appoint-leader leader=ED.ldr.builder
 176 7.E ED discard who=ED cards=R03
 177 7.E ED pass
 178 8.B MC pass
@@ -193,8 +193,3 @@
 186 8.B ED E:decree-add column=RECRUIT cards=F14
 187 8.B ED pass
 188 8.D ED craft who=ED card=M07 produce=i.coin
-189 8.D ED notify who=ED text="done crafting"
-190 8.D ED E:recruit at=[C6] card=F14
-191 8.D ED E:move group=ED.w from=C12 to=C9 card=VIZIER
-192 8.D ED E:battle defender=MC at=C9 card=VIZIER
-193 8.D MC remove group=MC.b.recruiter at=C9

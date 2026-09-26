@@ -296,7 +296,7 @@
 287 7.B ED pass
 288 7.D ED notify who=ED text="done crafting"
 289 7.D ED E:turmoil reason=unable
-290 7.D ED E:appoint-leader leader=ED.ldr.builder
+290 7.D ED E:appoint-leader leader=ED.ldr.commander
 291 7.E ED discard who=ED cards=R09
 292 7.E ED discard who=ED cards=R05
 293 7.E ED pass
