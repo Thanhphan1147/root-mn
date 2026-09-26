@@ -260,3 +260,64 @@ func listItems(v string) []string {
 	}
 	return strings.Split(v, "+")
 }
+
+// TryRMN applies a player-entered RMN line, validating it against the rules.
+// Errors are short and UI-friendly.
+func (g *Game) TryRMN(line string) error {
+	line = strings.TrimSpace(line)
+	if line == "" {
+		return fmt.Errorf("empty RMN")
+	}
+	ev, err := parseRMNLine(line)
+	if err != nil {
+		return fmt.Errorf("malformed RMN")
+	}
+	if a, ok := g.resolveByLine(line); ok {
+		return g.Apply(a)
+	}
+	if msg := g.explainIllegal(ev); msg != "" {
+		return fmt.Errorf("%s", msg)
+	}
+	return fmt.Errorf("not a legal move")
+}
+
+// explainIllegal returns a short reason for a few common illegal intents.
+func (g *Game) explainIllegal(ev rmnEvent) string {
+	switch ev.Intent {
+	case "C:build", "mc-build":
+		b := rmnBuildingInverse(strings.TrimSuffix(strings.TrimPrefix(ev.op("building"), "MC.b."), "#1"))
+		c := ev.op("at")
+		cl := g.Clearings[c]
+		if cl == nil {
+			return "unknown clearing " + c
+		}
+		if !g.Rules(MC, c) {
+			return "you do not rule " + c
+		}
+		if cl.FreeSlots() <= 0 {
+			return "no more building slots at " + c
+		}
+		if g.buildingsOf(MC, c, b) > 0 {
+			return "already a " + b + " at " + c
+		}
+		p := g.Players[MC]
+		remaining := p.Sawmills
+		switch b {
+		case "workshop":
+			remaining = p.Workshops
+		case "recruiter":
+			remaining = p.Recruiters
+		}
+		if remaining <= 0 {
+			return "no " + b + " left"
+		}
+		if g.availableWood(p, c) < MCBuildCost[7-remaining] {
+			return "not enough wood at " + c
+		}
+	case "move":
+		if g.Clearings[ev.op("from")] == nil {
+			return "unknown clearing " + ev.op("from")
+		}
+	}
+	return ""
+}

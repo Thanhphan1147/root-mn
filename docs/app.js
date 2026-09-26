@@ -40,6 +40,24 @@ function doAction(id) {
   render();
 }
 
+// Custom RMN input: apply a player-entered line; show a short error if illegal.
+function applyCustomRMN() {
+  const inp = document.getElementById("rmnin");
+  const errEl = document.getElementById("rmnerr");
+  const text = inp.value.trim();
+  if (!text || !window.RootEngine) return;
+  let obj;
+  try { obj = JSON.parse(window.RootEngine.tryrmn(text)); } catch (e) { obj = { error: String(e) }; }
+  if (obj.error) { errEl.textContent = obj.error; return; }
+  errEl.textContent = "";
+  inp.value = "";
+  game = obj;
+  persist();
+  render();
+}
+document.getElementById("rmngo").onclick = applyCustomRMN;
+document.getElementById("rmnin").addEventListener("keydown", (e) => { if (e.key === "Enter") applyCustomRMN(); });
+
 function newGame() {
   if (!window.RootEngine) return;
   if (game && !confirm("Start a new game? The current one will be replaced.")) return;

@@ -88,6 +88,21 @@ func main() {
 		"snapshot": js.FuncOf(func(this js.Value, args []js.Value) any {
 			return snapshotJSON()
 		}),
+		// tryrmn applies a player-entered RMN line and returns the resulting
+		// snapshot, or an {error} with a short reason it was rejected.
+		"tryrmn": js.FuncOf(func(this js.Value, args []js.Value) any {
+			if current == nil || len(args) < 1 {
+				return withError("no game")
+			}
+			if err := current.TryRMN(args[0].String()); err != nil {
+				out := map[string]any{}
+				_ = json.Unmarshal([]byte(snapshotJSON()), &out)
+				out["error"] = err.Error()
+				b, _ := json.Marshal(out)
+				return string(b)
+			}
+			return snapshotJSON()
+		}),
 	}
 	js.Global().Set("RootEngine", js.ValueOf(api))
 	select {}
