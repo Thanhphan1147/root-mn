@@ -1,6 +1,9 @@
 package root
 
-import "strings"
+import (
+	"sort"
+	"strings"
+)
 
 // resolveFavor removes all enemy pieces in clearings of the favor's suit.
 func (g *Game) resolveFavor(p *Player, c *CardDef) {
@@ -21,14 +24,18 @@ func (g *Game) resolveFavor(p *Player, c *CardDef) {
 				continue
 			}
 			if f == VB && g.Players[VB].Pawn == cl {
-				// Vagabond damages 3 items.
-				d := 0
-				for _, it := range g.Players[VB].Items {
-					if !it.Damaged && d < 3 {
-						it.Damaged = true
-						it.Zone = "damaged"
-						d++
+				// Vagabond damages 3 items (deterministic order).
+				var ids []string
+				for id, it := range g.Players[VB].Items {
+					if !it.Damaged {
+						ids = append(ids, id)
 					}
+				}
+				sort.Strings(ids)
+				for i := 0; i < len(ids) && i < 3; i++ {
+					it := g.Players[VB].Items[ids[i]]
+					it.Damaged = true
+					it.Zone = "damaged"
 				}
 				continue
 			}
