@@ -354,18 +354,43 @@ func listItems(v string) []string {
 	return strings.Split(v, "+")
 }
 
-// TryRMN applies a player-entered RMN line, validating it against the rules.
-// Errors are short and UI-friendly.
-func (g *Game) TryRMN(line string) error {
-	line = strings.TrimSpace(line)
-	if line == "" {
-		return fmt.Errorf("empty RMN")
+// BuildRMNLine fills in the sequence number, round.phase and actor of a
+// shorthand RMN line so a player can type just the intent and its operands (for
+// example "V:explore at=C12"). The actor is whoever the engine is waiting on —
+// the pending player when there is a deferred choice, otherwise the turn player
+// — and the round/phase/sequence come from the current state. A line that
+// already starts with a sequence number is returned unchanged.
+func (g *Game) BuildRMNLine(input string) (string, error) {
+	input = strings.TrimSpace(input)
+	if input == "" {
+		return "", fmt.Errorf("empty RMN")
 	}
-	ev, err := parseRMNLine(line)
+	if _, err := strconv.Atoi(strings.Fields(input)[0]); err == nil {
+		return input, nil
+	}
+	actor := g.Current
+	if g.Pending != nil {
+		actor = g.Pending.Player
+	}
+	if actor == "" {
+		return "", fmt.Errorf("no active player")
+	}
+	return fmt.Sprintf("%d %d.%s %s %s", len(g.RMNLog)+1, g.Round, g.Phase, actor, input), nil
+}
+
+// TryRMN applies a player-entered RMN line, validating it against the rules.
+// The line may be a full RMN line or the shorthand "intent [operand=value …]"
+// accepted by BuildRMNLine. Errors are short and UI-friendly.
+func (g *Game) TryRMN(line string) error {
+	full, err := g.BuildRMNLine(line)
+	if err != nil {
+		return err
+	}
+	ev, err := parseRMNLine(full)
 	if err != nil {
 		return fmt.Errorf("malformed RMN")
 	}
-	if a, ok := g.resolveByLine(line); ok {
+	if a, ok := g.resolveByLine(full); ok {
 		return g.Apply(a)
 	}
 	if msg := g.explainIllegal(ev); msg != "" {
