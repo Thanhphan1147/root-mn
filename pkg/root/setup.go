@@ -41,11 +41,16 @@ func BeginSetup(g *Game) {
 	for _, q := range Quests {
 		g.QuestDeck = append(g.QuestDeck, q.ID)
 	}
+	beforeQ := cloneSlice(g.QuestDeck)
 	shuffleStr(g.QuestDeck, &g.RngSeed)
+	afterQ := cloneSlice(g.QuestDeck)
+	g.recordSystemLine("shuffle", "zone=QUESTS", fmt.Sprintf("before=[%s] after=[%s]", strings.Join(beforeQ, ","), strings.Join(afterQ, ",")))
 	for i := 0; i < 3 && len(g.QuestDeck) > 0; i++ {
 		g.QuestAvail = append(g.QuestAvail, g.QuestDeck[0])
 		g.QuestDeck = g.QuestDeck[1:]
 	}
+	// Record the initial deck and quest order so a replay reconstructs the exact
+	// draws without depending on the seed.
 	g.SetupMode = true
 	g.Round = 0
 	g.Phase = "S"

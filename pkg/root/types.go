@@ -3,6 +3,7 @@ package root
 import (
 	"fmt"
 	"sort"
+	"strings"
 )
 
 // Building is a placed building.
@@ -182,9 +183,24 @@ type Game struct {
 	// the RMN can record it as the `revealed` outcome.
 	VBStolenThisAction string
 
+	// SDStolenThisAction is the card Stand and Deliver! took this action (a
+	// random pick from the target's hand); it is recorded so a replay takes the
+	// same card instead of re-rolling.
+	SDStolenThisAction string
+
+	// NextSteal, when non-empty, supplies the card Stand and Deliver! must take
+	// on replay.
+	NextSteal string
+
 	// NextRoll, when non-empty, supplies the next battle dice so a replayed
 	// line reproduces the recorded roll (see Roll).
 	NextRoll []int
+
+	// NextShuffle holds the logged `after` order for a deck recycle that
+	// happened mid-action. It is consumed by recycleDeck at the exact moment the
+	// deck empties, so a replay draws the same cards before/after the recycle
+	// instead of applying the shuffle too early (see AGENTS.md §3).
+	NextShuffle [][]string
 }
 
 // NewGame creates a game for the given factions (2-4, base only) on autumn.
@@ -245,7 +261,10 @@ func (g *Game) resetDeck() {
 		}
 		g.Deck = kept
 	}
+	before := cloneSlice(g.Deck)
 	g.shuffle()
+	after := cloneSlice(g.Deck)
+	g.recordSystemLine("shuffle", "zone=DECK reason=setup", fmt.Sprintf("before=[%s] after=[%s]", strings.Join(before, ","), strings.Join(after, ",")))
 }
 
 // shuffle uses a deterministic xorshift seeded by RngSeed.
@@ -554,14 +573,30 @@ func (g *Game) playersOrdered() []*Player {
 	return out
 }
 
+// recycleDeck refills an empty Deck from the Discard pile and shuffles it. When
+// a replay logged the shuffle (`NextShuffle`), the recorded order is applied at
+// this exact moment so draws before and after the recycle line up.
+func (g *Game) recycleDeck() {
+	if len(g.NextShuffle) > 0 {
+		g.Deck = cloneSlice(g.NextShuffle[0])
+		g.NextShuffle = g.NextShuffle[1:]
+		g.Discard = nil
+		return
+	}
+	g.Deck = append(g.Deck, g.Discard...)
+	g.Discard = nil
+	before := cloneSlice(g.Deck)
+	g.shuffle()
+	after := cloneSlice(g.Deck)
+	g.recordSystemLine("shuffle", "zone=DECK reason=recycle", fmt.Sprintf("before=[%s] after=[%s]", strings.Join(before, ","), strings.Join(after, ",")))
+}
+
 // drawCards draws n cards for f, reshuffling as needed.
 func (g *Game) drawCards(f Faction, n int) {
 	p := g.Players[f]
 	for i := 0; i < n; i++ {
 		if len(g.Deck) == 0 {
-			g.Deck = append(g.Deck, g.Discard...)
-			g.Discard = nil
-			g.shuffle()
+			g.recycleDeck()
 		}
 		if len(g.Deck) == 0 {
 			return

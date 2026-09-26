@@ -43,6 +43,9 @@ func init() {
 		return Action{Kind: "royal-claim", Faction: ev.Actor}, true, nil
 	})
 	register("give", func(g *Game, ev rmnEvent) (Action, bool, error) {
+		if cs := parseList(ev.op("cards")); len(cs) > 0 {
+			g.NextSteal = cs[0]
+		}
 		return Action{Kind: "stand-deliver", Faction: ev.Actor, Target: Faction(ev.op("from"))}, true, nil
 	})
 	register("draw", func(g *Game, ev rmnEvent) (Action, bool, error) {

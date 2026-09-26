@@ -70,3 +70,30 @@ func TestApplyRMNGoldenCorpus(t *testing.T) {
 		t.Logf("  fallback intent %-20s %d", k, v)
 	}
 }
+
+// TestApplyRMNSeedIndependent replays each game with a different seed: because
+// every chance outcome (deck/quest order, ruins, dice) is in the log, the result
+// must be identical.
+func TestApplyRMNSeedIndependent(t *testing.T) {
+	files, _ := filepath.Glob("../../testdata/corpus/*.rmn")
+	if len(files) == 0 {
+		t.Skip("no corpus")
+	}
+	for _, f := range files {
+		text, _ := os.ReadFile(f)
+		_, order, first, body := parseCorpusHeader(t, string(text))
+		g := NewGame(order, first, 987654321) // deliberately different seed
+		BeginSetup(g)
+		for _, line := range body {
+			if err := g.ApplyRMN(line); err != nil {
+				t.Fatalf("%s: %q: %v", filepath.Base(f), line, err)
+			}
+		}
+		want, _ := os.ReadFile(strings.TrimSuffix(f, ".rmn") + ".hash")
+		got, _ := Snapshot(g)["hash"].(string)
+		if got != strings.TrimSpace(string(want)) {
+			t.Fatalf("%s: seed-independent replay %s != %s", filepath.Base(f), got, strings.TrimSpace(string(want)))
+		}
+	}
+	t.Logf("seed-independent replay validated %d games", len(files))
+}

@@ -55,17 +55,26 @@ Randomness (dice, shuffles, card draws, ruins, quest order) MUST be logged as
 concrete outcomes during play, and **applied** (not regenerated) during replay,
 so a game is reconstructible from the log alone, **independent of the seed**.
 
-- **Dice**: a `battle … -> {atk=…,def=…}` line arms `Game.NextRoll`; `Roll()`
-  consumes it and STILL advances `RngSeed`, so later shuffles/draws stay in sync
-  during seeded play.
-- **Shuffles**: log `SYS shuffle zone=DECK|QUESTS before=[…] after=[…]`.
-  Replay applies `after` (sets `Deck = after`, `Discard = nil`; for `QUESTS`
-  sets the first 3 as `QuestAvail`, rest as `QuestDeck`). `before` is for
-  integrity checking. The random order is produced during play and only replayed.
-- **Draws**: log the concrete drawn cards and inject them on replay, so hands do
-  not depend on deck order. (Needed because a shuffle can occur *inside* one
-  action — a draw that empties and recycles the deck — so a standalone shuffle
-  line cannot be applied at the right moment.)
+- **Dice**: each roll emits its own `SYS roll -> {atk=…,def=…}` line (from
+  `resolveBattleRoll`), and replayed lines arm `Game.NextRoll`. The roll is logged
+  at the *point it happens*, not on the `battle` line: a battle can defer its roll
+  behind an ambush or a pre-roll one-shot (`battle-skip`, `CARD:effect`), so the
+  `battle` line may carry no dice. `Roll()` consumes the armed values and STILL
+  advances `RngSeed` so seeded play stays in sync. (The `battle … -> {atk,def}`
+  outcome is still emitted when the roll is immediate, but `SYS roll` is the
+  authoritative source.)
+- **Shuffles**: log `SYS shuffle zone=DECK|QUESTS [reason=setup|recycle] before=[…]
+  after=[…]`. Setup shuffles (`resetDeck`, quests) are applied immediately on
+  replay (sets `Deck = after`, `Discard = nil`; for `QUESTS` the first 3 become
+  `QuestAvail`, the rest `QuestDeck`). A **recycle** shuffle happens *inside* an
+  action (a draw that empties the deck); it is queued (`Game.NextShuffle`) and
+  consumed by `recycleDeck` at the exact moment the replay's deck empties, so
+  draws before and after the recycle line up. `before` is for integrity checking.
+- **Dice rolls / Stand and Deliver**: `SYS roll` covers battle dice. The only
+  other unlogged RNG consumer is `Stand and Deliver!` (`give`): it takes a random
+  card from the target's hand, so the concrete card is recorded (`cards=[…]`) and
+  injected (`Game.NextSteal`). When adding any new RNG use, log the concrete
+  outcome the same way — never re-roll during replay.
 - **Ruins**: `SYS assign-ruins -> {ruins=[…], items=[…]}`; replay sets each
   clearing's `RuinItem`.
 - **Quest order**: covered by the `zone=QUESTS` shuffle.
@@ -136,8 +145,9 @@ The whole system is worthless if the same log replays to a different state.
   deliberately and explained.
 
 `Snapshot(g)["hash"]` is `stateDigest(g)`: a canonical digest of **position**
-only — it excludes `RngSeed`, logs, `NextRoll`, `DrawnThisAction`,
-`VBStolenThisAction`, `Seq`. Keep it that way.
+only — it excludes `RngSeed`, logs, `NextRoll`, `NextShuffle`, `DrawnThisAction`,
+`VBStolenThisAction`, `SDStolenThisAction`, `NextSteal`, `Seq`; and it hashes
+`Deck`/`Discard` as sorted multisets. Keep it that way.
 
 ## 8. Workflow: adding or changing an action
 
@@ -164,7 +174,10 @@ only — it excludes `RngSeed`, logs, `NextRoll`, `DrawnThisAction`,
 - Shipped: `ApplyRMN` + per-faction handlers (0 fallback on the corpus),
   dice-outcome injection, `TryRMN` (custom RMN input in both UIs with short
   errors: `malformed RMN`, `not a legal move`, specific build reasons).
-- WIP (stashed in root-mn): full chance injection — `SYS shuffle before/after`,
-  ruin replay, seed-independent state digest, and the seed-independence test.
+- Shipped: **full chance injection** — `SYS roll` battle dice, seeded setup
+  shuffles, queued `reason=recycle` shuffles applied at the deck-empty moment,
+  ruin replay, Stand and Deliver card injection, and a seed-independent
+  state digest. `TestApplyRMNGoldenCorpus` (100/100, 0 fallback) and
+  `TestApplyRMNSeedIndependent` pass.
   Finish per §3 (add draw logging + multiset pile digest), get the corpus green,
   then un-stash/commit.

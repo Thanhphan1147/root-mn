@@ -416,9 +416,7 @@ func (g *Game) outrage(offender Faction, clearing string) {
 	}
 	// no matching card: WA draws 1
 	if len(g.Deck) == 0 {
-		g.Deck = append(g.Deck, g.Discard...)
-		g.Discard = nil
-		g.shuffle()
+		g.recycleDeck()
 	}
 	if len(g.Deck) > 0 {
 		c := g.Deck[0]

@@ -121,7 +121,11 @@ func (g *Game) rmnIntent(a Action) (string, string) {
 	case "decree-move":
 		return "E:move", fmt.Sprintf("group=%s from=%s to=%s card=%s", rmnWarrior(ED, a.Amount), a.From, a.To, a.Card)
 	case "decree-battle":
-		return "E:battle", fmt.Sprintf("defender=%s at=%s card=%s", a.Target, a.Clearing, a.Card)
+		op := fmt.Sprintf("defender=%s at=%s card=%s", a.Target, a.Clearing, a.Card)
+		if g.Battle != nil && (g.Battle.D1 != 0 || g.Battle.D2 != 0) {
+			op += fmt.Sprintf(" -> {atk=%d,def=%d}", g.Battle.D1, g.Battle.D2)
+		}
+		return "E:battle", op
 	case "decree-build":
 		return "E:build", fmt.Sprintf("building=ED.b.roost at=%s card=%s", a.Clearing, a.Card)
 	case "ed-done-crafting":
@@ -218,7 +222,11 @@ func (g *Game) rmnIntent(a Action) (string, string) {
 	case "royal-claim":
 		return "score", fmt.Sprintf("who=%s amount=%d", f, countRuled(g, f))
 	case "stand-deliver":
-		return "give", fmt.Sprintf("from=%s to=%s cards=?", a.Target, f)
+		cards := "?"
+		if g.SDStolenThisAction != "" {
+			cards = "[" + g.SDStolenThisAction + "]"
+		}
+		return "give", fmt.Sprintf("from=%s to=%s cards=%s", a.Target, f, cards)
 	case "tax-collector":
 		return "draw", fmt.Sprintf("who=%s qty=1 from=DECK", f)
 	case "codebreakers":

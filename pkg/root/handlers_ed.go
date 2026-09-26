@@ -16,6 +16,11 @@ func init() {
 		return Action{Kind: "decree-move", Faction: ED, From: ev.op("from"), To: ev.op("to"), Amount: n, Card: ev.op("card"), Column: decreeColumn(g, ev.op("card"))}, true, nil
 	})
 	register("E:battle", func(g *Game, ev rmnEvent) (Action, bool, error) {
+		if a, ok := ev.intOut("atk"); ok {
+			if d, ok := ev.intOut("def"); ok {
+				g.NextRoll = []int{a, d}
+			}
+		}
 		return Action{Kind: "decree-battle", Faction: ED, Clearing: ev.op("at"), Target: Faction(ev.op("defender")), Card: ev.op("card"), Column: decreeColumn(g, ev.op("card"))}, true, nil
 	})
 	register("E:build", func(g *Game, ev rmnEvent) (Action, bool, error) {

@@ -99,9 +99,18 @@ func (g *Game) applyPersistent(a Action) error {
 			return fmt.Errorf("target has no cards")
 		}
 		idx := int(g.RngSeed % uint64(len(tp.Hand)))
+		if g.NextSteal != "" {
+			for i, hc := range tp.Hand {
+				if hc == g.NextSteal {
+					idx = i
+					break
+				}
+			}
+		}
 		c := tp.Hand[idx]
 		tp.Hand = append(tp.Hand[:idx], tp.Hand[idx+1:]...)
 		p.Hand = append(p.Hand, c)
+		g.SDStolenThisAction = c
 		g.Score(a.Target, 1)
 		g.Logf(a.Faction, "stand-deliver", "Stand and Deliver!: took a card from %s (they scored 1 VP)", a.Target)
 	case "codebreakers":

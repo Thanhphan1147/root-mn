@@ -10,8 +10,15 @@ import (
 func TestRuinNotationAndRedaction(t *testing.T) {
 	g := NewGame([]Faction{MC, ED}, MC, 7)
 	BeginSetup(g)
-	if len(g.RMNLog) == 0 || !strings.Contains(g.RMNLog[0], "assign-ruins") {
-		t.Fatalf("first RMN line should be assign-ruins, got %v", g.RMNLog)
+	found := false
+	for _, l := range g.RMNLog {
+		if strings.Contains(l, "assign-ruins") {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("RMN log should record assign-ruins, got %v", g.RMNLog)
 	}
 	for _, viewer := range []string{"", "MC", "ED"} {
 		snap := Redact(g, viewer)

@@ -32,6 +32,7 @@ func (g *Game) clone(withLogs bool) *Game {
 	out.SetupPlaced = cloneMap(g.SetupPlaced)
 	out.FH = cloneSlice(g.FH)
 	out.DecreeQueue = cloneSlice(g.DecreeQueue)
+	out.NextShuffle = cloneSlice(g.NextShuffle)
 	if g.Pending != nil {
 		p := *g.Pending
 		p.Context = cloneMap(g.Pending.Context)

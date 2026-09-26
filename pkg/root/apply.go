@@ -42,6 +42,7 @@ func (g *Game) ApplyFast(a Action) error {
 func (g *Game) applyResolved(a Action) error {
 	g.DrawnThisAction = nil
 	g.VBStolenThisAction = ""
+	g.SDStolenThisAction = ""
 	if a.Kind == "battle-skip" && g.Pending != nil && g.Pending.Kind == PendingFieldHospitals {
 		g.FH = nil
 		g.Pending = nil

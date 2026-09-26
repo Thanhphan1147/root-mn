@@ -124,6 +124,11 @@ func (g *Game) resolveBattleRoll() {
 	b := g.Battle
 	d1, d2 := g.Roll()
 	b.D1, b.D2 = d1, d2
+	// Record the roll as its own SYS event. A battle can defer its roll behind an
+	// ambush/one-shot stage, so the roll does not always happen on the `battle`
+	// line that started it; logging it here keeps the outcome self-describing and
+	// lets a replay inject the exact dice (AGENTS.md §3).
+	g.recordSystemLine("roll", "", fmt.Sprintf("{atk=%d,def=%d}", d1, d2))
 	b.Step, b.StepName = 4, "Dice roll"
 	hi, lo := d1, d2
 	if d1 < d2 {

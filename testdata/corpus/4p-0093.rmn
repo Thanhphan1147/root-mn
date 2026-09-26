@@ -7,346 +7,362 @@
 %Faction WA alliance seat=3
 %Faction VB vagabond seat=4
 %First MC
-1 0.S SYS assign-ruins -> {ruins=[C6,C10,C11,C12], items=[i.sword,i.boot,i.hammer,i.bag]}
-2 0.S MC place group=MC.b.keep#1 to=C3
-3 0.S MC place group=MC.b.recruiter#1 to=C3
-4 0.S MC place group=MC.b.saw#1 to=C11
-5 0.S MC place group=MC.b.workshop#1 to=C11
-6 0.S ED place group=(ED.b.roost#1+6ED.w) to=C1
-7 0.S ED E:appoint-leader leader=ED.ldr.despot
-8 0.S VB V:choose-character character=V.character.ranger
-9 0.S VB V:move-pawn to=AutumnNW
-10 1.B MC pass
-11 1.D MC notify who=MC text="done crafting"
-12 1.D MC C:build who=MC building=MC.b.workshop at=C2
-13 1.D MC C:recruit who=MC at=[C3]
-14 1.D MC move group=2MC.w from=C3 to=C6
-15 1.D MC move group=2MC.w from=C6 to=C2
-16 1.D MC pass
-17 1.E MC pass
-18 1.B ED E:decree-add column=RECRUIT cards=B09
-19 1.B ED pass
-20 1.D ED notify who=ED text="done crafting"
-21 1.D ED E:recruit at=[C1] card=B09
-22 1.D ED E:move group=2ED.w from=C1 to=C9 card=VIZIER
-23 1.D ED E:build building=ED.b.roost at=C9 card=VIZIER
-24 1.D ED pass
-25 1.E ED pass
-26 1.B WA A:place-sympathy at=C5 spend=R11
-27 1.B WA A:revolt at=C5 base=A.b.base-r cards=(R10+B02)
-28 1.B MC field-hospitals at=C5 spend=R07 to=C3
-29 1.B WA pass
-30 1.D WA A:train card=B11
-31 1.D WA A:train card=R05
-32 1.D WA A:mobilize cards=M01
-33 1.D WA pass
-34 1.E WA place group=WA.w to=C5
-35 1.E WA place group=WA.w to=C5
+1 0.S SYS shuffle zone=DECK reason=setup -> before=[F01,F02,F03,F04,F05,F06,F07,F08,F09,F10,F11,F12,F13,F14,R01,R02,R03,R04,R05,R06,R07,R08,R09,R10,R11,R12,R13,M01,M02,M03,M04,M05,M06,M07,M08,M09,M10,M11,M12,M13,B01,B02,B03,B04,B05,B06,B07,B08,B09,B10,B11,B12,B13,B14] after=[R11,R10,B02,B05,F13,R03,F06,B09,M12,B11,M01,R05,M13,B12,M06,R07,R08,M02,B01,F07,F08,F01,F14,F12,R02,B07,B08,F10,R12,M05,M04,B04,R04,B14,F05,B06,M11,F04,M10,F03,M07,B03,R06,F09,B10,R01,R13,F11,B13,R09,M09,F02,M08,M03]
+2 0.S SYS assign-ruins -> {ruins=[C6,C10,C11,C12], items=[i.sword,i.boot,i.hammer,i.bag]}
+3 0.S SYS shuffle zone=QUESTS -> before=[q.F01,q.F02,q.F03,q.F04,q.F05,q.R01,q.R02,q.R03,q.R04,q.R05,q.M01,q.M02,q.M03,q.M04,q.M05] after=[q.M04,q.M05,q.R01,q.F02,q.F04,q.R04,q.F01,q.M02,q.R05,q.F03,q.F05,q.R03,q.M01,q.M03,q.R02]
+4 0.S MC place group=MC.b.keep#1 to=C3
+5 0.S MC place group=MC.b.recruiter#1 to=C3
+6 0.S MC place group=MC.b.saw#1 to=C11
+7 0.S MC place group=MC.b.workshop#1 to=C11
+8 0.S ED place group=(ED.b.roost#1+6ED.w) to=C1
+9 0.S ED E:appoint-leader leader=ED.ldr.despot
+10 0.S VB V:choose-character character=V.character.ranger
+11 0.S VB V:move-pawn to=AutumnNW
+12 1.B MC pass
+13 1.D MC notify who=MC text="done crafting"
+14 1.D MC C:build who=MC building=MC.b.workshop at=C2
+15 1.D MC C:recruit who=MC at=[C3]
+16 1.D MC move group=2MC.w from=C3 to=C6
+17 1.D MC move group=2MC.w from=C6 to=C2
+18 1.D MC pass
+19 1.E MC pass
+20 1.B ED E:decree-add column=RECRUIT cards=B09
+21 1.B ED pass
+22 1.D ED notify who=ED text="done crafting"
+23 1.D ED E:recruit at=[C1] card=B09
+24 1.D ED E:move group=2ED.w from=C1 to=C9 card=VIZIER
+25 1.D ED E:build building=ED.b.roost at=C9 card=VIZIER
+26 1.D ED pass
+27 1.E ED pass
+28 1.B WA A:place-sympathy at=C5 spend=R11
+29 1.B WA A:revolt at=C5 base=A.b.base-r cards=(R10+B02)
+30 1.B MC field-hospitals at=C5 spend=R07 to=C3
+31 1.B WA pass
+32 1.D WA A:train card=B11
+33 1.D WA A:train card=R05
+34 1.D WA A:mobilize cards=M01
+35 1.D WA pass
 36 1.E WA place group=WA.w to=C5
-37 1.E WA pass
-38 1.B VB V:move-pawn to=C10
-39 1.B VB pass
-40 1.D VB V:complete-quest quest=q.R01 reward=vp
-41 1.D VB V:aid target=MC card=B12 exhaust=boot#1 take=none
-42 1.D VB V:strike target=MC at=C10
-43 1.D MC field-hospitals at=C10 spend=B12 to=C3
-44 1.D VB pass
-45 1.E VB pass
-46 2.B MC pass
-47 2.D MC notify who=MC text="done crafting"
-48 2.D MC C:build who=MC building=MC.b.recruiter at=C7
-49 2.D MC C:recruit who=MC at=[C3,C7]
-50 2.D MC move group=MC.w from=C2 to=C10
-51 2.D MC move group=MC.w from=C2 to=C10
-52 2.D MC pass
-53 2.E MC pass
-54 2.B ED E:decree-add column=RECRUIT cards=M12
-55 2.B ED pass
-56 2.D ED notify who=ED text="done crafting"
-57 2.D ED E:recruit at=[C9] card=M12
-58 2.D ED E:recruit at=[C9] card=B09
-59 2.D ED E:move group=3ED.w from=C9 to=C12 card=VIZIER
-60 2.D ED E:build building=ED.b.roost at=C12 card=VIZIER
-61 2.D ED pass
-62 2.E ED pass
-63 2.B WA A:place-sympathy at=C2 spend=M01
-64 2.B WA pass
-65 2.D WA A:train card=B01
-66 2.D WA A:mobilize cards=M02
-67 2.D WA pass
-68 2.E WA move group=4WA.w from=C5 to=C2
-69 2.E WA move group=2WA.w from=C2 to=C6
-70 2.E WA A:organize at=C6
-71 2.E WA place group=WA.w to=C5
-72 2.E WA pass
-73 2.B VB V:move-pawn to=C2
-74 2.B VB V:refresh items=sword#4
-75 2.B VB V:refresh items=torch#2
-76 2.B VB V:refresh items=crossbow#3
-77 2.B VB pass
-78 2.D VB V:aid target=WA card=M13 exhaust=sword#4 take=none
-79 2.D VB V:strike target=MC at=C2
-80 2.D MC field-hospitals at=C2 spend=B05 to=C3
-81 2.D VB V:hideout
-82 2.E VB pass
-83 3.B MC pass
-84 3.D MC notify who=MC text="done crafting"
-85 3.D MC C:build who=MC building=MC.b.saw at=C8
-86 3.D MC C:recruit who=MC at=[C3,C7]
-87 3.D MC move group=2MC.w from=C3 to=C6
-88 3.D MC move group=MC.w from=C12 to=C7
-89 3.D MC pass
-90 3.E MC pass
-91 3.B ED E:decree-add column=RECRUIT cards=F01
-92 3.B ED pass
-93 3.D ED notify who=ED text="done crafting"
-94 3.D ED E:recruit at=[C9] card=B09
-95 3.D ED E:recruit at=[C12] card=F01
-96 3.D ED E:recruit at=[C9] card=M12
-97 3.D ED E:move group=4ED.w from=C12 to=C10 card=VIZIER
-98 3.D ED E:build building=ED.b.roost at=C10 card=VIZIER
-99 3.D ED pass
-100 3.E ED pass
-101 3.B WA pass
-102 3.D WA A:train card=R02
-103 3.D WA A:mobilize cards=M13
-104 3.D WA A:mobilize cards=F12
-105 3.D WA pass
-106 3.E WA place group=WA.w to=C5
-107 3.E WA place group=WA.w to=C5
+37 1.E WA place group=WA.w to=C5
+38 1.E WA place group=WA.w to=C5
+39 1.E WA pass
+40 1.B VB V:move-pawn to=C10
+41 1.B VB pass
+42 1.D VB V:complete-quest quest=q.R01 reward=vp
+43 1.D VB V:aid target=MC card=B12 exhaust=boot#1 take=none
+44 1.D VB V:strike target=MC at=C10
+45 1.D MC field-hospitals at=C10 spend=B12 to=C3
+46 1.D VB pass
+47 1.E VB pass
+48 2.B MC pass
+49 2.D MC notify who=MC text="done crafting"
+50 2.D MC C:build who=MC building=MC.b.recruiter at=C7
+51 2.D MC C:recruit who=MC at=[C3,C7]
+52 2.D MC move group=MC.w from=C2 to=C10
+53 2.D MC move group=MC.w from=C2 to=C10
+54 2.D MC pass
+55 2.E MC pass
+56 2.B ED E:decree-add column=RECRUIT cards=M12
+57 2.B ED pass
+58 2.D ED notify who=ED text="done crafting"
+59 2.D ED E:recruit at=[C9] card=M12
+60 2.D ED E:recruit at=[C9] card=B09
+61 2.D ED E:move group=3ED.w from=C9 to=C12 card=VIZIER
+62 2.D ED E:build building=ED.b.roost at=C12 card=VIZIER
+63 2.D ED pass
+64 2.E ED pass
+65 2.B WA A:place-sympathy at=C2 spend=M01
+66 2.B WA pass
+67 2.D WA A:train card=B01
+68 2.D WA A:mobilize cards=M02
+69 2.D WA pass
+70 2.E WA move group=4WA.w from=C5 to=C2
+71 2.E WA move group=2WA.w from=C2 to=C6
+72 2.E WA A:organize at=C6
+73 2.E WA place group=WA.w to=C5
+74 2.E WA pass
+75 2.B VB V:move-pawn to=C2
+76 2.B VB V:refresh items=sword#4
+77 2.B VB V:refresh items=torch#2
+78 2.B VB V:refresh items=crossbow#3
+79 2.B VB pass
+80 2.D VB V:aid target=WA card=M13 exhaust=sword#4 take=none
+81 2.D VB V:strike target=MC at=C2
+82 2.D MC field-hospitals at=C2 spend=B05 to=C3
+83 2.D VB V:hideout
+84 2.E VB pass
+85 3.B MC pass
+86 3.D MC notify who=MC text="done crafting"
+87 3.D MC C:build who=MC building=MC.b.saw at=C8
+88 3.D MC C:recruit who=MC at=[C3,C7]
+89 3.D MC move group=2MC.w from=C3 to=C6
+90 3.D MC move group=MC.w from=C12 to=C7
+91 3.D MC pass
+92 3.E MC pass
+93 3.B ED E:decree-add column=RECRUIT cards=F01
+94 3.B ED pass
+95 3.D ED notify who=ED text="done crafting"
+96 3.D ED E:recruit at=[C9] card=B09
+97 3.D ED E:recruit at=[C12] card=F01
+98 3.D ED E:recruit at=[C9] card=M12
+99 3.D ED E:move group=4ED.w from=C12 to=C10 card=VIZIER
+100 3.D ED E:build building=ED.b.roost at=C10 card=VIZIER
+101 3.D ED pass
+102 3.E ED pass
+103 3.B WA pass
+104 3.D WA A:train card=R02
+105 3.D WA A:mobilize cards=M13
+106 3.D WA A:mobilize cards=F12
+107 3.D WA pass
 108 3.E WA place group=WA.w to=C5
 109 3.E WA place group=WA.w to=C5
 110 3.E WA place group=WA.w to=C5
-111 3.E WA pass
-112 3.B VB V:move-pawn to=C10
-113 3.B VB V:refresh items=sword#4
-114 3.B VB V:refresh items=torch#2
-115 3.B VB V:refresh items=crossbow#3
-116 3.B VB pass
-117 3.D VB V:aid target=ED card=B07 exhaust=sword#4 take=none
-118 3.D VB V:explore at=C10
-119 3.D VB V:strike target=MC at=C10
-120 3.D MC field-hospitals at=C10 spend=B08 to=C3
-121 3.D VB move group=VB.p to=C12
-122 3.D VB pass
-123 3.E VB pass
-124 4.B MC pass
-125 4.D MC notify who=MC text="done crafting"
-126 4.D MC C:build who=MC building=MC.b.workshop at=C7
-127 4.D MC move group=3MC.w from=C7 to=C12
-128 4.D MC C:recruit who=MC at=[C3,C7]
-129 4.D MC move group=MC.w from=C12 to=C11
-130 4.D MC pass
-131 4.E MC pass
-132 4.B ED E:decree-add column=MOVE cards=F10
-133 4.B ED pass
-134 4.D ED craft who=ED card=F06 produce=i.boot
-135 4.D ED notify who=ED text="done crafting"
-136 4.D ED E:recruit at=[C12] card=F01
-137 4.D ED E:recruit at=[C12] card=B09
-138 4.D ED E:recruit at=[C9] card=M12
-139 4.D ED E:move group=ED.w from=C12 to=C4 card=VIZIER
-140 4.D ED E:move group=3ED.w from=C1 to=C9 card=F10
-141 4.D ED E:build building=ED.b.roost at=C4 card=VIZIER
-142 4.D ED pass
-143 4.E ED discard who=ED cards=R12
-144 4.E ED pass
-145 4.B WA A:revolt at=C2 base=A.b.base-m cards=(M02+M13)
-146 4.B WA A:place-sympathy at=C1 spend=(F13+F12)
-147 4.B WA pass
-148 4.D WA craft who=WA card=M05 produce=i.tea
-149 4.D WA A:train card=M04
-150 4.D WA pass
-151 4.E WA move group=3WA.w from=C2 to=C6
-152 4.E WA move group=4WA.w from=C5 to=C1
-153 4.E WA place group=WA.w to=C2
-154 4.E WA place group=WA.w to=C2
+111 3.E WA place group=WA.w to=C5
+112 3.E WA place group=WA.w to=C5
+113 3.E WA pass
+114 3.B VB V:move-pawn to=C10
+115 3.B VB V:refresh items=sword#4
+116 3.B VB V:refresh items=torch#2
+117 3.B VB V:refresh items=crossbow#3
+118 3.B VB pass
+119 3.D VB V:aid target=ED card=B07 exhaust=sword#4 take=none
+120 3.D VB V:explore at=C10
+121 3.D VB V:strike target=MC at=C10
+122 3.D MC field-hospitals at=C10 spend=B08 to=C3
+123 3.D VB move group=VB.p to=C12
+124 3.D VB pass
+125 3.E VB pass
+126 4.B MC pass
+127 4.D MC notify who=MC text="done crafting"
+128 4.D MC C:build who=MC building=MC.b.workshop at=C7
+129 4.D MC move group=3MC.w from=C7 to=C12
+130 4.D MC C:recruit who=MC at=[C3,C7]
+131 4.D MC move group=MC.w from=C12 to=C11
+132 4.D MC pass
+133 4.E MC pass
+134 4.B ED E:decree-add column=MOVE cards=F10
+135 4.B ED pass
+136 4.D ED craft who=ED card=F06 produce=i.boot
+137 4.D ED notify who=ED text="done crafting"
+138 4.D ED E:recruit at=[C12] card=F01
+139 4.D ED E:recruit at=[C12] card=B09
+140 4.D ED E:recruit at=[C9] card=M12
+141 4.D ED E:move group=ED.w from=C12 to=C4 card=VIZIER
+142 4.D ED E:move group=3ED.w from=C1 to=C9 card=F10
+143 4.D ED E:build building=ED.b.roost at=C4 card=VIZIER
+144 4.D ED pass
+145 4.E ED discard who=ED cards=R12
+146 4.E ED pass
+147 4.B WA A:revolt at=C2 base=A.b.base-m cards=(M02+M13)
+148 4.B WA A:place-sympathy at=C1 spend=(F13+F12)
+149 4.B WA pass
+150 4.D WA craft who=WA card=M05 produce=i.tea
+151 4.D WA A:train card=M04
+152 4.D WA pass
+153 4.E WA move group=3WA.w from=C2 to=C6
+154 4.E WA move group=4WA.w from=C5 to=C1
 155 4.E WA place group=WA.w to=C2
 156 4.E WA place group=WA.w to=C2
 157 4.E WA place group=WA.w to=C2
-158 4.E WA pass
-159 4.B VB V:move-pawn to=AutumnNW
-160 4.B VB V:refresh items=crossbow#3
-161 4.B VB V:refresh items=sword#4
-162 4.B VB V:refresh items=torch#2
-163 4.B VB pass
-164 4.D VB pass
-165 4.E VB pass
-166 5.B MC pass
-167 5.D MC craft who=MC card=R04 produce=i.bag
-168 5.D MC notify who=MC text="done crafting"
-169 5.D MC C:build who=MC building=MC.b.recruiter at=C8
-170 5.D MC C:recruit who=MC at=[C3,C7,C8]
-171 5.D MC move group=2MC.w from=C8 to=C4
-172 5.D MC move group=2MC.w from=C7 to=C12
-173 5.D MC pass
-174 5.E MC pass
-175 5.B ED E:decree-add column=BATTLE cards=B07
-176 5.B ED pass
-177 5.D ED craft who=ED card=F05 produce=i.tea
-178 5.D ED craft who=ED card=B14 produce=i.crossbow
-179 5.D ED notify who=ED text="done crafting"
-180 5.D ED E:recruit at=[C4] card=B09
-181 5.D ED E:recruit at=[C1] card=F01
-182 5.D ED E:recruit at=[C9] card=M12
-183 5.D ED E:move group=3ED.w from=C10 to=C2 card=VIZIER
-184 5.D ED E:move group=ED.w from=C12 to=C10 card=F10
-185 5.D ED E:battle defender=WA at=C2 card=B07
-186 5.D WA remove group=WA.b.base-M at=C2
-187 5.D WA notify text="skip"
-188 5.D ED E:build building=ED.b.roost at=C2 card=VIZIER
-189 5.D ED pass
-190 5.E ED pass
-191 5.B WA pass
-192 5.D WA craft who=WA card=F04 produce=i.bag
-193 5.D WA A:train card=B06
-194 5.D WA A:mobilize cards=M11
-195 5.D WA pass
-196 5.E WA move group=WA.w from=C5 to=C1
-197 5.E WA move group=4WA.w from=C1 to=C10
-198 5.E WA A:organize at=C10
-199 5.E WA place group=WA.w to=C5
-200 5.E WA pass
-201 5.B VB V:move-pawn to=C1
-202 5.B VB V:refresh items=boot#5
-203 5.B VB V:refresh items=boot#1
-204 5.B VB pass
-205 5.D VB V:aid target=ED card=F07 exhaust=boot#1 take=i.tea
-206 5.D VB V:aid target=ED card=B04 exhaust=torch#2 take=i.boot
-207 5.D VB V:complete-quest quest=q.F02 reward=vp
-208 5.D VB move group=VB.p to=C10
-209 5.D VB V:strike target=MC at=C10
-210 5.D MC field-hospitals at=C10 spend=R03 to=C3
-211 5.D VB pass
-212 5.E VB pass
-213 6.B MC pass
-214 6.D MC notify who=MC text="done crafting"
-215 6.D MC C:recruit who=MC at=[C3,C7,C8]
-216 6.D MC move group=MC.w from=C12 to=C4
-217 6.D MC move group=7MC.w from=C3 to=C6
-218 6.D MC C:build who=MC building=MC.b.saw at=C6
-219 6.D MC pass
-220 6.E MC pass
-221 6.B ED E:decree-add column=BATTLE cards=R06
-222 6.B ED pass
-223 6.D ED craft who=ED card=F09 produce=i.hammer
-224 6.D ED craft who=ED card=F07 produce=i.coin
-225 6.D ED notify who=ED text="done crafting"
-226 6.D ED E:recruit at=[C4] card=B09
-227 6.D ED E:recruit at=[C1] card=F01
-228 6.D ED E:turmoil reason=unable
-229 6.D ED E:appoint-leader leader=ED.ldr.commander
-230 6.E ED discard who=ED cards=B10
-231 6.E ED discard who=ED cards=B04
-232 6.E ED pass
-233 6.B WA pass
-234 6.D WA A:train card=R13
-235 6.D WA A:train card=R01
-236 6.D WA pass
-237 6.E WA battle attacker=WA defender=MC at=C6 -> {atk=1,def=1}
-238 6.E MC remove group=MC.w at=C6
-239 6.E WA remove group=WA.w at=C6
-240 6.E MC field-hospitals at=C6 spend=B13 to=C3
-241 6.E WA place group=WA.w to=C5
-242 6.E WA battle attacker=WA defender=ED at=C10 -> {atk=0,def=1}
-243 6.E ED remove group=ED.w at=C10
-244 6.E WA move group=3WA.w from=C5 to=C2
-245 6.E WA move group=WA.w from=C2 to=C10
-246 6.E WA move group=4WA.w from=C10 to=C12
-247 6.E WA pass
-248 6.B VB V:move-pawn to=C1
-249 6.B VB V:refresh items=crossbow#3
-250 6.B VB V:refresh items=tea#6
-251 6.B VB V:refresh items=torch#2
-252 6.B VB pass
-253 6.D VB V:aid target=ED card=F11 exhaust=sword#4 take=i.crossbow
-254 6.D VB V:hideout
-255 6.E VB pass
-256 7.B MC pass
-257 7.D MC notify who=MC text="done crafting"
-258 7.D MC move group=MC.w from=C8 to=C4
-259 7.D MC move group=6MC.w from=C6 to=C2
-260 7.D MC C:build who=MC building=MC.b.recruiter at=C2
-261 7.D MC move group=2MC.w from=C7 to=C12
-262 7.D MC move group=5MC.w from=C12 to=C10
-263 7.D MC pass
-264 7.E MC pass
-265 7.B ED E:decree-add column=BATTLE cards=M09
-266 7.B ED pass
-267 7.D ED craft who=ED card=M08 produce=i.sword
-268 7.D ED notify who=ED text="done crafting"
-269 7.D ED E:move group=3ED.w from=C9 to=C4 card=VIZIER
-270 7.D ED E:battle defender=WA at=C2 card=M09
-271 7.D WA remove group=WA.w at=C2
-272 7.D WA remove group=WA.w at=C2
-273 7.D WA notify text="skip"
-274 7.D ED remove group=ED.w at=C2
-275 7.D ED remove group=ED.w at=C2
-276 7.D ED E:battle defender=MC at=C10 card=VIZIER
-277 7.D MC remove group=MC.w at=C10
-278 7.D MC remove group=MC.w at=C10
-279 7.D ED remove group=ED.w at=C10
-280 7.D ED remove group=ED.b.roost at=C10
-281 7.D MC field-hospitals at=C10 spend=B10 to=C3
-282 7.D ED pass
-283 7.E ED discard who=ED cards=F02
-284 7.E ED pass
-285 7.B WA A:place-sympathy at=C11 spend=(M11+M07)
-286 7.B WA pass
-287 7.D WA A:mobilize cards=F10
-288 7.D WA A:mobilize cards=M03
-289 7.D WA pass
-290 7.E WA A:organize at=C12
-291 7.E WA move group=3WA.w from=C12 to=C7
-292 7.E WA A:organize at=C7
-293 7.E WA place group=WA.w to=C5
-294 7.E WA place group=WA.w to=C5
-295 7.E WA place group=WA.w to=C5
-296 7.E WA pass
-297 7.B VB V:move-pawn to=C10
-298 7.B VB V:refresh items=sword#4
-299 7.B VB V:refresh items=torch#2
-300 7.B VB V:refresh items=boot#7
-301 7.B VB V:refresh items=boot#5
-302 7.B VB pass
-303 7.D VB V:strike target=MC at=C10
-304 7.D MC field-hospitals at=C10 spend=R10 to=C3
-305 7.D VB V:strike target=MC at=C10
-306 7.D MC notify text="skip"
-307 7.D VB V:aid target=MC card=R07 exhaust=sword#4 take=none
-308 7.D VB move group=VB.p to=C12
-309 7.D VB V:explore at=C12
-310 7.D VB move group=VB.p to=C9
-311 7.D VB V:aid target=ED card=M06 exhaust=bag#9 take=none
-312 7.D VB V:aid target=ED card=M10 exhaust=tea#6 take=none
-313 7.D VB pass
-314 7.E VB pass
-315 8.B MC pass
-316 8.D MC notify who=MC text="took available F02 spending F03"
-317 8.D MC notify who=MC text="done crafting"
-318 8.D MC C:build who=MC building=MC.b.workshop at=C10
-319 8.D MC move group=2MC.w from=C11 to=C12
-320 8.D MC C:recruit who=MC at=[C2,C3,C7,C8]
-321 8.D MC move group=2MC.w from=C3 to=C7
-322 8.D MC pass
-323 8.E MC pass
-324 8.B ED E:decree-add column=BATTLE cards=F11
-325 8.B ED pass
-326 8.D ED craft who=ED card=M06 produce=i.boot
-327 8.D ED notify who=ED text="done crafting"
-328 8.D ED E:move group=2ED.w from=C4 to=C8 card=VIZIER
-329 8.D ED E:battle defender=VB at=C9 card=M09
-330 8.D VB V:damage items=boot#7
-331 8.D VB V:damage items=crossbow#3
-332 8.D ED E:battle defender=MC at=C4 card=VIZIER
-333 8.D MC remove group=MC.w at=C4
-334 8.D MC remove group=MC.w at=C4
-335 8.D MC remove group=MC.w at=C4
-336 8.D ED remove group=ED.w at=C4
-337 8.D MC field-hospitals at=C4 spend=R02 to=C3
-338 8.D ED E:battle defender=MC at=C8 card=F11
-339 8.D MC notify text="skip"
-340 8.D MC remove group=MC.b.recruiter at=C8
-341 8.D MC remove group=MC.b.saw at=C8
-342 8.D MC notify text="skip"
-343 8.D ED pass
+158 4.E WA place group=WA.w to=C2
+159 4.E WA place group=WA.w to=C2
+160 4.E WA pass
+161 4.B VB V:move-pawn to=AutumnW
+162 4.B VB V:refresh items=crossbow#3
+163 4.B VB V:refresh items=sword#4
+164 4.B VB V:refresh items=torch#2
+165 4.B VB pass
+166 4.D VB pass
+167 4.E VB pass
+168 5.B MC pass
+169 5.D MC craft who=MC card=R04 produce=i.bag
+170 5.D MC notify who=MC text="done crafting"
+171 5.D MC C:build who=MC building=MC.b.recruiter at=C8
+172 5.D MC C:recruit who=MC at=[C3,C7,C8]
+173 5.D MC move group=2MC.w from=C8 to=C4
+174 5.D MC move group=2MC.w from=C7 to=C12
+175 5.D MC pass
+176 5.E MC pass
+177 5.B ED E:decree-add column=BATTLE cards=B07
+178 5.B ED pass
+179 5.D ED craft who=ED card=F05 produce=i.tea
+180 5.D ED craft who=ED card=B14 produce=i.crossbow
+181 5.D ED notify who=ED text="done crafting"
+182 5.D ED E:recruit at=[C4] card=B09
+183 5.D ED E:recruit at=[C1] card=F01
+184 5.D ED E:recruit at=[C9] card=M12
+185 5.D ED E:move group=3ED.w from=C10 to=C2 card=VIZIER
+186 5.D ED E:move group=ED.w from=C12 to=C10 card=F10
+187 5.D SYS roll -> {atk=2,def=3}
+188 5.D ED E:battle defender=WA at=C2 card=B07 -> {atk=2,def=3}
+189 5.D WA remove group=WA.b.base-M at=C2
+190 5.D WA notify text="skip"
+191 5.D ED E:build building=ED.b.roost at=C2 card=VIZIER
+192 5.D ED pass
+193 5.E ED pass
+194 5.B WA pass
+195 5.D WA craft who=WA card=F04 produce=i.bag
+196 5.D WA A:train card=B06
+197 5.D WA A:mobilize cards=M11
+198 5.D WA pass
+199 5.E WA move group=WA.w from=C5 to=C1
+200 5.E WA move group=4WA.w from=C1 to=C10
+201 5.E WA A:organize at=C10
+202 5.E WA place group=WA.w to=C5
+203 5.E WA pass
+204 5.B VB V:move-pawn to=C4
+205 5.B VB V:refresh items=boot#5
+206 5.B VB V:refresh items=boot#1
+207 5.B VB pass
+208 5.D VB V:strike target=MC at=C4
+209 5.D MC field-hospitals at=C4 spend=R03 to=C3
+210 5.D VB V:aid target=MC card=B04 exhaust=boot#5 take=i.bag
+211 5.D VB move group=VB.p to=C12
+212 5.D VB V:explore at=C12
+213 5.D VB V:aid target=ED card=F07 exhaust=bag#6 take=i.tea
+214 5.D VB pass
+215 5.E VB pass
+216 6.B MC pass
+217 6.D MC notify who=MC text="done crafting"
+218 6.D MC C:build who=MC building=MC.b.workshop at=C12
+219 6.D MC C:recruit who=MC at=[C3,C7,C8]
+220 6.D MC move group=3MC.w from=C12 to=C10
+221 6.D MC move group=2MC.w from=C11 to=C6
+222 6.D MC pass
+223 6.E MC pass
+224 6.B ED E:decree-add column=BATTLE cards=R06
+225 6.B ED pass
+226 6.D ED craft who=ED card=F09 produce=i.hammer
+227 6.D ED craft who=ED card=F07 produce=i.coin
+228 6.D ED notify who=ED text="done crafting"
+229 6.D ED E:recruit at=[C12] card=F01
+230 6.D ED E:recruit at=[C10] card=B09
+231 6.D ED E:turmoil reason=unable
+232 6.D ED E:appoint-leader leader=ED.ldr.commander
+233 6.E ED discard who=ED cards=B10
+234 6.E ED pass
+235 6.B WA A:place-sympathy at=C12 spend=(B04+F08)
+236 6.B WA pass
+237 6.D WA A:train card=R13
+238 6.D WA A:train card=R01
+239 6.D WA pass
+240 6.E SYS roll -> {atk=1,def=1}
+241 6.E WA battle attacker=WA defender=MC at=C6 -> {atk=1,def=1}
+242 6.E MC remove group=MC.w at=C6
+243 6.E WA remove group=WA.w at=C6
+244 6.E MC field-hospitals at=C6 spend=B13 to=C3
+245 6.E WA place group=WA.w to=C5
+246 6.E SYS roll -> {atk=0,def=1}
+247 6.E WA battle attacker=WA defender=MC at=C10 -> {atk=0,def=1}
+248 6.E MC remove group=MC.w at=C10
+249 6.E MC field-hospitals at=C10 spend=R09 to=C3
+250 6.E SYS roll -> {atk=1,def=1}
+251 6.E WA battle attacker=WA defender=MC at=C10 -> {atk=1,def=1}
+252 6.E MC remove group=MC.w at=C10
+253 6.E WA remove group=WA.w at=C10
+254 6.E MC notify text="skip"
+255 6.E WA place group=WA.w to=C5
+256 6.E WA move group=4WA.w from=C5 to=C1
+257 6.E SYS shuffle zone=DECK reason=recycle -> before=[R11,R10,B02,R07,B11,R05,B12,M01,B01,B05,R02,B08,R12,M02,M13,F13,F12,M04,B03,B06,R03,B09,M12,F01,F10,B07,R06,B10,B04,F08,R13,R01,B13,R09] after=[R10,B12,R07,R01,F13,R12,R09,R06,R11,R02,M02,B11,M12,B06,B10,R13,B05,B04,F12,B02,R05,B08,F08,B01,B13,B03,B09,M01,B07,F01,M13,M04,R03,F10]
+258 6.E WA pass
+259 6.B VB V:move-pawn to=Witchwood
+260 6.B VB V:refresh items=boot#5
+261 6.B VB V:refresh items=crossbow#3
+262 6.B VB V:refresh items=torch#2
+263 6.B VB V:refresh items=boot#1
+264 6.B VB V:refresh items=bag#6
+265 6.B VB pass
+266 6.D VB move group=VB.p to=C10
+267 6.D VB V:strike target=MC at=C10
+268 6.D MC notify text="skip"
+269 6.D SYS roll -> {atk=0,def=1}
+270 6.D VB battle attacker=VB defender=WA at=C10 -> {atk=0,def=1}
+271 6.D VB V:damage items=bag#7
+272 6.D VB pass
+273 6.E VB pass
+274 7.B MC pass
+275 7.D MC notify who=MC text="done crafting"
+276 7.D MC C:build who=MC building=MC.b.saw at=C6
+277 7.D MC C:recruit who=MC at=[C3,C7,C8]
+278 7.D MC move group=2MC.w from=C7 to=C12
+279 7.D MC move group=2MC.w from=C8 to=C4
+280 7.D MC pass
+281 7.E MC pass
+282 7.B ED E:decree-add column=BATTLE cards=M09
+283 7.B ED pass
+284 7.D ED craft who=ED card=M08 produce=i.sword
+285 7.D ED notify who=ED text="done crafting"
+286 7.D ED E:move group=6ED.w from=C9 to=C4 card=VIZIER
+287 7.D SYS roll -> {atk=2,def=1}
+288 7.D ED E:battle defender=WA at=C10 card=VIZIER -> {atk=2,def=1}
+289 7.D WA remove group=WA.w at=C10
+290 7.D WA remove group=WA.w at=C10
+291 7.D ED remove group=ED.w at=C10
+292 7.D ED remove group=ED.w at=C10
+293 7.D SYS roll -> {atk=0,def=1}
+294 7.D ED E:battle defender=MC at=C9 card=M09 -> {atk=0,def=1}
+295 7.D MC remove group=MC.w at=C9
+296 7.D MC notify text="skip"
+297 7.D MC field-hospitals at=C9 spend=M07 to=C3
+298 7.D ED pass
+299 7.E ED discard who=ED cards=F02
+300 7.E ED pass
+301 7.B WA pass
+302 7.D WA A:train card=R10
+303 7.D WA A:mobilize cards=M03
+304 7.D WA pass
+305 7.E WA place group=WA.w to=C5
+306 7.E WA place group=WA.w to=C5
+307 7.E WA move group=5WA.w from=C1 to=C9
+308 7.E WA A:organize at=C9
+309 7.E WA place group=WA.w to=C5
+310 7.E SYS roll -> {atk=3,def=1}
+311 7.E WA battle attacker=WA defender=ED at=C9 -> {atk=3,def=1}
+312 7.E ED remove group=ED.w at=C9
+313 7.E ED remove group=ED.w at=C9
+314 7.E ED remove group=ED.b.roost at=C9
+315 7.E WA remove group=WA.w at=C9
+316 7.E WA place group=WA.w to=C5
+317 7.E WA pass
+318 7.B VB V:move-pawn to=C2
+319 7.B VB V:refresh items=crossbow#3
+320 7.B VB V:refresh items=sword#4
+321 7.B VB V:refresh items=boot#5
+322 7.B VB V:refresh items=boot#1
+323 7.B VB pass
+324 7.D VB V:complete-quest quest=q.M04 reward=vp
+325 7.D VB pass
+326 7.E VB pass
+327 8.B MC pass
+328 8.D MC notify who=MC text="done crafting"
+329 8.D MC move group=MC.w from=C3 to=C6
+330 8.D MC move group=5MC.w from=C6 to=C2
+331 8.D MC move group=9MC.w from=C3 to=C6
+332 8.D MC C:build who=MC building=MC.b.saw at=C2
+333 8.D MC move group=MC.w from=C12 to=C11
+334 8.D MC pass
+335 8.E MC pass
+336 8.B ED E:decree-add column=BATTLE cards=F13
+337 8.B ED pass
+338 8.D ED notify who=ED text="done crafting"
+339 8.D ED E:move group=2ED.w from=C4 to=C8 card=VIZIER
+340 8.D SYS roll -> {atk=2,def=0}
+341 8.D ED E:battle defender=MC at=C12 card=F13 -> {atk=2,def=0}
+342 8.D MC remove group=MC.w at=C12
+343 8.D MC remove group=MC.w at=C12
+344 8.D MC field-hospitals at=C12 spend=B10 to=C3
+345 8.D ED notify who=ED text="took available F02 spending F14"
+346 8.D SYS roll -> {atk=0,def=3}
+347 8.D ED E:battle defender=MC at=C2 card=VIZIER -> {atk=0,def=3}
+348 8.D MC remove group=MC.w at=C2
+349 8.D MC remove group=MC.w at=C2
+350 8.D MC remove group=MC.w at=C2
+351 8.D MC remove group=MC.w at=C2
+352 8.D MC field-hospitals at=C2 spend=B06 to=C3
+353 8.D SYS roll -> {atk=1,def=2}
+354 8.D ED E:battle defender=VB at=C2 card=M09 -> {atk=1,def=2}
+355 8.D VB V:damage items=tea#8
+356 8.D VB V:damage items=crossbow#3
+357 8.D VB V:damage items=sword#4
+358 8.D ED remove group=ED.w at=C2
+359 8.D ED pass

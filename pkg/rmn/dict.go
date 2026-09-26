@@ -93,7 +93,7 @@ func init() {
 	core("craft", []OperandDef{op("who", TFaction), op("card", TCard), op("produce", TUnit)}, nil, "optional", false)
 	core("reveal", []OperandDef{op("who", TFaction), op("cards", TUnitGroup), op("to", TFaction)}, []OutcomeDef{out("revealed", TCardIDList)}, "optional", false)
 	core("swap", []OperandDef{op("who", TFaction), op("card_out", TCard), op("card_in", TCard)}, nil, "optional", false)
-	core("shuffle", []OperandDef{op("zone", TLocation)}, []OutcomeDef{out("order", TCardIDList)}, "explicit", true)
+	core("shuffle", []OperandDef{op("zone", TLocation), opOpt("reason", TEnum)}, []OutcomeDef{outOpt("before", TCardIDList), out("after", TCardIDList)}, "explicit", true)
 	core("deal", []OperandDef{op("who", TFaction), op("cards", TUnitGroup)}, nil, "", true)
 
 	core("score", []OperandDef{op("who", TFaction), op("amount", TInt)}, nil, "", false)
@@ -126,7 +126,7 @@ func init() {
 	core("expose", []OperandDef{op("who", TFaction), op("at", TLocation), op("guess", TEnum)}, []OutcomeDef{out("actual", TEnum)}, "explicit", false)
 	core("notify", []OperandDef{op("who", TFaction), op("text", TText)}, nil, "", false)
 
-	core("roll", []OperandDef{op("who", TFaction), op("dice", TInt), op("sides", TInt)}, []OutcomeDef{out("values", TIntList)}, "explicit", false)
+	core("roll", []OperandDef{op("who", TFaction), op("dice", TInt), op("sides", TInt)}, []OutcomeDef{out("atk", TInt), out("def", TInt), out("values", TIntList)}, "explicit", false)
 	core("rng", []OperandDef{op("purpose", TEnum)}, []OutcomeDef{out("values", TIntList)}, "explicit", false)
 	core("setup", []OperandDef{op("key", TEnum), op("value", TScalar)}, nil, "optional", true)
 	core("assign-ruins", nil, []OutcomeDef{out("ruins", TLocationList), out("items", TItemList)}, "explicit", true)

@@ -138,17 +138,71 @@ func (g *Game) applyEvent(a Action) error {
 	round, phase := g.Round, g.Phase
 	err := g.applyResolved(a)
 	g.NextRoll = nil // don't leak armed dice into the next action
+	g.NextSteal = "" // likewise for Stand and Deliver's injected card
 	if err == nil {
 		g.recordRMN(a, round, phase)
 	}
 	return err
 }
 
-// applySystemEvent handles SYS/structural events (assign-ruins, shuffle, deal,
-// roll, rng). The deck and ruins are seeded, so during replay these are
-// informational; they exist so a log is self-describing.
+// applySystemEvent handles SYS/structural events. During replay these supply the
+// chance outcomes (deck/quest order, ruins) so the game is reconstructible from
+// the log alone, independent of the seed.
 func (g *Game) applySystemEvent(ev rmnEvent) error {
+	switch ev.Intent {
+	case "roll":
+		if a, ok := ev.intOut("atk"); ok {
+			if d, ok := ev.intOut("def"); ok {
+				g.NextRoll = []int{a, d}
+			}
+		}
+	case "assign-ruins":
+		ruins := parseList(ev.Out["ruins"])
+		items := parseList(ev.Out["items"])
+		for i, c := range ruins {
+			if i < len(items) {
+				if cl := g.Clearings[c]; cl != nil {
+					cl.RuinItem = unitItem(items[i])
+				}
+			}
+		}
+	case "shuffle":
+		after := parseList(ev.Out["after"])
+		switch ev.op("zone") {
+		case "DECK":
+			if ev.op("reason") == "recycle" {
+				// A recycle happened mid-action; hold the recorded order until
+				// the replay's deck actually empties (see recycleDeck).
+				g.NextShuffle = append(g.NextShuffle, cloneSlice(after))
+			} else {
+				g.Deck = after
+				g.Discard = nil
+			}
+		case "QUESTS":
+			g.QuestAvail = nil
+			g.QuestDeck = nil
+			for i, id := range after {
+				if i < 3 {
+					g.QuestAvail = append(g.QuestAvail, id)
+				} else {
+					g.QuestDeck = append(g.QuestDeck, id)
+				}
+			}
+		}
+	}
 	return nil
+}
+
+// recordSystemLine appends a SYS event to the RMN log.
+func (g *Game) recordSystemLine(intent, operands, outcome string) {
+	line := fmt.Sprintf("%d %d.%s SYS %s", len(g.RMNLog)+1, g.Round, g.Phase, intent)
+	if operands != "" {
+		line += " " + operands
+	}
+	if outcome != "" {
+		line += " -> " + outcome
+	}
+	g.RMNLog = append(g.RMNLog, line)
 }
 
 // --- parsing ---
@@ -167,8 +221,10 @@ func parseRMNLine(line string) (rmnEvent, error) {
 	}
 	ev.Actor = Faction(f[2])
 	ev.Intent = f[3]
+	inOut := false
 	for _, tok := range f[4:] {
 		if tok == "->" {
+			inOut = true
 			continue
 		}
 		if strings.HasPrefix(tok, "{") {
@@ -176,7 +232,11 @@ func parseRMNLine(line string) (rmnEvent, error) {
 			continue
 		}
 		if k, v, ok := cutKV(tok); ok {
-			ev.Ops[k] = unquote(v)
+			if inOut {
+				ev.Out[k] = unquote(v)
+			} else {
+				ev.Ops[k] = unquote(v)
+			}
 		}
 	}
 	return ev, nil
@@ -224,11 +284,44 @@ func cutKV(tok string) (string, string, bool) {
 }
 
 func parseKVSet(s string, dst map[string]string) {
-	for _, part := range strings.Split(s, ",") {
+	for _, part := range splitTop(s, ',') {
 		if k, v, ok := cutKV(strings.TrimSpace(part)); ok {
 			dst[k] = unquote(v)
 		}
 	}
+}
+
+// splitTop splits s on sep, ignoring separators nested inside (), [] or {}.
+func splitTop(s string, sep byte) []string {
+	var out []string
+	var b strings.Builder
+	depth := 0
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		switch c {
+		case '(', '[', '{':
+			depth++
+		case ')', ']', '}':
+			depth--
+		}
+		if c == sep && depth == 0 {
+			out = append(out, b.String())
+			b.Reset()
+			continue
+		}
+		b.WriteByte(c)
+	}
+	out = append(out, b.String())
+	return out
+}
+
+// parseList parses "[a,b,c]" (or "(a,b)") into a slice.
+func parseList(v string) []string {
+	v = strings.Trim(v, "[]()")
+	if v == "" {
+		return nil
+	}
+	return splitTop(v, ',')
 }
 
 func unquote(s string) string { return strings.Trim(s, `"`) }
