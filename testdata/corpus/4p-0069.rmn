@@ -207,7 +207,7 @@
 198 5.B VB V:refresh items=boot#1
 199 5.B VB V:refresh items=tea#3
 200 5.B VB V:refresh items=torch#2
-201 5.B VB V:move-pawn to=AutumnNW
+201 5.B VB V:move-pawn to=AutumnN
 202 5.B VB pass
 203 5.D VB move group=VB.p to=C1
 204 5.D VB V:aid target=MC card=F14 exhaust=tea#3 take=none

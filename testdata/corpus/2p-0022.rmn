@@ -144,7 +144,7 @@
 137 6.D ED remove group=ED.b.roost at=C12
 138 6.D MC field-hospitals at=C12 spend=F04 to=C2
 139 6.D ED E:turmoil reason=unable
-140 6.D ED E:appoint-leader leader=ED.ldr.builder
+140 6.D ED E:appoint-leader leader=ED.ldr.charismatic
 141 6.E ED pass
 142 7.B MC pass
 143 7.D MC notify who=MC text="done crafting"
@@ -158,37 +158,88 @@
 151 7.B ED E:decree-add column=BATTLE cards=B05
 152 7.B ED pass
 153 7.D ED notify who=ED text="done crafting"
-154 7.D ED E:recruit at=[C7] card=VIZIER
-155 7.D ED E:move group=ED.w from=C9 to=C12 card=VIZIER
-156 7.D SYS roll -> {atk=3,def=2}
-157 7.D ED E:battle defender=MC at=C7 card=B05 -> {atk=3,def=2}
-158 7.D MC remove group=MC.w at=C7
-159 7.D MC remove group=MC.w at=C7
-160 7.D ED remove group=ED.w at=C7
-161 7.D ED remove group=ED.w at=C7
-162 7.D MC field-hospitals at=C7 spend=B10 to=C2
-163 7.D ED pass
-164 7.E ED pass
-165 8.B MC pass
-166 8.D MC notify who=MC text="done crafting"
-167 8.D MC C:build who=MC building=MC.b.saw at=C11
-168 8.D MC move group=2MC.w from=C11 to=C12
-169 8.D MC move group=MC.w from=C12 to=C7
-170 8.D MC C:recruit who=MC at=[C10,C11,C3]
-171 8.D MC pass
-172 8.E MC discard who=MC cards=B04
-173 8.E MC pass
-174 8.B ED E:decree-add column=BATTLE cards=M05
-175 8.B ED pass
-176 8.D ED notify who=ED text="done crafting"
-177 8.D ED E:recruit at=[C7] card=VIZIER
-178 8.D ED E:move group=3ED.w from=C9 to=C12 card=VIZIER
-179 8.D SYS roll -> {atk=0,def=3}
-180 8.D ED E:battle defender=MC at=C7 card=B05 -> {atk=0,def=3}
-181 8.D MC remove group=MC.w at=C7
-182 8.D MC notify text="skip"
-183 8.D SYS roll -> {atk=1,def=1}
-184 8.D ED E:battle defender=MC at=C7 card=M05 -> {atk=1,def=1}
-185 8.D MC remove group=MC.b.workshop at=C7
-186 8.D MC notify text="skip"
-187 8.D ED pass
+154 7.D ED E:recruit at=[C5] card=VIZIER
+155 7.D SYS roll -> {atk=3,def=2}
+156 7.D ED E:battle defender=MC at=C5 card=B05 -> {atk=3,def=2}
+157 7.D MC remove group=MC.w at=C5
+158 7.D MC remove group=MC.w at=C5
+159 7.D ED remove group=ED.w at=C5
+160 7.D ED remove group=ED.w at=C5
+161 7.D MC field-hospitals at=C5 spend=R08 to=C2
+162 7.D SYS roll -> {atk=0,def=3}
+163 7.D ED E:battle defender=MC at=C9 card=VIZIER -> {atk=0,def=3}
+164 7.D MC remove group=MC.w at=C9
+165 7.D MC remove group=MC.w at=C9
+166 7.D MC notify text="skip"
+167 7.D MC field-hospitals at=C9 spend=B10 to=C2
+168 7.D ED pass
+169 7.E ED pass
+170 8.B MC pass
+171 8.D MC notify who=MC text="done crafting"
+172 8.D MC move group=4MC.w from=C2 to=C5
+173 8.D MC C:build who=MC building=MC.b.saw at=C12
+174 8.D MC C:recruit who=MC at=[C10,C11,C3]
+175 8.D MC move group=3MC.w from=C11 to=C3
+176 8.D MC pass
+177 8.E MC pass
+178 8.B ED E:decree-add column=BATTLE cards=M05
+179 8.B ED pass
+180 8.D ED notify who=ED text="done crafting"
+181 8.D ED E:recruit at=[C7] card=VIZIER
+182 8.D SYS roll -> {atk=1,def=1}
+183 8.D ED E:battle defender=MC at=C7 card=M05 -> {atk=1,def=1}
+184 8.D MC remove group=MC.w at=C7
+185 8.D ED remove group=ED.w at=C7
+186 8.D MC field-hospitals at=C7 spend=B04 to=C2
+187 8.D SYS roll -> {atk=1,def=2}
+188 8.D ED E:battle defender=MC at=C1 card=B05 -> {atk=1,def=2}
+189 8.D MC remove group=MC.w at=C1
+190 8.D ED remove group=ED.w at=C1
+191 8.D MC field-hospitals at=C1 spend=F11 to=C2
+192 8.D SYS roll -> {atk=2,def=3}
+193 8.D ED E:battle defender=MC at=C2 card=VIZIER -> {atk=2,def=3}
+194 8.D MC remove group=MC.w at=C2
+195 8.D MC remove group=MC.w at=C2
+196 8.D MC remove group=MC.w at=C2
+197 8.D ED remove group=ED.w at=C2
+198 8.D ED remove group=ED.w at=C2
+199 8.D MC notify text="skip"
+200 8.D ED pass
+201 8.E ED discard who=ED cards=B07
+202 8.E ED pass
+203 9.B MC pass
+204 9.D MC notify who=MC text="done crafting"
+205 9.D MC C:build who=MC building=MC.b.saw at=C11
+206 9.D MC C:recruit who=MC at=[C10,C11,C3]
+207 9.D MC move group=3MC.w from=C3 to=C7
+208 9.D MC move group=2MC.w from=C10 to=C12
+209 9.D MC pass
+210 9.E MC pass
+211 9.B ED E:decree-add column=RECRUIT cards=R05
+212 9.B ED pass
+213 9.D ED notify who=ED text="done crafting"
+214 9.D ED E:recruit at=[C7] card=VIZIER
+215 9.D ED E:recruit at=[C4] card=R05
+216 9.D ED E:battle defender=MC at=C2 card=B05
+217 9.D SYS roll -> {atk=2,def=1}
+218 9.D MC notify text="skip"
+219 9.D MC remove group=MC.w at=C2
+220 9.D ED remove group=ED.w at=C2
+221 9.D MC field-hospitals at=C2 spend=M01 to=C2
+222 9.D SYS roll -> {atk=3,def=1}
+223 9.D ED E:battle defender=MC at=C4 card=VIZIER -> {atk=3,def=1}
+224 9.D MC remove group=MC.w at=C4
+225 9.D MC remove group=MC.w at=C4
+226 9.D MC remove group=MC.w at=C4
+227 9.D ED remove group=ED.w at=C4
+228 9.D MC field-hospitals at=C4 spend=R13 to=C2
+229 9.D SYS roll -> {atk=3,def=3}
+230 9.D ED E:battle defender=MC at=C7 card=M05 -> {atk=3,def=3}
+231 9.D MC remove group=MC.w at=C7
+232 9.D MC remove group=MC.w at=C7
+233 9.D MC remove group=MC.w at=C7
+234 9.D ED remove group=ED.w at=C7
+235 9.D ED remove group=ED.w at=C7
+236 9.D ED remove group=ED.w at=C7
+237 9.D MC field-hospitals at=C7 spend=M11 to=C2
+238 9.D ED pass

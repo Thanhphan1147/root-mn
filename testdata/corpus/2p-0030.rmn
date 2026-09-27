@@ -223,4 +223,4 @@
 216 11.D ED notify who=ED text="done crafting"
 217 11.D ED E:turmoil reason=unable
 218 11.E SYS shuffle zone=DECK reason=recycle -> before=[B13,R06,M06,R09,R13,B12,B09,M03,R11,M11,B10,R12,F13,B06,M09,R01,F10,R10,B02,B08,M13,F07,B01,M05,R08,M12,F04,M10,F11,R04] after=[B01,R13,R09,M11,R10,B09,R06,B08,M13,B06,B02,R08,M05,F11,B12,B13,M10,M06,R01,F13,M03,R04,B10,F04,R11,R12,M12,M09,F10,F07]
-219 11.D ED E:appoint-leader leader=ED.ldr.commander
+219 11.D ED E:appoint-leader leader=ED.ldr.charismatic

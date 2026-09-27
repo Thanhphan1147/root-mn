@@ -353,7 +353,7 @@
 344 8.D ED E:recruit at=[C6] card=F12
 345 8.D ED play-dominance who=ED card=M02
 346 8.D ED E:turmoil reason=unable
-347 8.D ED E:appoint-leader leader=ED.ldr.builder
+347 8.D ED E:appoint-leader leader=ED.ldr.charismatic
 348 8.E ED discard who=ED cards=F03
 349 8.E ED pass
 350 8.B WA A:place-sympathy at=C8 spend=(F11+B05+F01)
@@ -401,7 +401,7 @@
 392 9.B ED pass
 393 9.D ED notify who=ED text="done crafting"
 394 9.D ED E:turmoil reason=unable
-395 9.D ED E:appoint-leader leader=ED.ldr.charismatic
+395 9.D ED E:appoint-leader leader=ED.ldr.builder
 396 9.E ED discard who=ED cards=M03
 397 9.E ED pass
 398 9.B WA pass

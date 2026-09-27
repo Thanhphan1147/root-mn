@@ -256,7 +256,14 @@ func (g *Game) applyCraft(a Action) error {
 	takeStr(&p.Hand, a.Card)
 	if c.Kind == KindItem {
 		g.ItemSupply[c.Item]--
-		p.CraftedItems = append(p.CraftedItems, c.Item)
+		if a.Faction == VB {
+			// Law 9.2.1/9.5 Craft: the Vagabond immediately takes the crafted
+			// item face up into its Satchel (or its matching track), where it is
+			// usable — not into the Crafted Items box.
+			g.giveVBItem(p, c.Item)
+		} else {
+			p.CraftedItems = append(p.CraftedItems, c.Item)
+		}
 		vp := c.VP
 		if a.Faction == ED && p.Leader != "builder" {
 			vp = 1 // Disdain for Trade
@@ -310,10 +317,14 @@ func (g *Game) markCraftingPieces(p *Player, c *CardDef) {
 			}
 		}
 	case VB:
+		cl := g.Clearings[p.Pawn]
+		if cl == nil {
+			return // in a forest: no clearing suit to craft with
+		}
 		for _, it := range p.Items {
 			if it.Type == "hammer" && it.Zone == "satchel" && it.FaceUp && !it.Damaged {
 				it.FaceUp = false
-				consumeSuit(&need, &anyNeed, g.Clearings[p.Pawn].Suit)
+				consumeSuit(&need, &anyNeed, cl.Suit)
 			}
 		}
 	}

@@ -141,7 +141,9 @@ The whole system is worthless if the same log replays to a different state.
 
 - **Golden corpus**: `testdata/corpus/*.rmn` (+ `.hash`), ~100 games (2p + 4p).
   Regenerate with root-bot `cmd/gencorpus` after any change that alters behavior
-  or the state digest.
+  or the state digest. **Clear the output directory first** (`rm testdata/corpus/*.rmn
+  testdata/corpus/*.hash`) — the generator skips unfinished games and names files
+  by index, so it can otherwise leave stale files from an earlier engine.
 - `TestApplyRMNGoldenCorpus`: replay every game through `ApplyRMN` and match the
   recorded final-state hash. It also reports handler vs resolver coverage — the
   target is **0 fallback** (every action line routed through a declared handler).

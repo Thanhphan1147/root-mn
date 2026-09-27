@@ -287,4 +287,4 @@
 280 14.B ED pass
 281 14.D ED notify who=ED text="done crafting"
 282 14.D ED E:turmoil reason=unable
-283 14.D ED E:appoint-leader leader=ED.ldr.builder
+283 14.D ED E:appoint-leader leader=ED.ldr.commander

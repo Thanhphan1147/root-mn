@@ -16,7 +16,7 @@
 7 0.S MC place group=MC.b.saw#1 to=C4
 8 0.S ED place group=(ED.b.roost#1+6ED.w) to=C2
 9 0.S ED E:appoint-leader leader=ED.ldr.despot
-10 0.S VB V:choose-character character=V.character.tinker
+10 0.S VB V:choose-character character=V.character.thief
 11 0.S VB V:move-pawn to=AutumnW
 12 1.B MC pass
 13 1.D MC notify who=MC text="done crafting"

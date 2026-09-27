@@ -89,7 +89,7 @@
 82 4.D ED E:recruit at=[C4] card=B05
 83 4.D ED E:recruit at=[C1] card=F01
 84 4.D ED E:turmoil reason=unable
-85 4.D ED E:appoint-leader leader=ED.ldr.commander
+85 4.D ED E:appoint-leader leader=ED.ldr.builder
 86 4.E ED pass
 87 5.B MC pass
 88 5.D MC notify who=MC text="done crafting"
@@ -107,126 +107,140 @@
 100 5.B ED pass
 101 5.D ED craft who=ED card=F07 produce=i.coin
 102 5.D ED notify who=ED text="done crafting"
-103 5.D ED E:move group=3ED.w from=C10 to=C2 card=VIZIER
-104 5.D ED E:move group=3ED.w from=C1 to=C10 card=F08
-105 5.D SYS roll -> {atk=2,def=3}
-106 5.D ED E:battle defender=MC at=C4 card=VIZIER -> {atk=2,def=3}
-107 5.D MC remove group=MC.w at=C4
-108 5.D MC notify text="skip"
-109 5.D ED remove group=ED.w at=C4
-110 5.D MC field-hospitals at=C4 spend=B10 to=C3
-111 5.D ED pass
-112 5.E ED pass
-113 6.B MC pass
-114 6.D MC craft who=MC card=F04 produce=i.bag
-115 6.D MC notify who=MC text="done crafting"
-116 6.D MC C:build who=MC building=MC.b.workshop at=C8
-117 6.D MC C:recruit who=MC at=[C11,C12,C7]
-118 6.D MC move group=4MC.w from=C6 to=C2
-119 6.D MC move group=MC.w from=C9 to=C1
-120 6.D MC pass
-121 6.E MC pass
-122 6.B ED E:decree-add column=RECRUIT cards=B12
-123 6.B ED pass
-124 6.D ED craft who=ED card=F09 produce=i.hammer
-125 6.D ED notify who=ED text="done crafting"
-126 6.D ED E:recruit at=[C4] card=B12
-127 6.D ED E:move group=2ED.w from=C10 to=C2 card=VIZIER
-128 6.D ED E:move group=ED.w from=C1 to=C10 card=F08
-129 6.D SYS roll -> {atk=3,def=2}
-130 6.D ED E:battle defender=MC at=C1 card=VIZIER -> {atk=3,def=2}
-131 6.D MC remove group=MC.w at=C1
-132 6.D MC remove group=MC.w at=C1
-133 6.D ED remove group=ED.w at=C1
-134 6.D ED remove group=ED.b.roost at=C1
-135 6.D MC field-hospitals at=C1 spend=F03 to=C3
-136 6.D ED pass
-137 6.E ED pass
-138 7.B MC pass
-139 7.D MC craft who=MC card=R05 produce=i.tea
-140 7.D MC craft who=MC card=M06 produce=i.boot
-141 7.D MC notify who=MC text="done crafting"
-142 7.D MC move group=6MC.w from=C1 to=C10
-143 7.D MC move group=MC.w from=C10 to=C2
-144 7.D MC C:build who=MC building=MC.b.recruiter at=C2
-145 7.D MC move group=2MC.w from=C11 to=C6
-146 7.D MC move group=MC.w from=C12 to=C10
-147 7.D MC pass
-148 7.E MC pass
-149 7.B ED E:decree-add column=RECRUIT cards=R03
-150 7.B ED pass
-151 7.D ED notify who=ED text="done crafting"
-152 7.D ED E:recruit at=[C10] card=R03
-153 7.D ED E:recruit at=[C10] card=B12
-154 7.D ED E:move group=2ED.w from=C4 to=C8 card=VIZIER
-155 7.D ED E:move group=ED.w from=C8 to=C4 card=F08
-156 7.D SYS roll -> {atk=1,def=0}
-157 7.D ED E:battle defender=MC at=C8 card=VIZIER -> {atk=1,def=0}
-158 7.D MC remove group=MC.w at=C8
-159 7.D MC remove group=MC.b.workshop at=C8
-160 7.D MC field-hospitals at=C8 spend=B06 to=C3
-161 7.D ED pass
-162 7.E ED pass
-163 8.B MC pass
-164 8.D MC notify who=MC text="done crafting"
-165 8.D MC C:build who=MC building=MC.b.recruiter at=C9
-166 8.D MC move group=2MC.w from=C7 to=C8
-167 8.D MC move group=MC.w from=C2 to=C10
-168 8.D MC move group=4MC.w from=C3 to=C6
-169 8.D MC move group=2MC.w from=C9 to=C12
-170 8.D MC pass
-171 8.E MC discard who=MC cards=F06
-172 8.E MC pass
-173 8.B ED E:decree-add column=MOVE cards=R13
-174 8.B ED pass
-175 8.D ED notify who=ED text="done crafting"
-176 8.D ED E:recruit at=[C10] card=B12
-177 8.D ED E:recruit at=[C10] card=R03
-178 8.D ED E:move group=2ED.w from=C4 to=C9 card=VIZIER
-179 8.D ED E:move group=ED.w from=C4 to=C8 card=R13
-180 8.D ED E:move group=ED.w from=C8 to=C4 card=F08
-181 8.D SYS roll -> {atk=0,def=2}
-182 8.D ED E:battle defender=MC at=C8 card=VIZIER -> {atk=0,def=2}
-183 8.D MC remove group=MC.w at=C8
-184 8.D MC remove group=MC.w at=C8
-185 8.D MC field-hospitals at=C8 spend=B08 to=C3
-186 8.D ED pass
-187 8.E ED pass
-188 9.B MC pass
-189 9.D MC craft who=MC card=B11 produce=i.bag
-190 9.D MC notify who=MC text="done crafting"
-191 9.D MC C:build who=MC building=MC.b.recruiter at=C1
-192 9.D MC move group=2MC.w from=C12 to=C9
-193 9.D MC move group=2MC.w from=C7 to=C8
-194 9.D MC move group=2MC.w from=C6 to=C11
-195 9.D MC move group=4MC.w from=C6 to=C3
-196 9.D MC pass
-197 9.E MC discard who=MC cards=M03
-198 9.E MC pass
-199 9.B ED E:decree-add column=BATTLE cards=F13
-200 9.B ED pass
-201 9.D ED notify who=ED text="done crafting"
-202 9.D ED E:recruit at=[C10] card=R03
-203 9.D ED E:recruit at=[C10] card=B12
-204 9.D ED E:move group=3ED.w from=C10 to=C12 card=VIZIER
-205 9.D ED E:move group=ED.w from=C4 to=C8 card=R13
-206 9.D ED E:move group=2ED.w from=C12 to=C9 card=F08
-207 9.D ED E:battle defender=MC at=C2 card=VIZIER
-208 9.D SYS roll -> {atk=2,def=1}
-209 9.D MC ambush who=MC at=C2 card=B02
-210 9.D MC remove group=MC.w at=C2
-211 9.D MC remove group=MC.w at=C2
-212 9.D MC remove group=MC.w at=C2
-213 9.D ED remove group=ED.w at=C2
-214 9.D ED remove group=ED.w at=C2
-215 9.D ED remove group=ED.w at=C2
-216 9.D MC field-hospitals at=C2 spend=M12 to=C3
-217 9.D SYS roll -> {atk=0,def=0}
-218 9.D ED E:battle defender=MC at=C12 card=F13
-219 9.D MC remove group=MC.b.recruiter at=C12
-220 9.D MC notify text="skip"
-221 9.D ED pass
-222 9.E ED pass
-223 10.B MC pass
-224 10.D MC notify who=MC text="done crafting"
-225 10.D MC C:build who=MC building=MC.b.saw at=C5
+103 5.D ED E:recruit at=[C4] card=VIZIER
+104 5.D ED E:move group=3ED.w from=C10 to=C2 card=VIZIER
+105 5.D ED E:move group=3ED.w from=C1 to=C10 card=F08
+106 5.D ED pass
+107 5.E ED pass
+108 6.B MC pass
+109 6.D MC craft who=MC card=F04 produce=i.bag
+110 6.D MC notify who=MC text="done crafting"
+111 6.D MC C:build who=MC building=MC.b.workshop at=C5
+112 6.D MC C:recruit who=MC at=[C11,C12,C7]
+113 6.D MC move group=3MC.w from=C6 to=C2
+114 6.D MC move group=4MC.w from=C7 to=C12
+115 6.D MC spend-bird who=MC card=B10
+116 6.D MC move group=MC.w from=C4 to=C8
+117 6.D MC move group=MC.w from=C5 to=C1
+118 6.D MC pass
+119 6.E MC pass
+120 6.B ED E:decree-add column=RECRUIT cards=B12
+121 6.B ED pass
+122 6.D ED craft who=ED card=F09 produce=i.hammer
+123 6.D ED notify who=ED text="done crafting"
+124 6.D ED E:recruit at=[C4] card=VIZIER
+125 6.D ED E:recruit at=[C4] card=B12
+126 6.D ED E:move group=3ED.w from=C4 to=C8 card=VIZIER
+127 6.D ED E:move group=ED.w from=C8 to=C4 card=F08
+128 6.D ED pass
+129 6.E ED pass
+130 7.B MC pass
+131 7.D MC craft who=MC card=R05 produce=i.tea
+132 7.D MC craft who=MC card=M06 produce=i.boot
+133 7.D MC notify who=MC text="done crafting"
+134 7.D MC C:build who=MC building=MC.b.recruiter at=C9
+135 7.D MC move group=2MC.w from=C12 to=C11
+136 7.D MC move group=MC.w from=C6 to=C2
+137 7.D MC move group=MC.w from=C2 to=C5
+138 7.D MC move group=MC.w from=C5 to=C1
+139 7.D MC pass
+140 7.E MC pass
+141 7.B ED E:decree-add column=BATTLE cards=M08
+142 7.B ED pass
+143 7.D ED notify who=ED text="done crafting"
+144 7.D ED E:recruit at=[C4] card=VIZIER
+145 7.D ED E:recruit at=[C4] card=B12
+146 7.D ED E:move group=ED.w from=C10 to=C2 card=VIZIER
+147 7.D ED E:move group=2ED.w from=C8 to=C7 card=F08
+148 7.D SYS roll -> {atk=2,def=3}
+149 7.D ED E:battle defender=MC at=C2 card=M08 -> {atk=2,def=3}
+150 7.D MC remove group=MC.w at=C2
+151 7.D MC remove group=MC.w at=C2
+152 7.D MC remove group=MC.w at=C2
+153 7.D ED remove group=ED.w at=C2
+154 7.D ED remove group=ED.w at=C2
+155 7.D MC notify text="skip"
+156 7.D ED pass
+157 7.E ED discard who=ED cards=M13
+158 7.E ED pass
+159 8.B MC pass
+160 8.D MC craft who=MC card=R13 produce=card:R13
+161 8.D MC notify who=MC text="done crafting"
+162 8.D MC C:recruit who=MC at=[C11,C12,C7,C9]
+163 8.D MC C:build who=MC building=MC.b.recruiter at=C5
+164 8.D MC move group=6MC.w from=C1 to=C10
+165 8.D MC move group=3MC.w from=C12 to=C7
+166 8.D MC pass
+167 8.E MC discard who=MC cards=R12
+168 8.E MC discard who=MC cards=F06
+169 8.E MC move group=2MC.w from=C7 to=C3
+170 8.E MC pass
+171 8.B ED E:decree-add column=MOVE cards=B06
+172 8.B ED pass
+173 8.D ED notify who=ED text="done crafting"
+174 8.D ED E:recruit at=[C1] card=VIZIER
+175 8.D ED E:recruit at=[C4] card=B12
+176 8.D ED E:move group=5ED.w from=C4 to=C9 card=B06
+177 8.D ED E:move group=ED.w from=C2 to=C6 card=VIZIER
+178 8.D ED E:move group=2ED.w from=C1 to=C10 card=F08
+179 8.D SYS roll -> {atk=3,def=2}
+180 8.D ED E:battle defender=MC at=C9 card=M08 -> {atk=3,def=2}
+181 8.D MC remove group=MC.w at=C9
+182 8.D MC remove group=MC.w at=C9
+183 8.D MC remove group=MC.w at=C9
+184 8.D ED remove group=ED.w at=C9
+185 8.D ED remove group=ED.w at=C9
+186 8.D MC field-hospitals at=C9 spend=M03 to=C3
+187 8.D ED pass
+188 8.E ED discard who=ED cards=B08
+189 8.E ED pass
+190 9.B MC pass
+191 9.D MC notify who=MC text="done crafting"
+192 9.D MC move group=MC.w from=C1 to=C10
+193 9.D MC move group=4MC.w from=C3 to=C6
+194 9.D MC move group=2MC.w from=C6 to=C2
+195 9.D MC C:build who=MC building=MC.b.recruiter at=C2
+196 9.D MC move group=MC.w from=C3 to=C11
+197 9.D MC pass
+198 9.E MC discard who=MC cards=F13
+199 9.E MC discard who=MC cards=M12
+200 9.E MC move group=2MC.w from=C2 to=C10
+201 9.E MC pass
+202 9.B ED E:decree-add column=MOVE cards=B11
+203 9.B ED pass
+204 9.D ED notify who=ED text="done crafting"
+205 9.D ED E:recruit at=[C1] card=VIZIER
+206 9.D ED E:recruit at=[C4] card=B12
+207 9.D ED E:move group=5ED.w from=C4 to=C12 card=B11
+208 9.D ED E:move group=2ED.w from=C12 to=C7 card=F08
+209 9.D ED E:move group=ED.w from=C12 to=C11 card=B06
+210 9.D ED E:move group=2ED.w from=C10 to=C12 card=VIZIER
+211 9.D SYS roll -> {atk=1,def=0}
+212 9.D ED E:battle defender=MC at=C7 card=M08 -> {atk=1,def=0}
+213 9.D MC remove group=MC.w at=C7
+214 9.D MC field-hospitals at=C7 spend=B13 to=C3
+215 9.D ED pass
+216 9.E ED discard who=ED cards=R10
+217 9.E ED pass
+218 10.B MC pass
+219 10.D MC notify who=MC text="done crafting"
+220 10.D MC move group=MC.w from=C10 to=C1
+221 10.D MC move group=5MC.w from=C11 to=C12
+222 10.D MC move group=2MC.w from=C12 to=C7
+223 10.D MC C:build who=MC building=MC.b.workshop at=C8
+224 10.D MC move group=2MC.w from=C8 to=C4
+225 10.D MC pass
+226 10.E MC discard who=MC cards=F12
+227 10.E MC discard who=MC cards=R09
+228 10.E MC move group=3MC.w from=C1 to=C9
+229 10.E MC pass
+230 10.B ED E:decree-add column=MOVE cards=B02
+231 10.B ED pass
+232 10.D ED notify who=ED text="done crafting"
+233 10.D ED E:recruit at=[C4] card=B12
+234 10.D ED E:turmoil reason=unable
+235 10.D ED E:appoint-leader leader=ED.ldr.charismatic
+236 10.E ED discard who=ED cards=M04
+237 10.E ED pass
+238 11.B MC pass
+239 11.D MC craft who=MC card=R07 produce=i.coin
