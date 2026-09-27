@@ -129,10 +129,13 @@ The whole system is worthless if the same log replays to a different state.
 - **Legality MUST be computed on the true state, never the redacted clone.** A
   redacted snapshot once dropped the Vagabond's Explore because the (hidden)
   ruin item was cleared first. Acting-player legal actions come from `g`, not `cp`.
-- The **dominance zone** (`AvailableDominance`, exposed as `dominance` /
-  `dominanceActive`) is public: played and spent dominance cards live there (not
-  in a player's crafted area), each with the faction that activated it. Any
-  player may swap one for a matching card (the `take-dominance` action).
+- The **dominance zone** (`AvailableDominance`, exposed as `dominance`) is
+  public: any dominance card that would be discarded is placed there instead
+  (Law 3.3.3), and any player may take one during their Daylight by spending a
+  matching card (`take-dominance`; a bird dominance needs a bird card). An
+  **activated** dominance card is different: it lives in the owner's play area,
+  is tracked by `DominanceActive` (exposed as `dominanceActive`), removes their
+  score marker, and can never be taken or replaced (Law 3.3.1–3.3.2).
 
 ## 7. Validation — the yardstick (never regress)
 

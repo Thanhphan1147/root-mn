@@ -18,18 +18,6 @@ func (g *Game) legalMCDaylight() []Action {
 	var acts []Action
 	acts = append(acts, g.spendBirdActions(p)...)
 
-	// Dominance activation (>=10 VP).
-	if p.VP >= 10 {
-		for _, id := range p.Hand {
-			if c, ok := Card(id); ok && c.Kind == KindDominance {
-				acts = append(acts, Action{
-					ID: actID("dominance", id), Label: "Activate " + c.Name + " (Dominance)",
-					Kind: "dominance", Faction: MC, Card: id,
-				})
-			}
-		}
-	}
-
 	if g.ActionsLeft > 0 || g.MarchMovesLeft > 0 {
 		acts = append(acts, g.moveActions(MC)...)
 	}

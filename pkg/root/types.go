@@ -460,6 +460,15 @@ func (g *Game) Logf(actor Faction, kind, format string, args ...any) {
 	}
 }
 
+// declareWinner records f as the winner, adding the Vagabond if it has a
+// coalition with f (9.2.8: if the coalitioned player wins, the Vagabond wins).
+func (g *Game) declareWinner(f Faction) {
+	g.Winner = []Faction{f}
+	if vb := g.Players[VB]; vb != nil && vb.Coalition == f {
+		g.Winner = append(g.Winner, VB)
+	}
+}
+
 // WinnerFaction returns the winner if any.
 func (g *Game) WinnerFaction() (Faction, bool) {
 	if len(g.Winner) > 0 {
@@ -468,10 +477,7 @@ func (g *Game) WinnerFaction() (Faction, bool) {
 	for _, f := range g.Order {
 		p := g.Players[f]
 		if p.VP >= 30 {
-			g.Winner = []Faction{f}
-			if vb := g.Players[VB]; vb != nil && vb.Coalition == f {
-				g.Winner = append(g.Winner, VB)
-			}
+			g.declareWinner(f)
 			return f, true
 		}
 	}
@@ -485,10 +491,7 @@ func (g *Game) checkWin() {
 	}
 	for _, f := range g.Order {
 		if g.Players[f].VP >= 30 {
-			g.Winner = []Faction{f}
-			if vb := g.Players[VB]; vb != nil && vb.Coalition == f {
-				g.Winner = append(g.Winner, VB)
-			}
+			g.declareWinner(f)
 			g.Logf(f, "win", "%s reached 30 VP and wins!", f)
 			return
 		}
@@ -502,7 +505,7 @@ func (g *Game) Score(f Faction, n int) {
 		return
 	}
 	p := g.Players[f]
-	if p == nil || g.hasDominance(f) {
+	if p == nil || g.hasDominance(f) || p.Coalition != "" {
 		return
 	}
 	p.VP += n

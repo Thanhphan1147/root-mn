@@ -229,8 +229,8 @@ func (g *Game) routeDiscard(card string) {
 	g.Discard = append(g.Discard, card)
 }
 
-// applyTakeDominance spends a matching card to take a dominance card from the
-// public zone into hand, ending any activation it carried.
+// applyTakeDominance spends a matching card to take an available dominance card
+// (3.3.4) from near the map into hand.
 func (g *Game) applyTakeDominance(a Action) error {
 	p := g.Players[a.Faction]
 	if !takeStr(&p.Hand, a.Card) {
@@ -238,11 +238,10 @@ func (g *Game) applyTakeDominance(a Action) error {
 	}
 	g.routeDiscard(a.Card)
 	if !takeStr(&g.AvailableDominance, a.Item) {
-		return fmt.Errorf("dominance not on the table")
+		return fmt.Errorf("dominance not available")
 	}
-	delete(g.DominanceActive, a.Item)
 	p.Hand = append(p.Hand, a.Item)
-	g.Logf(a.Faction, "dominance", "Took %s from the table", cardName(a.Item))
+	g.Logf(a.Faction, "dominance", "Took available %s", cardName(a.Item))
 	return nil
 }
 
@@ -334,15 +333,17 @@ func consumeSuit(need *[]Suit, anyNeed *int, have Suit) bool {
 	return false
 }
 
-// applyDominance plays a dominance card from hand: it goes to the public
-// dominance zone (not the player's crafted area) and stops that player scoring.
+// applyDominance activates a dominance card (3.3.1): during Daylight at 10+ VP,
+// the card goes to the player's play area (tracked in DominanceActive) and their
+// score marker is removed — they can no longer score. An activated card cannot
+// be removed or replaced (3.3.2), so only one is ever active per faction.
 func (g *Game) applyDominance(a Action) error {
 	p := g.Players[a.Faction]
 	if !takeStr(&p.Hand, a.Card) {
 		return fmt.Errorf("card not in hand")
 	}
-	g.routeDiscard(a.Card)
 	g.DominanceActive[a.Card] = a.Faction
+	p.VP = 0
 	g.Logf(a.Faction, "dominance", "Activated %s; no longer scores VP", cardName(a.Card))
 	return nil
 }

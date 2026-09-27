@@ -237,6 +237,7 @@ func (g *Game) legalDaylight(f Faction) []Action {
 		acts = g.legalVBDaylight()
 	}
 	acts = append(acts, g.persistentDaylightActions(f)...)
+	acts = append(acts, g.dominanceActions(f)...)
 	acts = append(acts, g.takeDominanceActions(f)...)
 	if g.ExtraBattle {
 		acts = append(acts, g.battleActions(f)...)
@@ -244,8 +245,31 @@ func (g *Game) legalDaylight(f Faction) []Action {
 	return acts
 }
 
-// takeDominanceActions lets a player spend a matching card to take an
-// available (discarded/spent) Dominance card into hand.
+// dominanceActions lets a faction with 10+ VP activate a dominance card from
+// hand during its Daylight (3.3.1). An activated card cannot be replaced, so
+// none are offered once one is already active (3.3.2). The Vagabond never
+// activates a dominance for victory; in a 4+ player game it forms a coalition.
+func (g *Game) dominanceActions(f Faction) []Action {
+	p := g.Players[f]
+	if p == nil || f == VB || p.VP < 10 || g.hasDominance(f) {
+		return nil
+	}
+	var acts []Action
+	for _, id := range p.Hand {
+		if c, ok := Card(id); ok && c.Kind == KindDominance {
+			acts = append(acts, Action{
+				ID:    actID("dominance", id),
+				Label: "Activate " + c.Name + " (Dominance)",
+				Kind:  "dominance", Faction: f, Card: id,
+			})
+		}
+	}
+	return acts
+}
+
+// takeDominanceActions lets a player spend a matching card to take an available
+// (discarded/spent) Dominance card into hand (3.3.4). An available bird
+// dominance can only be taken with a bird card.
 func (g *Game) takeDominanceActions(f Faction) []Action {
 	p := g.Players[f]
 	var acts []Action

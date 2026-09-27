@@ -219,8 +219,9 @@ func (g *Game) legalVBDaylight() []Action {
 	}
 	// Special action
 	acts = append(acts, g.vbSpecialActions(p)...)
-	// Coalition (>=10 VP, dominance card in hand).
-	if p.VP >= 10 && p.Coalition == "" {
+	// Coalition (9.2.8): in a 4+ player game, at 10+ VP, activate a dominance
+	// card to join the lowest-scoring player.
+	if len(g.Order) >= 4 && p.VP >= 10 && p.Coalition == "" {
 		for _, id := range p.Hand {
 			if c, ok := Card(id); ok && c.Kind == KindDominance {
 				for _, t := range g.coalitionTargets() {
@@ -343,12 +344,6 @@ func (g *Game) applyVB(a Action) error {
 		p.Pawn = a.To
 		g.VBSlipped = true
 		g.Logf(VB, "slip", "Slipped to %s", a.To)
-		// Slipping into a forest ends the Vagabond's turn immediately: they take
-		// no Daylight or Evening actions.
-		if g.isForest(a.To) {
-			g.Logf(VB, "slip", "The Vagabond slipped into the %s forest; turn ends", a.To)
-			g.endTurn()
-		}
 	case "vb-move":
 		hostile := g.hostileWarriorsAt(a.To)
 		cost := 1
@@ -459,6 +454,11 @@ func (g *Game) applyVB(a Action) error {
 		takeStr(&p.Hand, a.Card)
 		p.Crafted = append(p.Crafted, a.Card)
 		p.Coalition = a.Target
+		p.VP = 0 // the score marker moves to the coalition partner's board
+		// 9.2.9.IIId: coalitioning with a Hostile faction makes it Indifferent.
+		if p.Relationships[a.Target] == "hostile" {
+			p.Relationships[a.Target] = "indifferent"
+		}
 		g.Logf(VB, "coalition", "Formed a coalition with %s; the Vagabond no longer scores", a.Target)
 	}
 	return nil

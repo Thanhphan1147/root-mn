@@ -244,24 +244,24 @@ func (g *Game) checkDominanceWin(f Faction) bool {
 		switch c.Effect {
 		case "dom-fox":
 			if g.ruledSuit(Fox) >= 3 {
-				g.Winner = []Faction{f}
+				g.declareWinner(f)
 				return true
 			}
 		case "dom-rabbit":
 			if g.ruledSuit(Rabbit) >= 3 {
-				g.Winner = []Faction{f}
+				g.declareWinner(f)
 				return true
 			}
 		case "dom-mouse":
 			if g.ruledSuit(Mouse) >= 3 {
-				g.Winner = []Faction{f}
+				g.declareWinner(f)
 				return true
 			}
 		case "dom-bird":
 			m := GetMap("autumn")
 			for _, pair := range m.Corners {
 				if g.Rules(f, pair[0]) && g.Rules(f, pair[1]) {
-					g.Winner = []Faction{f}
+					g.declareWinner(f)
 					return true
 				}
 			}
