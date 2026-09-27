@@ -343,6 +343,12 @@ func (g *Game) applyVB(a Action) error {
 		p.Pawn = a.To
 		g.VBSlipped = true
 		g.Logf(VB, "slip", "Slipped to %s", a.To)
+		// Slipping into a forest ends the Vagabond's turn immediately: they take
+		// no Daylight or Evening actions.
+		if g.isForest(a.To) {
+			g.Logf(VB, "slip", "The Vagabond slipped into the %s forest; turn ends", a.To)
+			g.endTurn()
+		}
 	case "vb-move":
 		hostile := g.hostileWarriorsAt(a.To)
 		cost := 1

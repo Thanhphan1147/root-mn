@@ -164,7 +164,7 @@
 157 8.B ED pass
 158 8.D ED notify who=ED text="done crafting"
 159 8.D ED E:turmoil reason=unable
-160 8.D ED E:appoint-leader leader=ED.ldr.charismatic
+160 8.D ED E:appoint-leader leader=ED.ldr.commander
 161 8.E ED pass
 162 9.B MC pass
 163 9.D MC notify who=MC text="done crafting"

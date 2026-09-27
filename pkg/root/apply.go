@@ -229,16 +229,20 @@ func (g *Game) routeDiscard(card string) {
 	g.Discard = append(g.Discard, card)
 }
 
-// applyTakeDominance spends a matching card to take an available dominance.
+// applyTakeDominance spends a matching card to take a dominance card from the
+// public zone into hand, ending any activation it carried.
 func (g *Game) applyTakeDominance(a Action) error {
 	p := g.Players[a.Faction]
 	if !takeStr(&p.Hand, a.Card) {
 		return fmt.Errorf("card not in hand")
 	}
 	g.routeDiscard(a.Card)
-	takeStr(&g.AvailableDominance, a.Item)
+	if !takeStr(&g.AvailableDominance, a.Item) {
+		return fmt.Errorf("dominance not on the table")
+	}
+	delete(g.DominanceActive, a.Item)
 	p.Hand = append(p.Hand, a.Item)
-	g.Logf(a.Faction, "dominance", "Took available %s", cardName(a.Item))
+	g.Logf(a.Faction, "dominance", "Took %s from the table", cardName(a.Item))
 	return nil
 }
 
@@ -330,13 +334,15 @@ func consumeSuit(need *[]Suit, anyNeed *int, have Suit) bool {
 	return false
 }
 
-// applyDominance activates a dominance card (no more scoring).
+// applyDominance plays a dominance card from hand: it goes to the public
+// dominance zone (not the player's crafted area) and stops that player scoring.
 func (g *Game) applyDominance(a Action) error {
 	p := g.Players[a.Faction]
 	if !takeStr(&p.Hand, a.Card) {
 		return fmt.Errorf("card not in hand")
 	}
-	p.Crafted = append(p.Crafted, a.Card)
+	g.routeDiscard(a.Card)
+	g.DominanceActive[a.Card] = a.Faction
 	g.Logf(a.Faction, "dominance", "Activated %s; no longer scores VP", cardName(a.Card))
 	return nil
 }

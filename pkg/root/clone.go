@@ -25,6 +25,7 @@ func (g *Game) clone(withLogs bool) *Game {
 	out.Deck = cloneSlice(g.Deck)
 	out.Discard = cloneSlice(g.Discard)
 	out.AvailableDominance = cloneSlice(g.AvailableDominance)
+	out.DominanceActive = cloneMap(g.DominanceActive)
 	out.QuestDeck = cloneSlice(g.QuestDeck)
 	out.QuestAvail = cloneSlice(g.QuestAvail)
 	out.Winner = cloneSlice(g.Winner)

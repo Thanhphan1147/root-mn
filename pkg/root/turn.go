@@ -233,8 +233,10 @@ func (g *Game) endTurn() {
 
 // checkDominanceWin is evaluated at the start of a player's Birdsong.
 func (g *Game) checkDominanceWin(f Faction) bool {
-	p := g.Players[f]
-	for _, id := range p.Crafted {
+	for id, owner := range g.DominanceActive {
+		if owner != f {
+			continue
+		}
 		c, ok := Card(id)
 		if !ok || c.Kind != KindDominance {
 			continue

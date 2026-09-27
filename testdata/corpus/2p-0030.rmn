@@ -134,7 +134,7 @@
 127 6.D ED E:recruit at=[C5] card=R11
 128 6.D ED E:recruit at=[C9] card=M11
 129 6.D ED E:turmoil reason=unable
-130 6.D ED E:appoint-leader leader=ED.ldr.builder
+130 6.D ED E:appoint-leader leader=ED.ldr.commander
 131 6.E ED discard who=ED cards=R12
 132 6.E ED pass
 133 7.B MC pass
@@ -152,7 +152,7 @@
 145 7.B ED pass
 146 7.D ED notify who=ED text="done crafting"
 147 7.D ED E:turmoil reason=unable
-148 7.D ED E:appoint-leader leader=ED.ldr.charismatic
+148 7.D ED E:appoint-leader leader=ED.ldr.builder
 149 7.E ED discard who=ED cards=B06
 150 7.E ED discard who=ED cards=M09
 151 7.E ED pass
@@ -169,11 +169,11 @@
 162 8.E MC pass
 163 8.B ED E:decree-add column=RECRUIT cards=R10
 164 8.B ED pass
-165 8.D ED craft who=ED card=M08 produce=i.sword
-166 8.D ED craft who=ED card=R07 produce=i.coin
+165 8.D ED craft who=ED card=R07 produce=i.coin
+166 8.D ED craft who=ED card=M08 produce=i.sword
 167 8.D ED notify who=ED text="done crafting"
 168 8.D ED E:turmoil reason=unable
-169 8.D ED E:appoint-leader leader=ED.ldr.commander
+169 8.D ED E:appoint-leader leader=ED.ldr.charismatic
 170 8.E ED pass
 171 9.B MC pass
 172 9.D MC notify who=MC text="done crafting"
@@ -207,20 +207,3 @@
 200 10.D ED notify who=ED text="done crafting"
 201 10.D ED E:turmoil reason=unable
 202 10.D ED E:appoint-leader leader=ED.ldr.builder
-203 10.E ED discard who=ED cards=F04
-204 10.E ED discard who=ED cards=M10
-205 10.E ED pass
-206 11.B MC pass
-207 11.D MC craft who=MC card=F06 produce=i.boot
-208 11.D MC notify who=MC text="done crafting"
-209 11.D MC C:recruit who=MC at=[C11,C4,C7]
-210 11.D MC pass
-211 11.E MC discard who=MC cards=F11
-212 11.E MC pass
-213 11.B ED E:decree-add column=RECRUIT cards=R04
-214 11.B ED pass
-215 11.D ED craft who=ED card=B14 produce=i.crossbow
-216 11.D ED notify who=ED text="done crafting"
-217 11.D ED E:turmoil reason=unable
-218 11.E SYS shuffle zone=DECK reason=recycle -> before=[B13,R06,M06,R09,R13,B12,B09,M03,R11,M11,B10,R12,F13,B06,M09,R01,F10,R10,B02,B08,M13,F07,B01,M05,R08,M12,F04,M10,F11,R04] after=[B01,R13,R09,M11,R10,B09,R06,B08,M13,B06,B02,R08,M05,F11,B12,B13,M10,M06,R01,F13,M03,R04,B10,F04,R11,R12,M12,M09,F10,F07]
-219 11.D ED E:appoint-leader leader=ED.ldr.charismatic

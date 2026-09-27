@@ -124,9 +124,14 @@ type Game struct {
 	Deck               []string
 	Discard            []string
 	AvailableDominance []string
-	ItemSupply         map[string]int
-	QuestDeck          []string
-	QuestAvail         []string
+	// DominanceActive maps a played dominance card id to the faction that
+	// activated it (0 VP scoring, and its win condition is checked at their
+	// Birdsong). Played and spent dominance cards share AvailableDominance — the
+	// public dominance zone everyone can swap from.
+	DominanceActive map[string]Faction
+	ItemSupply      map[string]int
+	QuestDeck       []string
+	QuestAvail      []string
 
 	Round   int
 	Phase   string // S, B, D, E
@@ -206,12 +211,13 @@ type Game struct {
 // NewGame creates a game for the given factions (2-4, base only) on autumn.
 func NewGame(factions []Faction, first Faction, seed uint64) *Game {
 	g := &Game{
-		Map:       "autumn",
-		Relaxed:   false,
-		Clearings: map[string]*Clearing{},
-		Players:   map[Faction]*Player{},
-		Deck:      []string{},
-		RngSeed:   seed,
+		Map:             "autumn",
+		Relaxed:         false,
+		Clearings:       map[string]*Clearing{},
+		Players:         map[Faction]*Player{},
+		Deck:            []string{},
+		RngSeed:         seed,
+		DominanceActive: map[string]Faction{},
 	}
 	m := GetMap("autumn")
 	for _, id := range m.ClearingList() {
@@ -503,9 +509,8 @@ func (g *Game) Score(f Faction, n int) {
 }
 
 func (g *Game) hasDominance(f Faction) bool {
-	p := g.Players[f]
-	for _, id := range p.Crafted {
-		if c, ok := Card(id); ok && c.Kind == KindDominance {
+	for _, owner := range g.DominanceActive {
+		if owner == f {
 			return true
 		}
 	}
