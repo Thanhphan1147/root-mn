@@ -387,7 +387,7 @@
 378 8.D SYS roll -> {atk=3,def=1}
 379 8.D VB battle attacker=VB defender=MC at=C12 -> {atk=3,def=1}
 380 8.D MC remove group=MC.w at=C12
-381 8.D VB V:damage items=hammer#6
+381 8.D VB V:damage items=torch#2
 382 8.D MC notify text="skip"
 383 8.D VB V:aid target=MC card=F10 exhaust=bag#7 take=none
 384 8.D VB V:aid target=MC card=B11 exhaust=boot#1 take=none

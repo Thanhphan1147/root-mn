@@ -239,17 +239,18 @@ func (g *Game) legalVBDaylight() []Action {
 
 // coalitionTargets returns the lowest-VP non-Vagabond player(s) not already in
 // a coalition.
+// coalitionTargets returns the lowest-VP non-Vagabond player(s) the Vagabond may
+// coalition with (9.2.8): the target must have fewer VP than each other player
+// except the Vagabond. A player who has activated a dominance has no score
+// marker, so they cannot be chosen (FAQ 9.2.8).
 func (g *Game) coalitionTargets() []Faction {
 	low := 1 << 30
 	var tied []Faction
 	for _, f := range g.Order {
-		if f == VB {
+		if f == VB || g.hasDominance(f) {
 			continue
 		}
 		p := g.Players[f]
-		if p.Coalition != "" {
-			continue
-		}
 		if p.VP < low {
 			low = p.VP
 			tied = []Faction{f}

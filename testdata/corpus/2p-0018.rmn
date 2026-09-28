@@ -211,7 +211,7 @@
 204 9.B ED pass
 205 9.D ED notify who=ED text="done crafting"
 206 9.D ED E:turmoil reason=unable
-207 9.D ED E:appoint-leader leader=ED.ldr.commander
+207 9.D ED E:appoint-leader leader=ED.ldr.charismatic
 208 9.E ED discard who=ED cards=B05
 209 9.E ED discard who=ED cards=M08
 210 9.E ED pass
@@ -236,9 +236,5 @@
 229 10.B ED E:decree-add column=MOVE cards=M03
 230 10.B ED pass
 231 10.D ED notify who=ED text="done crafting"
-232 10.D ED E:move group=3ED.w from=C12 to=C4 card=VIZIER
-233 10.D ED E:move group=ED.w from=C11 to=C3 card=M03
-234 10.D SYS roll -> {atk=3,def=1}
-235 10.D ED E:battle defender=MC at=C4 card=VIZIER -> {atk=3,def=1}
-236 10.D MC remove group=MC.w at=C4
-237 10.D MC remove group=MC.b.workshop at=C4
+232 10.D ED E:turmoil reason=unable
+233 10.D ED E:appoint-leader leader=ED.ldr.commander

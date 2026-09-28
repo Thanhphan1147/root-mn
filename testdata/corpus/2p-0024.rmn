@@ -105,7 +105,7 @@
 98 5.D ED E:recruit at=[C11] card=M01
 99 5.D ED E:recruit at=[C3] card=R13
 100 5.D ED E:turmoil reason=unable
-101 5.D ED E:appoint-leader leader=ED.ldr.builder
+101 5.D ED E:appoint-leader leader=ED.ldr.charismatic
 102 5.E ED discard who=ED cards=R07
 103 5.E ED pass
 104 6.B MC pass
@@ -121,7 +121,7 @@
 114 6.B ED pass
 115 6.D ED notify who=ED text="done crafting"
 116 6.D ED E:turmoil reason=unable
-117 6.D ED E:appoint-leader leader=ED.ldr.charismatic
+117 6.D ED E:appoint-leader leader=ED.ldr.builder
 118 6.E ED discard who=ED cards=F14
 119 6.E ED pass
 120 7.B MC pass

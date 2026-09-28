@@ -121,6 +121,33 @@ func TestCoalitionWinIncludesVagabond(t *testing.T) {
 	}
 }
 
+// TestCoalitionExcludesDominancePlayer: Law 9.2.8 + FAQ — the target must be the
+// lowest-VP player, but a player who activated a dominance (no score marker)
+// cannot be chosen.
+func TestCoalitionExcludesDominancePlayer(t *testing.T) {
+	g := NewGame([]Faction{MC, ED, WA, VB}, MC, 9)
+	g.Players[VB].VP = 10
+	g.Players[MC].VP = 3
+	g.Players[ED].VP = 5
+	g.Players[WA].VP = 8
+
+	if ts := g.coalitionTargets(); len(ts) != 1 || ts[0] != MC {
+		t.Fatalf("targets = %v, want [MC]", ts)
+	}
+	// MC activates a dominance: no score marker, so not coalitionable.
+	g.DominanceActive["M02"] = MC
+	g.Players[MC].VP = 0
+	ts := g.coalitionTargets()
+	for _, f := range ts {
+		if f == MC {
+			t.Fatalf("a dominance player must not be a coalition target: %v", ts)
+		}
+	}
+	if len(ts) != 1 || ts[0] != ED {
+		t.Fatalf("targets = %v, want [ED]", ts)
+	}
+}
+
 func contains(s []string, v string) bool {
 	for _, x := range s {
 		if x == v {
