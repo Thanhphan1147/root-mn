@@ -235,4 +235,4 @@
 228 11.B ED pass
 229 11.D ED notify who=ED text="done crafting"
 230 11.D ED E:turmoil reason=unable
-231 11.D ED E:appoint-leader leader=ED.ldr.despot
+231 11.D ED E:appoint-leader leader=ED.ldr.charismatic

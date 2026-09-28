@@ -189,7 +189,7 @@
 182 7.D ED remove group=ED.w at=C8
 183 7.D MC notify text="skip"
 184 7.D ED E:turmoil reason=unable
-185 7.D ED E:appoint-leader leader=ED.ldr.charismatic
+185 7.D ED E:appoint-leader leader=ED.ldr.commander
 186 7.E ED discard who=ED cards=R03
 187 7.E ED pass
 188 8.B MC pass
@@ -204,8 +204,8 @@
 197 8.B ED pass
 198 8.D ED craft who=ED card=M07 produce=i.coin
 199 8.D ED notify who=ED text="done crafting"
-200 8.D ED E:recruit at=[C6] card=VIZIER
-201 8.D ED E:recruit at=[C6] card=F14
+200 8.D ED E:recruit at=[C6] card=F14
+201 8.D ED E:move group=ED.w from=C12 to=C9 card=VIZIER
 202 8.D SYS roll -> {atk=3,def=3}
 203 8.D ED E:battle defender=MC at=C9 card=VIZIER -> {atk=3,def=3}
 204 8.D MC remove group=MC.b.recruiter at=C9

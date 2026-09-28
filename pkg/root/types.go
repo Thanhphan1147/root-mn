@@ -436,6 +436,19 @@ func (g *Game) sympathyOnMap() int {
 	return n
 }
 
+// placeSympathy puts a sympathy token in a clearing (8.4.2 Spread / 8.6.1.IV
+// Organize). The token is a real Token so it counts as a piece and can be
+// removed (in battle or by Strike/Favor), triggering Outrage (8.2.6);
+// cl.Sympathy mirrors it for the many "is this clearing sympathetic?" checks.
+func (g *Game) placeSympathy(c string) {
+	cl := g.Clearings[c]
+	if cl == nil || cl.Sympathy == WA {
+		return
+	}
+	cl.Sympathy = WA
+	cl.Tokens = append(cl.Tokens, Token{WA, "sympathy"})
+}
+
 // DayStage reports the current faction's Daylight sub-step ("craft" or
 // "actions"/"decree"), used by the client to explain why actions are limited.
 func (g *Game) DayStage() string {

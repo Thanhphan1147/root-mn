@@ -353,10 +353,9 @@ func (g *Game) applyWA(a Action) error {
 		g.Logf(WA, "revolt", "Revolt at %s spending %s: base placed, %d enemy piece(s) removed (+%d VP)",
 			a.Clearing, strings.Join(a.Cards, "+"), vp, vp)
 	case "spread":
-		cl := g.Clearings[a.Clearing]
 		k := g.sympathyOnMap() + 1
 		g.spendSpecific(p, a.Cards)
-		cl.Sympathy = WA
+		g.placeSympathy(a.Clearing)
 		g.Score(WA, SympathyVP[k])
 		g.Logf(WA, "sympathy", "Spread sympathy at %s spending %s (+%d VP)",
 			a.Clearing, strings.Join(a.Cards, "+"), SympathyVP[k])
@@ -373,7 +372,7 @@ func (g *Game) applyWA(a Action) error {
 		}
 	case "organize":
 		g.removeWarrior(WA, a.Clearing, 1)
-		g.Clearings[a.Clearing].Sympathy = WA
+		g.placeSympathy(a.Clearing)
 		k := g.sympathyOnMap()
 		if k > 10 {
 			k = 10
